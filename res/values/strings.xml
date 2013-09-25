@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Connect 64 by James Twyford</string>
+    <string name="action_settings">Settings</string>
+
+    <string-array name="ranges">
+        <item>1 to 16</item>
+        <item>17 to 32</item>
+        <item>33 to 48</item>
+        <item>49 to 64</item>
+    </string-array>
+
+</resources>

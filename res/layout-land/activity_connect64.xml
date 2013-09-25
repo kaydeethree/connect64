@@ -1,0 +1,389 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentLeft="true"
+    android:layout_alignParentTop="true" >
+
+    <TableLayout
+        android:id="@+id/connect64"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|center_horizontal" >
+
+        <TableRow
+            android:id="@+id/tableRow1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button1"
+                style="@style/MarginlessButton"
+                android:tag="1" />
+
+            <Button
+                android:id="@+id/button2"
+                style="@style/MarginlessButton"
+                android:tag="2" />
+
+            <Button
+                android:id="@+id/button3"
+                style="@style/MarginlessButton"
+                android:tag="3" />
+
+            <Button
+                android:id="@+id/button4"
+                style="@style/MarginlessButton"
+                android:tag="4" />
+
+            <Button
+                android:id="@+id/button5"
+                style="@style/MarginlessButton"
+                android:tag="5" />
+
+            <Button
+                android:id="@+id/button6"
+                style="@style/MarginlessButton"
+                android:tag="6" />
+
+            <Button
+                android:id="@+id/button7"
+                style="@style/MarginlessButton"
+                android:tag="7" />
+
+            <Button
+                android:id="@+id/button8"
+                style="@style/MarginlessButton"
+                android:tag="8" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button9"
+                style="@style/MarginlessButton"
+                android:tag="9" />
+
+            <Button
+                android:id="@+id/button10"
+                style="@style/MarginlessButton"
+                android:tag="10" />
+
+            <Button
+                android:id="@+id/button11"
+                style="@style/MarginlessButton"
+                android:tag="11" />
+
+            <Button
+                android:id="@+id/button12"
+                style="@style/MarginlessButton"
+                android:tag="12" />
+
+            <Button
+                android:id="@+id/button13"
+                style="@style/MarginlessButton"
+                android:tag="13" />
+
+            <Button
+                android:id="@+id/button14"
+                style="@style/MarginlessButton"
+                android:tag="14" />
+
+            <Button
+                android:id="@+id/button15"
+                style="@style/MarginlessButton"
+                android:tag="15" />
+
+            <Button
+                android:id="@+id/button16"
+                style="@style/MarginlessButton"
+                android:tag="16" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button17"
+                style="@style/MarginlessButton"
+                android:tag="17" />
+
+            <Button
+                android:id="@+id/button18"
+                style="@style/MarginlessButton"
+                android:tag="18" />
+
+            <Button
+                android:id="@+id/button19"
+                style="@style/MarginlessButton"
+                android:tag="19" />
+
+            <Button
+                android:id="@+id/button20"
+                style="@style/MarginlessButton"
+                android:tag="20" />
+
+            <Button
+                android:id="@+id/button21"
+                style="@style/MarginlessButton"
+                android:tag="21" />
+
+            <Button
+                android:id="@+id/button22"
+                style="@style/MarginlessButton"
+                android:tag="22" />
+
+            <Button
+                android:id="@+id/button23"
+                style="@style/MarginlessButton"
+                android:tag="23" />
+
+            <Button
+                android:id="@+id/button24"
+                style="@style/MarginlessButton"
+                android:tag="24" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow4"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button25"
+                style="@style/MarginlessButton"
+                android:tag="25" />
+
+            <Button
+                android:id="@+id/button26"
+                style="@style/MarginlessButton"
+                android:tag="26" />
+
+            <Button
+                android:id="@+id/button27"
+                style="@style/MarginlessButton"
+                android:tag="27" />
+
+            <Button
+                android:id="@+id/button28"
+                style="@style/MarginlessButton"
+                android:tag="28" />
+
+            <Button
+                android:id="@+id/button29"
+                style="@style/MarginlessButton"
+                android:tag="29" />
+
+            <Button
+                android:id="@+id/button30"
+                style="@style/MarginlessButton"
+                android:tag="30" />
+
+            <Button
+                android:id="@+id/button31"
+                style="@style/MarginlessButton"
+                android:tag="31" />
+
+            <Button
+                android:id="@+id/button32"
+                style="@style/MarginlessButton"
+                android:tag="32" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow5"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button33"
+                style="@style/MarginlessButton"
+                android:tag="33" />
+
+            <Button
+                android:id="@+id/button34"
+                style="@style/MarginlessButton"
+                android:tag="34" />
+
+            <Button
+                android:id="@+id/button35"
+                style="@style/MarginlessButton"
+                android:tag="35" />
+
+            <Button
+                android:id="@+id/button36"
+                style="@style/MarginlessButton"
+                android:tag="36" />
+
+            <Button
+                android:id="@+id/button37"
+                style="@style/MarginlessButton"
+                android:tag="37" />
+
+            <Button
+                android:id="@+id/button38"
+                style="@style/MarginlessButton"
+                android:tag="38" />
+
+            <Button
+                android:id="@+id/button39"
+                style="@style/MarginlessButton"
+                android:tag="39" />
+
+            <Button
+                android:id="@+id/button40"
+                style="@style/MarginlessButton"
+                android:tag="40" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow6"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button41"
+                style="@style/MarginlessButton"
+                android:tag="41" />
+
+            <Button
+                android:id="@+id/button42"
+                style="@style/MarginlessButton"
+                android:tag="42" />
+
+            <Button
+                android:id="@+id/button43"
+                style="@style/MarginlessButton"
+                android:tag="43" />
+
+            <Button
+                android:id="@+id/button44"
+                style="@style/MarginlessButton"
+                android:tag="44" />
+
+            <Button
+                android:id="@+id/button45"
+                style="@style/MarginlessButton"
+                android:tag="45" />
+
+            <Button
+                android:id="@+id/button46"
+                style="@style/MarginlessButton"
+                android:tag="46" />
+
+            <Button
+                android:id="@+id/button47"
+                style="@style/MarginlessButton"
+                android:tag="47" />
+
+            <Button
+                android:id="@+id/button48"
+                style="@style/MarginlessButton"
+                android:tag="48" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow7"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button49"
+                style="@style/MarginlessButton"
+                android:tag="49" />
+
+            <Button
+                android:id="@+id/button50"
+                style="@style/MarginlessButton"
+                android:tag="50" />
+
+            <Button
+                android:id="@+id/button51"
+                style="@style/MarginlessButton"
+                android:tag="51" />
+
+            <Button
+                android:id="@+id/button52"
+                style="@style/MarginlessButton"
+                android:tag="52" />
+
+            <Button
+                android:id="@+id/button53"
+                style="@style/MarginlessButton"
+                android:tag="53" />
+
+            <Button
+                android:id="@+id/button54"
+                style="@style/MarginlessButton"
+                android:tag="54" />
+
+            <Button
+                android:id="@+id/button55"
+                style="@style/MarginlessButton"
+                android:tag="55" />
+
+            <Button
+                android:id="@+id/button56"
+                style="@style/MarginlessButton"
+                android:tag="56" />
+        </TableRow>
+
+        <TableRow
+            android:id="@+id/tableRow8"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" >
+
+            <Button
+                android:id="@+id/button57"
+                style="@style/MarginlessButton"
+                android:tag="57" />
+
+            <Button
+                android:id="@+id/button58"
+                style="@style/MarginlessButton"
+                android:tag="58" />
+
+            <Button
+                android:id="@+id/button59"
+                style="@style/MarginlessButton"
+                android:tag="59" />
+
+            <Button
+                android:id="@+id/button60"
+                style="@style/MarginlessButton"
+                android:tag="60" />
+
+            <Button
+                android:id="@+id/button61"
+                style="@style/MarginlessButton"
+                android:tag="61" />
+
+            <Button
+                android:id="@+id/button62"
+                style="@style/MarginlessButton"
+                android:tag="62" />
+
+            <Button
+                android:id="@+id/button63"
+                style="@style/MarginlessButton"
+                android:tag="63" />
+
+            <Button
+                android:id="@+id/button64"
+                style="@style/MarginlessButton"
+                android:tag="64" />
+        </TableRow>
+    </TableLayout>
+
+    <include
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        layout="@layout/input_buttons" />
+
+</LinearLayout>
