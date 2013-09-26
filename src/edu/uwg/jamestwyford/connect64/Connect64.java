@@ -18,11 +18,9 @@ import android.widget.TableLayout;
  * @version assignment3
  */
 public class Connect64 extends Activity {
-	/**
-	 * debug id tag.
-	 */
-	public static final String LOG_TAG = "C64";
+	private static final String LOG_TAG = "C64";
 	private TableLayout grid;
+	private Spinner rangeSpinner;
 	private String clickedButton = "";
 
 	/**
@@ -60,12 +58,20 @@ public class Connect64 extends Activity {
 		setContentView(R.layout.activity_connect64);
 		this.grid = (TableLayout) findViewById(R.id.connect64);
 
-		Spinner rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
+		setupRangeSpinner();
+
+		int[] positions = { 1, 8, 64, 57, 15, 19, 46, 36 };
+		int[] values = { 1, 8, 15, 22, 34, 49, 55, 64 };
+		initializePuzzle(positions, values);
+	}
+
+	private void setupRangeSpinner() {
+		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
 				this, R.array.ranges, android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		rangeSpinner.setAdapter(adapter);
-		rangeSpinner
+		this.rangeSpinner.setAdapter(adapter);
+		this.rangeSpinner
 				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
 					@Override
 					public void onItemSelected(AdapterView<?> parent,
@@ -77,8 +83,6 @@ public class Connect64 extends Activity {
 					public void onNothingSelected(AdapterView<?> parent) {
 					}
 				});
-		
-		initializePuzzle();
 	}
 
 	private void setupInputButtons(int range) {
@@ -89,16 +93,28 @@ public class Connect64 extends Activity {
 		}
 	}
 
-	private void initializePuzzle() {
-		int[] positions = { 1, 8, 64, 57, 15, 19, 46, 36 };
-		int[] values    = { 1, 8, 15, 22, 34, 49, 55, 64 };
-
+	private void initializePuzzle(int[] positions, int[] values) {
+		if (positions.length != values.length) {
+			throw new IllegalArgumentException(
+					"positions.length != values.length");
+		}
+		
+		resetPuzzle();
 		for (int i = 0; i < positions.length; i++) {
-			Log.d(LOG_TAG, "Position: " + positions[i] + " Value: " + values[i]);
-			Button button = ((Button) this.grid.findViewWithTag("" + positions[i]));
+			Button button = (Button) this.grid.findViewWithTag(""
+					+ positions[i]);
 			button.setText("" + values[i]);
 			button.setEnabled(false);
 		}
 	}
 
+	private void resetPuzzle() {
+		this.rangeSpinner.setSelection(0);
+		
+		for (int i = 1; i <= 64; i++) {
+			Button button = (Button) this.grid.findViewWithTag("" + i);
+			button.setText("");
+			button.setEnabled(true);
+		}
+	}
 }
