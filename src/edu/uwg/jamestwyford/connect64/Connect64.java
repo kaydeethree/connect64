@@ -93,6 +93,19 @@ public class Connect64 extends Activity {
 		}
 	}
 
+	/**
+	 * Resets the grid and loads values into the specified positions.<br>
+	 * <br>
+	 * <b>NOTE:</b> The 8x8 game grid uses subscripts starting at 11 in the
+	 * top-left corner and ending at 88 in the bottom-right. So, row 3 column 4
+	 * is position 34.
+	 * 
+	 * @param positions
+	 *            an integer array with values from 11-88 (but no 9s). Does not
+	 *            need to be sorted.
+	 * @param values
+	 *            an equal-length integer array with values from 1-64.
+	 */
 	private void initializePuzzle(int[] positions, int[] values) {
 		if (positions.length != values.length) {
 			throw new IllegalArgumentException(
@@ -101,7 +114,8 @@ public class Connect64 extends Activity {
 
 		resetPuzzle();
 		for (int i = 0; i < positions.length; i++) {
-			Log.d(LOG_TAG, "setting position: g" + positions[i] + " value: " + values[i]);
+			Log.d(LOG_TAG, "setting position: g" + positions[i] + " value: "
+					+ values[i]);
 			Button button = (Button) this.grid.findViewWithTag("g"
 					+ positions[i]);
 			button.setText("" + values[i]);
