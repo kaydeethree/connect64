@@ -18,13 +18,30 @@ import android.widget.TableLayout;
  * @version assignment3
  */
 public class Connect64 extends Activity {
-	public final static String LOG_TAG = "C64";
+	/**
+	 * debug id tag.
+	 */
+	public static final String LOG_TAG = "C64";
 	private TableLayout grid;
+	private String clickedButton = "";
+	
+	/**
+	 * Input handler for the 16 input buttons.
+	 * @param view the button clicked
+	 */
+	public void inputButtonClick(View view) {
+		Button button = (Button) view;
+		this.clickedButton = button.getText().toString();
+	}
 
+	/**
+	 * Input handler for the 64 game grid buttons.
+	 * @param view the button clicked
+	 */
 	public void gameButtonClick(View view) {
 		Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag());
-		button.setText(button.getTag().toString());
+		button.setText(this.clickedButton);
 	}
 
 	@Override
@@ -38,12 +55,12 @@ public class Connect64 extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connect64);
 
-		grid = (TableLayout) findViewById(R.id.connect64);
+		this.grid = (TableLayout) findViewById(R.id.connect64);
 		((Button) findViewById(R.id.button1)).setText("1");
 		((Button) findViewById(R.id.button11)).setText("11");
-		((Button) grid.findViewWithTag("5")).setText("5");
-		((Button) grid.findViewWithTag("16")).setText("16");
-		((Button) grid.findViewWithTag("60")).setText("60");
+		((Button) this.grid.findViewWithTag("5")).setText("5");
+		((Button) this.grid.findViewWithTag("16")).setText("16");
+		((Button) this.grid.findViewWithTag("60")).setText("60");
 
 		Spinner rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(

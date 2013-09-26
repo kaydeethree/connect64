@@ -22,30 +22,22 @@
 
         <Button
             android:id="@+id/input1"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in1" />
 
         <Button
             android:id="@+id/input2"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in2" />
 
         <Button
             android:id="@+id/input3"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in3" />
 
         <Button
             android:id="@+id/input4"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in4" />
     </TableRow>
 
@@ -56,30 +48,22 @@
 
         <Button
             android:id="@+id/input5"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in5" />
 
         <Button
             android:id="@+id/input6"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in6" />
 
         <Button
             android:id="@+id/input7"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in7" />
 
         <Button
             android:id="@+id/input8"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in8" />
     </TableRow>
 
@@ -90,30 +74,22 @@
 
         <Button
             android:id="@+id/input9"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in9" />
 
         <Button
             android:id="@+id/input10"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in10" />
 
         <Button
             android:id="@+id/input11"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in11" />
 
         <Button
             android:id="@+id/input12"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in12" />
     </TableRow>
 
@@ -124,30 +100,22 @@
 
         <Button
             android:id="@+id/input13"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in13" />
 
         <Button
             android:id="@+id/input14"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in14" />
 
         <Button
             android:id="@+id/input15"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+              style="@style/InputButton"
             android:tag="in15" />
 
         <Button
             android:id="@+id/input16"
-            style="?android:attr/buttonStyleSmall"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            style="@style/InputButton"
             android:tag="in16" />
     </TableRow>
 
