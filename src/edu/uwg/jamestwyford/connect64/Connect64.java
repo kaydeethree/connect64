@@ -97,6 +97,7 @@ public class Connect64 extends Activity {
 			Log.d(LOG_TAG, "Position: " + positions[i] + " Value: " + values[i]);
 			Button button = ((Button) this.grid.findViewWithTag("" + positions[i]));
 			button.setText("" + values[i]);
+			button.setEnabled(false);
 		}
 	}
 
