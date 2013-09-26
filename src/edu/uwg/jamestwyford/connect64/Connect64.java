@@ -60,7 +60,7 @@ public class Connect64 extends Activity {
 
 		setupRangeSpinner();
 
-		int[] positions = { 1, 8, 64, 57, 15, 19, 46, 36 };
+		int[] positions = { 11, 18, 88, 81, 27, 33, 66, 54 };
 		int[] values = { 1, 8, 15, 22, 34, 49, 55, 64 };
 		initializePuzzle(positions, values);
 	}
@@ -98,10 +98,11 @@ public class Connect64 extends Activity {
 			throw new IllegalArgumentException(
 					"positions.length != values.length");
 		}
-		
+
 		resetPuzzle();
 		for (int i = 0; i < positions.length; i++) {
-			Button button = (Button) this.grid.findViewWithTag(""
+			Log.d(LOG_TAG, "setting position: g" + positions[i] + " value: " + values[i]);
+			Button button = (Button) this.grid.findViewWithTag("g"
 					+ positions[i]);
 			button.setText("" + values[i]);
 			button.setEnabled(false);
@@ -110,11 +111,14 @@ public class Connect64 extends Activity {
 
 	private void resetPuzzle() {
 		this.rangeSpinner.setSelection(0);
-		
-		for (int i = 1; i <= 64; i++) {
-			Button button = (Button) this.grid.findViewWithTag("" + i);
-			button.setText("");
-			button.setEnabled(true);
+
+		for (int i = 1; i <= 8; i++) {
+			for (int j = 1; j <= 8; j++) {
+				Log.d(LOG_TAG, "resetting position: g" + i + j);
+				Button button = (Button) this.grid.findViewWithTag("g" + i + j);
+				button.setText("");
+				button.setEnabled(true);
+			}
 		}
 	}
 }
