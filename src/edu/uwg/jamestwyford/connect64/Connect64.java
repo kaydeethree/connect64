@@ -24,10 +24,12 @@ public class Connect64 extends Activity {
 	public static final String LOG_TAG = "C64";
 	private TableLayout grid;
 	private String clickedButton = "";
-	
+
 	/**
 	 * Input handler for the 16 input buttons.
-	 * @param view the button clicked
+	 * 
+	 * @param view
+	 *            the button clicked
 	 */
 	public void inputButtonClick(View view) {
 		Button button = (Button) view;
@@ -36,7 +38,9 @@ public class Connect64 extends Activity {
 
 	/**
 	 * Input handler for the 64 game grid buttons.
-	 * @param view the button clicked
+	 * 
+	 * @param view
+	 *            the button clicked
 	 */
 	public void gameButtonClick(View view) {
 		Button button = (Button) view;
@@ -54,13 +58,7 @@ public class Connect64 extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connect64);
-
 		this.grid = (TableLayout) findViewById(R.id.connect64);
-		((Button) findViewById(R.id.button1)).setText("1");
-		((Button) findViewById(R.id.button11)).setText("11");
-		((Button) this.grid.findViewWithTag("5")).setText("5");
-		((Button) this.grid.findViewWithTag("16")).setText("16");
-		((Button) this.grid.findViewWithTag("60")).setText("60");
 
 		Spinner rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
@@ -74,10 +72,13 @@ public class Connect64 extends Activity {
 							View view, int pos, long id) {
 						setupInputButtons(pos);
 					}
+
 					@Override
 					public void onNothingSelected(AdapterView<?> parent) {
 					}
 				});
+		
+		initializePuzzle();
 	}
 
 	private void setupInputButtons(int range) {
@@ -85,6 +86,17 @@ public class Connect64 extends Activity {
 		for (int i = 1; i <= 16; i++) {
 			((Button) inputGrid.findViewWithTag("in" + i)).setText(""
 					+ (16 * range + i));
+		}
+	}
+
+	private void initializePuzzle() {
+		int[] positions = { 1, 8, 10, 17, 18, 22, 27, 28 };
+		int[] values = { 1, 2, 3, 4, 5, 6, 7, 8 };
+
+		for (int i = 0; i < positions.length; i++) {
+			Log.d(LOG_TAG, "Position: " + positions[i] + " Value: " + values[i]);
+			Button button = ((Button) this.grid.findViewWithTag("" + positions[i]));
+			button.setText("" + values[i]);
 		}
 	}
 
