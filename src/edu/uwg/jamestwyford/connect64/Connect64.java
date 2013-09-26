@@ -90,8 +90,8 @@ public class Connect64 extends Activity {
 	}
 
 	private void initializePuzzle() {
-		int[] positions = { 1, 8, 10, 15, 19, 22, 28, 29 };
-		int[] values = { 1, 2, 3, 4, 5, 6, 7, 8 };
+		int[] positions = { 1, 8, 64, 57, 15, 19, 46, 36 };
+		int[] values    = { 1, 8, 15, 22, 34, 49, 55, 64 };
 
 		for (int i = 0; i < positions.length; i++) {
 			Log.d(LOG_TAG, "Position: " + positions[i] + " Value: " + values[i]);
