@@ -21,46 +21,53 @@ import android.widget.Toast;
  */
 public class Connect64 extends Activity {
 	private static final String LOG_TAG = "C64";
-	private static final int NO_INPUT = -1;
+	// keep negative so hasNext() and hasPrev() will always return false
+	private static final int BAD_VALUE = -1;
+
 	private TableLayout grid;
 	private TableLayout inputGrid;
 	private Spinner rangeSpinner;
-	private int input;
+
+	private int range;
 	private int[] initialPositions;
 	private int[] initialValues;
 	private SparseIntArray gridState;
-	private int range;
+
+	private int input;
 
 	/**
-	 * Input handler for the 64 game grid buttons.
+	 * Input handler for the 64 game grid buttons. If <code>input</code> is
+	 * valid, sets the clicked button to that value. Clears the button
+	 * otherwise. If the grid is full, calls <code>checkWinCondition()</code>.
 	 * 
 	 * @param view
 	 *            the button clicked
 	 */
 	public void gameButtonClick(final View view) {
 		final Button button = (Button) view;
-		Log.d(LOG_TAG, "" + button.getTag());
+		Log.d(LOG_TAG, "" + button.getTag() + " input: " + this.input);
 
-		if (this.input > 0) {
+		if (this.input != BAD_VALUE) {
 			setText(button);
 		} else {
 			clearText(button);
 		}
 		configureInputButtons();
+
 		if (this.gridState.size() == 64) {
 			checkWinCondition();
 		}
 	}
 
 	/**
-	 * Input handler for the 16 input buttons.
+	 * Input handler for the 16 input buttons. Sets <code>input</code> to the
+	 * value of the button.
 	 * 
 	 * @param view
 	 *            the button clicked
 	 */
 	public void inputButtonClick(final View view) {
-		final Button button = (Button) view;
-		this.input = Integer.valueOf(button.getText().toString());
+		this.input = getValue((Button) view);
 	}
 
 	@Override
@@ -75,54 +82,63 @@ public class Connect64 extends Activity {
 		setContentView(R.layout.activity_connect64);
 		this.grid = (TableLayout) findViewById(R.id.connect64);
 		this.gridState = new SparseIntArray(64);
-		this.input = NO_INPUT;
+		this.input = BAD_VALUE;
 
 		setupRangeSpinner();
 
-		// final int[] testPositions = new int[] { 11, 18, 88, 81, 27, 33, 66,
-		// 54 };
-		// final int[] testValues = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
-
-		final int[] testPositions = new int[] { 12, 13, 14, 15, 16, 17, 18, 28,
-				27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38, 48,
-				47, 46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58, 68,
-				67, 66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78, 88,
-				87, 86, 85, 84, 83, 82 };
-
-		final int[] testValues = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-				12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
-				28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
-				44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-				60, 61, 62, 63 };
-
-		resetAndInitializePuzzle(testPositions, testValues);
+		// final int[] testPos = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
+		// final int[] testVals = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
+		final int[] testPos = new int[] { 12, 13, 14, 15, 16, 17, 18, 28, 27,
+				26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38, 48, 47,
+				46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58, 68, 67,
+				66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78, 88, 87,
+				86, 85, 84, 83, 82 };
+		final int[] testVals = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+				13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+				29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,
+				45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
+				61, 62, 63 };
+		resetAndInitialize(testPos, testVals);
 	}
 
 	/**
-	 * overall board win condition check. Board must be full and all 64 button
-	 * neighbors must be valid.
+	 * Overall board win condition check. Board must be full and all 64 spots
+	 * must have a valid higher and lower neighor to fulfill the win condition.
+	 * If the player has won, switch to the next board.
 	 */
 	private void checkWinCondition() {
-		final Toast toast;
+		Toast toast = null;
+		boolean boardValid = isBoardCorrect();
+		if (boardValid) {
+			toast = Toast.makeText(this, R.string.youWin, Toast.LENGTH_LONG);
+			// TODO reset grid and load next board
 
-		if (isBoardCorrect()) {
-			toast = Toast.makeText(this, "Winner!", Toast.LENGTH_LONG);
-		} else {
-			toast = Toast.makeText(this, "Loser!", Toast.LENGTH_LONG);
+		} else if (this.gridState.size() == 64 && !boardValid) {
+			toast = Toast.makeText(this, R.string.youLose, Toast.LENGTH_LONG);
 		}
-		toast.show();
+		if (toast != null) {
+			toast.show();
+		}
 	}
 
+	/**
+	 * Clears the text of the specified button. Sets <code>input</code> to the
+	 * removed value so it may be quickly set elsewhere.
+	 * 
+	 * @param button
+	 *            the button to clear text from
+	 */
 	private void clearText(final Button button) {
 		final int pos = getTag(button);
 		this.gridState.delete(pos);
+		this.input = getValue(button);
 		button.setText("");
 	}
 
 	/**
-	 * Sets the text on the input buttons to the current range, and sets the
-	 * enabled state for each button as appropriate. Buttons whose freshly-set
-	 * text appears on the game grid will be disabled.
+	 * Sets the text on the input buttons based on the current
+	 * <code>range</code>. Buttons whose freshly-set text appears on the game
+	 * grid will be disabled.
 	 */
 	private void configureInputButtons() {
 		this.inputGrid = (TableLayout) findViewById(R.id.inputButtons);
@@ -149,18 +165,19 @@ public class Connect64 extends Activity {
 	}
 
 	/**
-	 * returns the value as an integer of the button or -2 if empty/null
+	 * Returns the value as an integer of the button or <code>BAD_VALUE</code>
+	 * if empty/null
 	 * 
 	 * @param button
 	 *            the button to get the value of
-	 * @return the integer value of the button or -2 if empty/null
+	 * @return the integer value of the button or <code>BAD_VALUE</code> if
+	 *         empty/null
 	 */
 	private int getValue(final Button button) {
-		final int invalidValue = -2;
 		try {
 			return Integer.valueOf(button.getText().toString());
 		} catch (final NumberFormatException ex) {
-			return invalidValue;
+			return BAD_VALUE;
 		}
 	}
 
@@ -174,9 +191,11 @@ public class Connect64 extends Activity {
 	 */
 	private boolean hasCorrectNeighbors(final Button button) {
 		final int tag = getTag(button);
+		final int value = getValue(button);
+
+		// XXX hack!
 		final int x = tag / 10;
 		final int y = tag % 10;
-		final int value = getValue(button);
 
 		// TODO come up with more efficient solution
 		final Button left = getButton("" + (x - 1) + y);
@@ -208,6 +227,13 @@ public class Connect64 extends Activity {
 		return getValue(otherButton) == thisValue - 1;
 	}
 
+	/**
+	 * Win-condition checking at the board level. Iterates through all the
+	 * buttons to make sure each one isn't empty and that it has valid
+	 * neighbors.
+	 * 
+	 * @return true if no button is empty or has all invalid neighbors.
+	 */
 	private boolean isBoardCorrect() {
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
@@ -221,18 +247,19 @@ public class Connect64 extends Activity {
 	}
 
 	private boolean isEmpty(final Button button) {
-		if (button == null || button.getText().equals("")) {
+		if (getValue(button) == BAD_VALUE) {
 			return true;
 		}
 		return false;
 	}
 
 	/**
-	 * Resets the grid and loads values into the specified positions.
+	 * Resets the game grid and loads values into the specified positions.
 	 * <p>
-	 * <b>NOTE:</b> The 8x8 game grid uses subscripts starting at 11 in the
-	 * top-left corner and ending at 88 in the bottom-right. So, row 3 column 4
-	 * is position 34.
+	 * <b>NOTE:</b> The 8x8 game grid uses subscripts starting at
+	 * <code>11</code> in the top-left corner and ending at <code>88</code> in
+	 * the bottom-right. So, the button in the third row and the fourth column
+	 * has position <code>34</code> and has the same string as its tag.
 	 * 
 	 * @param positions
 	 *            an integer array with values from 11-88 (but no 0s or 9s).
@@ -240,8 +267,7 @@ public class Connect64 extends Activity {
 	 * @param values
 	 *            an equal-length integer array with values from 1-64.
 	 */
-	private void resetAndInitializePuzzle(final int[] positions,
-			final int[] values) {
+	private void resetAndInitialize(final int[] positions, final int[] values) {
 		if (positions.length != values.length) {
 			throw new IllegalArgumentException(
 					"positions.length != values.length");
@@ -270,17 +296,23 @@ public class Connect64 extends Activity {
 		this.range = pos;
 	}
 
+	/**
+	 * Sets the text of the specified button to the value of <code>input</code>.
+	 * Analogously to <code>clearText()</code>, if a value already exists at the
+	 * specified button, sets <code>input</code> to that value.
+	 * 
+	 * @param button
+	 *            the button to set the text for.
+	 */
 	private void setText(final Button button) {
-		if (this.input < 1) {
+		if (this.input == BAD_VALUE) {
 			return;
 		}
-		if (getValue(button) > 0) {
-			clearText(button);
-		}
-		button.setText("" + this.input);
 		final int pos = getTag(button);
+		int tempInput = getValue(button);
+		button.setText("" + this.input);
 		this.gridState.put(pos, this.input);
-		this.input = NO_INPUT;
+		this.input = tempInput;
 	}
 
 	private void setupRangeSpinner() {
