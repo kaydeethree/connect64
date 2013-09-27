@@ -14,7 +14,7 @@ import android.widget.TableLayout;
 import android.widget.Toast;
 
 /**
- * Activity for the 8x8 game grid.
+ * Activity for the 8x8 game board.
  * 
  * @author jtwyford
  * @version assignment3
@@ -24,33 +24,33 @@ public class Connect64 extends Activity {
 	// keep negative so hasNext() and hasPrev() will always return false
 	private static final int BAD_VALUE = -1;
 
-	private TableLayout grid;
-	private TableLayout inputGrid;
+	private TableLayout gameBoard;
+	private TableLayout inputButtons;
 	private Spinner rangeSpinner;
 
 	private int range;
 	private int[] initialPositions;
 	private int[] initialValues;
-	private SparseIntArray gridState;
+	private SparseIntArray boardState;
 
 	private int input;
 
 	/**
-	 * Input handler for the 64 game grid buttons. If <code>input</code> is
+	 * Input handler for the 64 game board buttons. If <code>input</code> is
 	 * valid, sets the clicked button to that value. Clears the button
-	 * otherwise. If the grid is full, calls <code>checkWinCondition()</code>.
+	 * otherwise. If the board is full, calls <code>checkWinCondition()</code>.
 	 * 
 	 * @param view
 	 *            the button clicked
 	 */
 	public void gameButtonClick(final View view) {
 		final Button button = (Button) view;
-		Log.d(LOG_TAG, "" + button.getTag() + " input: " + this.input);
+		Log.d(LOG_TAG, "button: " + button.getTag() + " input: " + this.input);
 
 		setText(button);
-		configureInputButtons();
+		setupInputButtons();
 
-		if (this.gridState.size() == 64) {
+		if (this.boardState.size() == 64) {
 			checkWinCondition();
 		}
 	}
@@ -76,10 +76,10 @@ public class Connect64 extends Activity {
 	protected void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connect64);
-		this.grid = (TableLayout) findViewById(R.id.connect64);
-		this.gridState = new SparseIntArray(64);
+		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
+		this.inputButtons = (TableLayout) findViewById(R.id.inputButtons);
+		this.boardState = new SparseIntArray(64);
 		this.input = BAD_VALUE;
-
 		setupRangeSpinner();
 
 		// final int[] testPos = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
@@ -98,8 +98,8 @@ public class Connect64 extends Activity {
 	}
 
 	/**
-	 * Overall board win condition check. Board must be full and all 64 spots
-	 * must have a valid higher and lower neighor to fulfill the win condition.
+	 * Overall board win condition check. Board must be full and all Buttons
+	 * must have a valid higher and lower neighbor to fulfill the win condition.
 	 * If the player has won, switch to the next board.
 	 */
 	private void checkWinCondition() {
@@ -107,9 +107,9 @@ public class Connect64 extends Activity {
 		final boolean boardValid = isBoardCorrect();
 		if (boardValid) {
 			toast = Toast.makeText(this, R.string.youWin, Toast.LENGTH_LONG);
-			// TODO reset grid and load next board
+			// TODO reset board and load next board
 
-		} else if (this.gridState.size() == 64 && !boardValid) {
+		} else if (this.boardState.size() == 64 && !boardValid) {
 			toast = Toast.makeText(this, R.string.youLose, Toast.LENGTH_LONG);
 		}
 		if (toast != null) {
@@ -117,38 +117,16 @@ public class Connect64 extends Activity {
 		}
 	}
 
-	/**
-	 * Sets the text on the input buttons based on the current
-	 * <code>range</code>. Buttons whose freshly-set text appears on the game
-	 * grid will be disabled.
-	 */
-	private void configureInputButtons() {
-		this.inputGrid = (TableLayout) findViewById(R.id.inputButtons);
-		int buttonVal;
-		Button inputButton;
-		for (int i = 1; i <= 16; i++) {
-			buttonVal = 16 * this.range + i;
-			inputButton = (Button) this.inputGrid.findViewWithTag("in" + i);
-			inputButton.setText(String.valueOf(buttonVal));
-			if (this.gridState.indexOfValue(buttonVal) >= 0) {
-				inputButton.setEnabled(false);
-			} else {
-				inputButton.setEnabled(true);
-			}
-		}
-	}
-
 	private Button getButton(final String tag) {
-		return (Button) this.grid.findViewWithTag(tag);
+		return (Button) this.gameBoard.findViewWithTag(tag);
 	}
 
-	private Integer getTag(final Button button) {
+	private int getTag(final Button button) {
 		return Integer.valueOf(button.getTag().toString());
 	}
 
 	/**
-	 * Returns the value as an integer of the button or <code>BAD_VALUE</code>
-	 * if empty/null
+	 * Returns the value of the Button as an integer.
 	 * 
 	 * @param button
 	 *            the button to get the value of
@@ -163,15 +141,29 @@ public class Connect64 extends Activity {
 		}
 	}
 
+	private boolean hasNext(final int thisValue, final Button otherButton) {
+		if (otherButton == null) {
+			return false;
+		}
+		return thisValue == getValue(otherButton) - 1;
+	}
+
+	private boolean hasPrev(final int thisValue, final Button otherButton) {
+		if (otherButton == null) {
+			return false;
+		}
+		return thisValue == getValue(otherButton) + 1;
+	}
+
 	/**
-	 * Win-condition checking at the button level. Looks for a neighbor with
+	 * Win-condition checking at the Button level. Looks for a neighbor with
 	 * value+1 and a neighbor with value-1.
 	 * 
 	 * @param button
 	 *            the button to check against
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
-	private boolean hasCorrectNeighbors(final Button button) {
+	private boolean hasValidNeighbors(final Button button) {
 		final int tag = getTag(button);
 		final int value = getValue(button);
 
@@ -179,7 +171,7 @@ public class Connect64 extends Activity {
 		final int x = tag / 10;
 		final int y = tag % 10;
 
-		// TODO come up with more efficient solution
+		// TODO WTB more efficient solution
 		final Button left = getButton("" + (x - 1) + y);
 		final Button right = getButton("" + (x + 1) + y);
 		final Button up = getButton("" + x + (y - 1));
@@ -195,32 +187,17 @@ public class Connect64 extends Activity {
 		return hasNext && hasPrev;
 	}
 
-	private boolean hasNext(final int thisValue, final Button otherButton) {
-		if (otherButton == null) {
-			return false;
-		}
-		return getValue(otherButton) == thisValue + 1;
-	}
-
-	private boolean hasPrev(final int thisValue, final Button otherButton) {
-		if (otherButton == null) {
-			return false;
-		}
-		return getValue(otherButton) == thisValue - 1;
-	}
-
 	/**
-	 * Win-condition checking at the board level. Iterates through all the
-	 * buttons to make sure each one isn't empty and that it has valid
-	 * neighbors.
+	 * Win-condition checking at the board level. Iterates through each Button
+	 * to check that it isn't empty and that it has valid neighbors.
 	 * 
-	 * @return true if no button is empty or has all invalid neighbors.
+	 * @return true if no Button is empty or has all invalid neighbors.
 	 */
 	private boolean isBoardCorrect() {
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
 				final Button button = getButton("" + i + j);
-				if (isEmpty(button) || !hasCorrectNeighbors(button)) {
+				if (isEmpty(button) || !hasValidNeighbors(button)) {
 					return false;
 				}
 			}
@@ -236,12 +213,12 @@ public class Connect64 extends Activity {
 	}
 
 	/**
-	 * Resets the game grid and loads values into the specified positions.
+	 * Resets the game board and loads values into the specified positions.
 	 * <p>
-	 * <b>NOTE:</b> The 8x8 game grid uses subscripts starting at
+	 * <b>NOTE:</b> The 8x8 game board uses positions starting at
 	 * <code>11</code> in the top-left corner and ending at <code>88</code> in
-	 * the bottom-right. So, the button in the third row and the fourth column
-	 * has position <code>34</code> and has the same string as its tag.
+	 * the bottom-right. So, the Button in the third row and the fourth column
+	 * has position <code>34</code> and has the same String as its tag.
 	 * 
 	 * @param positions
 	 *            an integer array with values from 11-88 (but no 0s or 9s).
@@ -257,11 +234,11 @@ public class Connect64 extends Activity {
 		this.initialPositions = positions;
 		this.initialValues = values;
 
-		resetGrid();
-		storeInitialValues();
+		resetboard();
+		setInitialValues();
 	}
 
-	private void resetGrid() {
+	private void resetboard() {
 		this.rangeSpinner.setSelection(0);
 
 		for (int i = 1; i <= 8; i++) {
@@ -271,7 +248,18 @@ public class Connect64 extends Activity {
 				button.setEnabled(true);
 			}
 		}
-		this.gridState.clear();
+		this.boardState.clear();
+	}
+
+	private void setInitialValues() {
+		for (int i = 0; i < this.initialPositions.length; i++) {
+			final Button button = getButton(String
+					.valueOf(this.initialPositions[i]));
+			button.setText(String.valueOf(this.initialValues[i]));
+			button.setEnabled(false);
+			this.boardState
+					.put(this.initialPositions[i], this.initialValues[i]);
+		}
 	}
 
 	private void setRange(final int pos) {
@@ -292,12 +280,31 @@ public class Connect64 extends Activity {
 
 		if (this.input == BAD_VALUE) {
 			button.setText("");
-			this.gridState.delete(pos);
+			this.boardState.delete(pos);
 		} else {
 			button.setText(String.valueOf(this.input));
-			this.gridState.put(pos, this.input);
+			this.boardState.put(pos, this.input);
 		}
 		this.input = tempInput;
+	}
+
+	/**
+	 * Sets the text on the input buttons based on the current
+	 * <code>range</code>. Buttons whose freshly-set text appears on the game
+	 * board will be disabled.
+	 */
+	private void setupInputButtons() {
+		for (int i = 1; i <= 16; i++) {
+			final int buttonVal = 16 * this.range + i;
+			final Button inputButton = (Button) this.inputButtons
+					.findViewWithTag("in" + i);
+			inputButton.setText(String.valueOf(buttonVal));
+			if (this.boardState.indexOfValue(buttonVal) >= 0) {
+				inputButton.setEnabled(false);
+			} else {
+				inputButton.setEnabled(true);
+			}
+		}
 	}
 
 	private void setupRangeSpinner() {
@@ -313,22 +320,12 @@ public class Connect64 extends Activity {
 					public void onItemSelected(final AdapterView<?> parent,
 							final View view, final int pos, final long id) {
 						setRange(pos);
-						configureInputButtons();
+						setupInputButtons();
 					}
 
 					@Override
 					public void onNothingSelected(final AdapterView<?> parent) {
 					}
 				});
-	}
-
-	private void storeInitialValues() {
-		for (int i = 0; i < this.initialPositions.length; i++) {
-			final Button button = getButton(String
-					.valueOf(this.initialPositions[i]));
-			button.setText(String.valueOf(this.initialValues[i]));
-			button.setEnabled(false);
-			this.gridState.put(this.initialPositions[i], this.initialValues[i]);
-		}
 	}
 }
