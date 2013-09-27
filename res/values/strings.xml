@@ -10,5 +10,7 @@
         <item>33 to 48</item>
         <item>49 to 64</item>
     </string-array>
+        <string name="puzzleNum">Puzzle</string>
+        <string name="backButton">Undo</string>
 
 </resources>
