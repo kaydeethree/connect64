@@ -40,7 +40,7 @@ public class Connect64 extends Activity {
 		final Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag());
 
-		if (getValue(button) < 0) {
+		if (getValue(button) < 0 || this.input > 0) {
 			setText(button);
 		} else {
 			clearText(button);
@@ -58,6 +58,9 @@ public class Connect64 extends Activity {
 	private void setText(final Button button) {
 		if (this.input < 1) {
 			return;
+		}
+		if (getValue(button) > 0) {
+			clearText(button);
 		}
 		button.setText("" + this.input);
 		final int pos = Integer.valueOf(button.getTag().toString());
@@ -91,22 +94,22 @@ public class Connect64 extends Activity {
 
 		setupRangeSpinner();
 
-		final int[] testPositions = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
-		final int[] testValues = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
-		/*
-		 * final int[] testPositions = new int[] { 12, 13, 14, 15, 16, 17, 18,
-		 * 28, 27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38, 48,
-		 * 47, 46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58, 68, 67,
-		 * 66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78, 88, 87, 86,
-		 * 85, 84, 83, 82 };
-		 */
-		/*
-		 * final int[] testValues = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-		 * 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
-		 * 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
-		 * 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
-		 * 63 };
-		 */
+		// final int[] testPositions = new int[] { 11, 18, 88, 81, 27, 33, 66,
+		// 54 };
+		// final int[] testValues = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
+
+		final int[] testPositions = new int[] { 12, 13, 14, 15, 16, 17, 18, 28,
+				27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38, 48,
+				47, 46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58, 68,
+				67, 66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78, 88,
+				87, 86, 85, 84, 83, 82 };
+
+		final int[] testValues = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+				12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+				28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+				44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+				60, 61, 62, 63 };
+
 		resetAndInitializePuzzle(testPositions, testValues);
 	}
 
