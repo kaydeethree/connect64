@@ -24,10 +24,10 @@ public class Connect64 extends Activity {
 	private TableLayout grid;
 	private TableLayout inputGrid;
 	private Spinner rangeSpinner;
-	private int clickedButton = -1;
+	private int input = -1;
 	private int[] initialPositions;
 	private int[] initialValues;
-	private SparseIntArray inputs;
+	private SparseIntArray gridState;
 	private int range;
 
 	/**
@@ -37,26 +37,32 @@ public class Connect64 extends Activity {
 	 *            the button clicked
 	 */
 	public void gameButtonClick(final View view) {
-		if (this.clickedButton < 1) {
-			return;
-		}
 		final Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag());
-		button.setText("" + this.clickedButton);
-		final int pos = Integer.valueOf(button.getTag().toString());
-		this.inputs.put(pos, this.clickedButton);
-		configureInputButtons();
-		this.clickedButton = -1;
 
-		if (isBoardFull()) {
-			final Toast toast;
-			if (checkWinCondition()) {
-				toast = Toast.makeText(this, "Winner!", Toast.LENGTH_LONG);
-			} else {
-				toast = Toast.makeText(this, "Loser!", Toast.LENGTH_LONG);
-			}
-			toast.show();
+		if (getValue(button) < 0) {
+			setText(button);
+		} else {
+			clearText(button);
 		}
+		configureInputButtons();
+		checkWinCondition();
+	}
+
+	private void clearText(final Button button) {
+		final int pos = Integer.valueOf(button.getTag().toString());
+		this.gridState.delete(pos);
+		button.setText("");
+	}
+
+	private void setText(final Button button) {
+		if (this.input < 1) {
+			return;
+		}
+		button.setText("" + this.input);
+		final int pos = Integer.valueOf(button.getTag().toString());
+		this.gridState.put(pos, this.input);
+		this.input = -1;
 	}
 
 	/**
@@ -67,7 +73,7 @@ public class Connect64 extends Activity {
 	 */
 	public void inputButtonClick(final View view) {
 		final Button button = (Button) view;
-		this.clickedButton = Integer.valueOf(button.getText().toString());
+		this.input = Integer.valueOf(button.getText().toString());
 	}
 
 	@Override
@@ -81,7 +87,7 @@ public class Connect64 extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connect64);
 		this.grid = (TableLayout) findViewById(R.id.connect64);
-		this.inputs = new SparseIntArray(64);
+		this.gridState = new SparseIntArray(64);
 
 		setupRangeSpinner();
 
@@ -104,15 +110,20 @@ public class Connect64 extends Activity {
 		resetAndInitializePuzzle(testPositions, testValues);
 	}
 
-	private boolean checkWinCondition() {
-		for (int i = 1; i <= 8; i++) {
-			for (int j = 1; j <= 8; j++) {
-				if (isEmpty(i, j) || !hasCorrectNeighbors(i, j)) {
-					return false;
-				}
+	/**
+	 * overall board win condition check. Board must be full and all 64 button
+	 * neighbors must be valid.
+	 */
+	private void checkWinCondition() {
+		final Toast toast;
+		if (this.gridState.size() == 64) {
+			if (isBoardCorrect()) {
+				toast = Toast.makeText(this, "Winner!", Toast.LENGTH_LONG);
+			} else {
+				toast = Toast.makeText(this, "Loser!", Toast.LENGTH_LONG);
 			}
+			toast.show();
 		}
-		return true;
 	}
 
 	/**
@@ -128,7 +139,7 @@ public class Connect64 extends Activity {
 			buttonVal = 16 * this.range + i;
 			inputButton = (Button) this.inputGrid.findViewWithTag("in" + i);
 			inputButton.setText("" + buttonVal);
-			if (this.inputs.indexOfValue(buttonVal) >= 0) {
+			if (this.gridState.indexOfValue(buttonVal) >= 0) {
 				inputButton.setEnabled(false);
 			} else {
 				inputButton.setEnabled(true);
@@ -198,10 +209,10 @@ public class Connect64 extends Activity {
 		return getValue(otherButton) == thisValue - 1;
 	}
 
-	private boolean isBoardFull() {
+	private boolean isBoardCorrect() {
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
-				if (isEmpty(i, j)) {
+				if (isEmpty(i, j) || !hasCorrectNeighbors(i, j)) {
 					return false;
 				}
 			}
@@ -253,7 +264,7 @@ public class Connect64 extends Activity {
 				button.setEnabled(true);
 			}
 		}
-		this.inputs.clear();
+		this.gridState.clear();
 	}
 
 	private void setRange(final int pos) {
@@ -287,7 +298,7 @@ public class Connect64 extends Activity {
 			final Button button = getButton("" + this.initialPositions[i]);
 			button.setText("" + this.initialValues[i]);
 			button.setEnabled(false);
-			this.inputs.put(this.initialPositions[i], this.initialValues[i]);
+			this.gridState.put(this.initialPositions[i], this.initialValues[i]);
 		}
 	}
 }
