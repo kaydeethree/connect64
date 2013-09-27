@@ -22,7 +22,7 @@ import android.widget.Toast;
  */
 public class Connect64 extends Activity {
 	private static final String LOG_TAG = "C64";
-	// keep negative so hasNext() and hasPrev() will always return false
+	// keep negative so isNext() and isPrev() will always return false
 	private static final int BAD_VALUE = -1;
 	private static final int BOARD_MAX = 64;
 	private static final int ROW_SIZE = 8;
@@ -38,6 +38,7 @@ public class Connect64 extends Activity {
 	private int[] initialValues;
 	private SparseIntArray boardState;
 	private int input;
+	private int puzzle;
 
 	/**
 	 * Input handler for the clear button. Resets the game board to the initial
@@ -100,25 +101,12 @@ public class Connect64 extends Activity {
 
 		if (savedState == null) {
 			Log.d(LOG_TAG, "savedState = null. Initializing");
-			this.puzzleLabel.setText("Puzzle 1");
+			this.puzzle = 0;
+			this.puzzleLabel.setText("Puzzle " + this.puzzle);
 			this.input = BAD_VALUE;
-			this.initialPositions = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
-			this.initialValues = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
-
-			/*
-			 * this.initialPositions = new int[] { 12, 13, 14, 15, 16, 17, 18,
-			 * 28, 27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38,
-			 * 48, 47, 46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58,
-			 * 68, 67, 66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78,
-			 * 88, 87, 86, 85, 84, 83, 82 };
-			 * 
-			 * this.initialValues = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-			 * 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
-			 * 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
-			 * 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-			 * 60, 61, 62, 63 };
-			 */
-
+			Puzzle puzzle = PuzzleFactory.getPuzzle(this.puzzle);
+			this.initialPositions = puzzle.getPositions();
+			this.initialValues = puzzle.getValues();
 			resetAndInitialize();
 		} else {
 			Log.d(LOG_TAG, "savedState != null");
@@ -135,9 +123,11 @@ public class Connect64 extends Activity {
 			this.initialValues = savedState.getIntArray("initialValues");
 			this.input = savedState.getInt("input");
 			this.range = savedState.getInt("range");
-			this.puzzleLabel.setText(savedState.getCharSequence("label"));
+			this.puzzle = savedState.getInt("puzzle");
+			this.puzzleLabel.setText("Puzzle " + this.puzzle);
 			resetAndInitialize();
 			this.rangeSpinner.setSelection(this.range);
+			
 
 			SparseIntArray state = this.boardState;
 			int[] positions = savedState.getIntArray("statePositions");
@@ -159,7 +149,7 @@ public class Connect64 extends Activity {
 		outState.putIntArray("initialValues", this.initialValues);
 		outState.putInt("input", this.input);
 		outState.putInt("range", this.range);
-		outState.putCharSequence("label", this.puzzleLabel.getText());
+		outState.putInt("puzzle", this.puzzle);
 
 		SparseIntArray state = this.boardState;
 		int size = state.size();
