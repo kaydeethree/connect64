@@ -168,10 +168,8 @@ public class Connect64 extends Activity {
 	 * Win-condition checking at the button level. Looks for a neighbor with
 	 * value+1 and a neighbor with value-1.
 	 * 
-	 * @param x
-	 *            the column of the desired button [1-8]
-	 * @param y
-	 *            the row of the desired button [1-8]
+	 * @param button
+	 *            the button to check against
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
 	private boolean hasCorrectNeighbors(final Button button) {
