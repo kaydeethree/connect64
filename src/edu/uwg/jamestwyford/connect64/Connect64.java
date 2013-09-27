@@ -3,6 +3,7 @@ package edu.uwg.jamestwyford.connect64;
 import android.app.Activity;
 import android.os.Bundle;
 import android.util.Log;
+import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.View;
 import android.widget.AdapterView;
@@ -23,9 +24,11 @@ public class Connect64 extends Activity {
 	private TableLayout grid;
 	private TableLayout inputGrid;
 	private Spinner rangeSpinner;
-	private String clickedButton = "";
+	private int clickedButton;
 	private int[] initialPositions;
 	private int[] initialValues;
+	private SparseIntArray inputs;
+	private int range;
 
 	/**
 	 * Input handler for the 64 game grid buttons.
@@ -36,7 +39,10 @@ public class Connect64 extends Activity {
 	public void gameButtonClick(final View view) {
 		final Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag());
-		button.setText(this.clickedButton);
+		button.setText("" + this.clickedButton);
+		int pos = Integer.valueOf(button.getTag().toString().substring(1));
+		inputs.put(pos, this.clickedButton);
+		setupInputButtons();
 
 		if (isBoardFull()) {
 			final Toast toast;
@@ -57,7 +63,7 @@ public class Connect64 extends Activity {
 	 */
 	public void inputButtonClick(final View view) {
 		final Button button = (Button) view;
-		this.clickedButton = button.getText().toString();
+		this.clickedButton = Integer.valueOf(button.getText().toString());
 	}
 
 	@Override
@@ -71,6 +77,7 @@ public class Connect64 extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connect64);
 		this.grid = (TableLayout) findViewById(R.id.connect64);
+		this.inputs = new SparseIntArray(64);
 
 		setupRangeSpinner();
 
@@ -213,20 +220,31 @@ public class Connect64 extends Activity {
 
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
-				Log.d(LOG_TAG, "resetting position: g" + i + j);
 				final Button button = getButton("g" + i + j);
 				button.setText("");
 				button.setEnabled(true);
 			}
 		}
+		inputs.clear();
 	}
 
-	private void setupInputButtons(final int range) {
+	private void setupInputButtons() {
 		this.inputGrid = (TableLayout) findViewById(R.id.inputButtons);
+		int buttonVal;
+		Button inputButton;
 		for (int i = 1; i <= 16; i++) {
-			((Button) this.inputGrid.findViewWithTag("in" + i)).setText(""
-					+ (16 * range + i));
+			buttonVal = 16 * this.range + i;
+			inputButton = (Button) this.inputGrid.findViewWithTag("in" + i);
+			inputButton.setText("" + buttonVal);
+			if (inputs.indexOfValue(buttonVal) >= 0) {
+				inputButton.setEnabled(false);
+			} else {
+				inputButton.setEnabled(true);
+			}
 		}
+	}
+	private void setRange(int pos) {
+		this.range = pos;
 	}
 
 	private void setupRangeSpinner() {
@@ -241,7 +259,8 @@ public class Connect64 extends Activity {
 					@Override
 					public void onItemSelected(final AdapterView<?> parent,
 							final View view, final int pos, final long id) {
-						setupInputButtons(pos);
+						setRange(pos);
+						setupInputButtons();
 					}
 
 					@Override
@@ -255,6 +274,7 @@ public class Connect64 extends Activity {
 			final Button button = getButton("g" + this.initialPositions[i]);
 			button.setText("" + this.initialValues[i]);
 			button.setEnabled(false);
+			inputs.put(this.initialPositions[i], this.initialValues[i]);
 		}
 	}
 }
