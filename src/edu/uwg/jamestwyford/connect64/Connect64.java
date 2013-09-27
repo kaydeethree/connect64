@@ -37,31 +37,30 @@ public class Connect64 extends Activity {
 	private int[] initialPositions;
 	private int[] initialValues;
 	private SparseIntArray boardState;
-
 	private int input;
 
 	/**
-	 * Resets the game board.
+	 * Input handler for the clear button. Resets the game board to the initial
+	 * state.
 	 * 
 	 * @param view
 	 *            ignored
 	 */
 	public final void clearButtonClick(final View view) {
-		resetAndInitialize(this.initialPositions, this.initialValues);
+		resetAndInitialize();
 	}
 
 	/**
-	 * Input handler for the 64 game board buttons. If <code>input</code> is
-	 * valid, sets the clicked button to that value. Clears the button
-	 * otherwise. Updates the input buttons to dis/enable buttons as
-	 * appropriate. If the board is full, calls {@link #checkWinCondition}
+	 * Input handler for the 64 game board Buttons. If <code>input</code> is
+	 * valid, sets the clicked Button to that value. Clears the Button
+	 * otherwise. Updates the input Buttons to dis/enable them as appropriate.
+	 * If the board is full, calls {@link #checkWinCondition()}
 	 * 
 	 * @param view
-	 *            the button clicked
+	 *            the Button clicked
 	 */
 	public final void gameButtonClick(final View view) {
-		final Button button = (Button) view;
-		setText(button);
+		setText((Button) view);
 		setupInputButtons();
 
 		if (this.boardState.size() == BOARD_MAX) {
@@ -71,10 +70,10 @@ public class Connect64 extends Activity {
 
 	/**
 	 * Input handler for the 16 input buttons. Sets <code>input</code> to the
-	 * value of the button.
+	 * value of the Button.
 	 * 
 	 * @param view
-	 *            the button clicked
+	 *            the Button clicked
 	 */
 	public final void inputButtonClick(final View view) {
 		this.input = getValue((Button) view);
@@ -89,54 +88,64 @@ public class Connect64 extends Activity {
 	@Override
 	protected final void onCreate(final Bundle savedState) {
 		super.onCreate(savedState);
+		Log.d(LOG_TAG, "onCreate()");
 		setContentView(R.layout.activity_connect64);
+
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
 		this.inputButtons = (TableLayout) findViewById(R.id.inputButtons);
 		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
 		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		setupRangeSpinner();
-		
+
 		if (savedState == null) {
 			Log.d(LOG_TAG, "savedState = null. Initializing");
 			this.puzzleLabel.setText("Puzzle 1");
 			this.input = BAD_VALUE;
-			final int[] testPos = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
-			final int[] testVals = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
+			this.initialPositions = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
+			this.initialValues = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
 
-			/*final int[] testPos = new int[] { 12, 13, 14, 15, 16, 17, 18, 28,
-					27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38,
-					48, 47, 46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57,
-					58, 68, 67, 66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76,
-					77, 78, 88, 87, 86, 85, 84, 83, 82 };
-			final int[] testVals = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-					12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
-					27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41,
-					42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56,
-					57, 58, 59, 60, 61, 62, 63 };*/
+			/*
+			 * this.initialPositions = new int[] { 12, 13, 14, 15, 16, 17, 18,
+			 * 28, 27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38,
+			 * 48, 47, 46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58,
+			 * 68, 67, 66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78,
+			 * 88, 87, 86, 85, 84, 83, 82 };
+			 * 
+			 * this.initialValues = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+			 * 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
+			 * 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
+			 * 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
+			 * 60, 61, 62, 63 };
+			 */
 
-			resetAndInitialize(testPos, testVals);
+			resetAndInitialize();
+		} else {
+			Log.d(LOG_TAG, "savedState != null");
 		}
 	}
 
 	@Override
 	protected void onRestoreInstanceState(Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
+		Log.d(LOG_TAG, "onRestoreInstanceState()");
+
 		if (savedState != null) {
 			this.initialPositions = savedState.getIntArray("initialPositions");
 			this.initialValues = savedState.getIntArray("initialValues");
 			this.input = savedState.getInt("input");
 			this.range = savedState.getInt("range");
 			this.puzzleLabel.setText(savedState.getCharSequence("label"));
-			resetAndInitialize(this.initialPositions, this.initialValues);
-			this.rangeSpinner.setSelection(range);
-			
+			resetAndInitialize();
+			this.rangeSpinner.setSelection(this.range);
+
 			SparseIntArray state = this.boardState;
 			int[] positions = savedState.getIntArray("statePositions");
 			int[] values = savedState.getIntArray("stateValues");
 			for (int i = 0; i < positions.length; i++) {
 				state.put(positions[i], values[i]);
-				getButton(String.valueOf(positions[i])).setText(String.valueOf(values[i]));
+				getButton(String.valueOf(positions[i])).setText(
+						String.valueOf(values[i]));
 			}
 		}
 	}
@@ -144,6 +153,7 @@ public class Connect64 extends Activity {
 	@Override
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
+		Log.d(LOG_TAG, "onSaveInstanceState()");
 
 		outState.putIntArray("initialPositions", this.initialPositions);
 		outState.putIntArray("initialValues", this.initialValues);
@@ -152,9 +162,10 @@ public class Connect64 extends Activity {
 		outState.putCharSequence("label", this.puzzleLabel.getText());
 
 		SparseIntArray state = this.boardState;
-		int[] positions = new int[state.size()];
-		int[] values = new int[state.size()];
-		for (int i = 0; i < state.size(); i++) {
+		int size = state.size();
+		int[] positions = new int[size];
+		int[] values = new int[size];
+		for (int i = 0; i < size; i++) {
 			positions[i] = state.keyAt(i);
 			values[i] = state.valueAt(i);
 		}
@@ -265,27 +276,15 @@ public class Connect64 extends Activity {
 	}
 
 	/**
-	 * Resets the game board and loads values into the specified positions.
+	 * Resets the game board and loads values at <code>initialValues</code> into
+	 * the positions at <code>initialPositions</code>.
 	 * <p>
 	 * <b>NOTE:</b> The 8x8 game board uses positions starting at
 	 * <code>11</code> in the top-left corner and ending at <code>88</code> in
 	 * the bottom-right. So, the Button in the third row and the fourth column
 	 * has position <code>34</code> and has the same String as its tag.
-	 * 
-	 * @param positions
-	 *            an integer array with values from 11-88 (but no 0s or 9s).
-	 *            Does not need to be sorted.
-	 * @param values
-	 *            an equal-length integer array with values from 1-64.
 	 */
-	private void resetAndInitialize(final int[] positions, final int[] values) {
-		if (positions.length != values.length) {
-			throw new IllegalArgumentException(
-					"positions.length != values.length");
-		}
-		this.initialPositions = positions;
-		this.initialValues = values;
-
+	private void resetAndInitialize() {
 		resetBoard();
 		setInitialValues();
 		setupInputButtons();
