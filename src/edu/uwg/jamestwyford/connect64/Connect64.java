@@ -37,10 +37,14 @@ public class Connect64 extends Activity {
 		final Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag());
 		button.setText(this.clickedButton);
-		enableValidButtons();
-		if (checkWinCondition()) {
-			final Toast toast = Toast.makeText(this, "Winner!",
-					Toast.LENGTH_LONG);
+
+		if (isBoardFull()) {
+			final Toast toast;
+			if (checkWinCondition()) {
+				toast = Toast.makeText(this, "Winner!", Toast.LENGTH_LONG);
+			} else {
+				toast = Toast.makeText(this, "Loser!", Toast.LENGTH_LONG);
+			}
 			toast.show();
 		}
 	}
@@ -86,52 +90,15 @@ public class Connect64 extends Activity {
 		resetAndInitializePuzzle(testPositions, testValues);
 	}
 
-	/**
-	 * Checks neighbors looking for any with a stored value. Will return true if
-	 * a number can be placed in this position.
-	 * <p>
-	 * For the button at position 34, this method checks the buttons at 24, 44,
-	 * 33, and 35.
-	 * 
-	 * @param x
-	 *            the column of the desired button [1-8]
-	 * @param y
-	 *            the row of the desired button [1-8]
-	 * @return true if any of the four neighbors has a stored value
-	 * @see hasValidNeighbor(x, y) for win-condition checking
-	 */
-	private boolean canEnablePosition(final int x, final int y) {
-		// TODO come up with more efficient solution
-		final Button left = getButton("g" + (x - 1) + y);
-		final Button right = getButton("g" + (x + 1) + y);
-		final Button up = getButton("g" + x + (y - 1));
-		final Button down = getButton("g" + x + (y + 1));
-
-		return notEmpty(left) || notEmpty(right) || notEmpty(up)
-				|| notEmpty(down);
-	}
-
 	private boolean checkWinCondition() {
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
-				if (!hasCorrectNeighbors(i, j)) {
+				if (isEmpty(i, j) || !hasCorrectNeighbors(i, j)) {
 					return false;
 				}
 			}
 		}
 		return true;
-	}
-
-	private void enableValidButtons() {
-		for (int i = 1; i <= 8; i++) {
-			for (int j = 1; j <= 8; j++) {
-				final Button button = getButton("g" + i + j);
-				button.setEnabled(canEnablePosition(i, j));
-			}
-		}
-
-		// the for-loop likely enabled our initial buttons, so re-disable them
-		storeInitialValues();
 	}
 
 	private Button getButton(final String tag) {
@@ -196,11 +163,23 @@ public class Connect64 extends Activity {
 		return getValue(otherButton) == thisValue - 1;
 	}
 
-	private boolean notEmpty(final Button button) {
-		if (button == null || button.getText().equals("")) {
-			return false;
+	private boolean isBoardFull() {
+		for (int i = 1; i <= 8; i++) {
+			for (int j = 1; j <= 8; j++) {
+				if (isEmpty(i, j)) {
+					return false;
+				}
+			}
 		}
 		return true;
+	}
+
+	private boolean isEmpty(final int x, final int y) {
+		Button button = getButton("g" + x + y);
+		if (button == null || button.getText().equals("")) {
+			return true;
+		}
+		return false;
 	}
 
 	/**
@@ -227,7 +206,6 @@ public class Connect64 extends Activity {
 
 		resetGrid();
 		storeInitialValues();
-		enableValidButtons();
 	}
 
 	private void resetGrid() {
