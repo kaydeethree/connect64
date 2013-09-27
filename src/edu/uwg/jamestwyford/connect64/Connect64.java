@@ -153,11 +153,14 @@ public class Connect64 extends Activity {
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
 	private boolean hasValidNeighbors(final Button button) {
+		final int value = this.getValue(button);
+		if (value == BAD_VALUE) {
+			return false;
+		}
 		final int xDelta = 1;
 		final int yDelta = 10;
 		final int tag = this.getTag(button);
-		final int value = this.getValue(button);
-
+	
 		final int left = this.boardState.get(tag - xDelta, BAD_VALUE);
 		final int right = this.boardState.get(tag + xDelta, BAD_VALUE);
 		final int up = this.boardState.get(tag - yDelta, BAD_VALUE);
@@ -183,19 +186,12 @@ public class Connect64 extends Activity {
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
 				final Button button = this.getButton("" + i + j);
-				if (this.isEmpty(button) || !this.hasValidNeighbors(button)) {
+				if (!this.hasValidNeighbors(button)) {
 					return false;
 				}
 			}
 		}
 		return true;
-	}
-
-	private boolean isEmpty(final Button button) {
-		if (this.getValue(button) == BAD_VALUE) {
-			return true;
-		}
-		return false;
 	}
 
 	private boolean isNext(final int thisValue, final int otherValue) {
