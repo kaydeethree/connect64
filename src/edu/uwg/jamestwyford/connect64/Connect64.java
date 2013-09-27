@@ -24,7 +24,7 @@ public class Connect64 extends Activity {
 	private TableLayout grid;
 	private TableLayout inputGrid;
 	private Spinner rangeSpinner;
-	private int clickedButton;
+	private int clickedButton = -1;
 	private int[] initialPositions;
 	private int[] initialValues;
 	private SparseIntArray inputs;
@@ -37,12 +37,16 @@ public class Connect64 extends Activity {
 	 *            the button clicked
 	 */
 	public void gameButtonClick(final View view) {
+		if (this.clickedButton < 1) {
+			return;
+		}
 		final Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag());
 		button.setText("" + this.clickedButton);
-		int pos = Integer.valueOf(button.getTag().toString());
-		inputs.put(pos, this.clickedButton);
-		setupInputButtons();
+		final int pos = Integer.valueOf(button.getTag().toString());
+		this.inputs.put(pos, this.clickedButton);
+		configureInputButtons();
+		this.clickedButton = -1;
 
 		if (isBoardFull()) {
 			final Toast toast;
@@ -111,6 +115,27 @@ public class Connect64 extends Activity {
 		return true;
 	}
 
+	/**
+	 * Sets the text on the input buttons to the current range, and sets the
+	 * enabled state for each button as appropriate. Buttons whose freshly-set
+	 * text appears on the game grid will be disabled.
+	 */
+	private void configureInputButtons() {
+		this.inputGrid = (TableLayout) findViewById(R.id.inputButtons);
+		int buttonVal;
+		Button inputButton;
+		for (int i = 1; i <= 16; i++) {
+			buttonVal = 16 * this.range + i;
+			inputButton = (Button) this.inputGrid.findViewWithTag("in" + i);
+			inputButton.setText("" + buttonVal);
+			if (this.inputs.indexOfValue(buttonVal) >= 0) {
+				inputButton.setEnabled(false);
+			} else {
+				inputButton.setEnabled(true);
+			}
+		}
+	}
+
 	private Button getButton(final String tag) {
 		return (Button) this.grid.findViewWithTag(tag);
 	}
@@ -126,7 +151,7 @@ public class Connect64 extends Activity {
 		final int invalidValue = -2;
 		try {
 			return Integer.valueOf(button.getText().toString());
-		} catch (NumberFormatException ex) {
+		} catch (final NumberFormatException ex) {
 			return invalidValue;
 		}
 	}
@@ -185,7 +210,7 @@ public class Connect64 extends Activity {
 	}
 
 	private boolean isEmpty(final int x, final int y) {
-		Button button = getButton("" + x + y);
+		final Button button = getButton("" + x + y);
 		if (button == null || button.getText().equals("")) {
 			return true;
 		}
@@ -228,31 +253,10 @@ public class Connect64 extends Activity {
 				button.setEnabled(true);
 			}
 		}
-		inputs.clear();
+		this.inputs.clear();
 	}
 
-	/**
-	 * Sets the text on the input buttons to the current range, and sets the
-	 * enabled state for each button as appropriate. Buttons whose freshly-set
-	 * text appears on the game grid will be disabled.
-	 */
-	private void setupInputButtons() {
-		this.inputGrid = (TableLayout) findViewById(R.id.inputButtons);
-		int buttonVal;
-		Button inputButton;
-		for (int i = 1; i <= 16; i++) {
-			buttonVal = 16 * this.range + i;
-			inputButton = (Button) this.inputGrid.findViewWithTag("in" + i);
-			inputButton.setText("" + buttonVal);
-			if (inputs.indexOfValue(buttonVal) >= 0) {
-				inputButton.setEnabled(false);
-			} else {
-				inputButton.setEnabled(true);
-			}
-		}
-	}
-
-	private void setRange(int pos) {
+	private void setRange(final int pos) {
 		this.range = pos;
 	}
 
@@ -269,7 +273,7 @@ public class Connect64 extends Activity {
 					public void onItemSelected(final AdapterView<?> parent,
 							final View view, final int pos, final long id) {
 						setRange(pos);
-						setupInputButtons();
+						configureInputButtons();
 					}
 
 					@Override
@@ -283,7 +287,7 @@ public class Connect64 extends Activity {
 			final Button button = getButton("" + this.initialPositions[i]);
 			button.setText("" + this.initialValues[i]);
 			button.setEnabled(false);
-			inputs.put(this.initialPositions[i], this.initialValues[i]);
+			this.inputs.put(this.initialPositions[i], this.initialValues[i]);
 		}
 	}
 }
