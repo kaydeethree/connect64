@@ -106,18 +106,18 @@ public class Connect64 extends Activity {
 	}
 
 	/**
-	 * returns the value as an integer of the button or -2 if empty
+	 * returns the value as an integer of the button or -2 if empty/null
 	 * 
 	 * @param button
 	 *            the button to get the value of
-	 * @return the integer value of the button or -2 if empty
+	 * @return the integer value of the button or -2 if empty/null
 	 */
 	private int getValue(final Button button) {
-		final String val = button.getText().toString();
-		if (!val.equals("")) {
-			return Integer.valueOf(val);
-		} else {
-			return -2;
+		final int invalidValue = -2;
+		try {
+			return Integer.valueOf(button.getText().toString());
+		} catch (NumberFormatException ex) {
+			return invalidValue;
 		}
 	}
 
@@ -139,10 +139,10 @@ public class Connect64 extends Activity {
 		final Button up = getButton("g" + x + (y - 1));
 		final Button down = getButton("g" + x + (y + 1));
 
-		final boolean hasNext = value == 64 || hasNext(value, left)
+		final boolean hasNext = (value == 64) || hasNext(value, left)
 				|| hasNext(value, right) || hasNext(value, up)
 				|| hasNext(value, down);
-		final boolean hasPrev = value == 1 || hasPrev(value, left)
+		final boolean hasPrev = (value == 1) || hasPrev(value, left)
 				|| hasPrev(value, right) || hasPrev(value, up)
 				|| hasPrev(value, down);
 
@@ -190,8 +190,8 @@ public class Connect64 extends Activity {
 	 * is position 34.
 	 * 
 	 * @param positions
-	 *            an integer array with values from 11-88 (but no 9s). Does not
-	 *            need to be sorted.
+	 *            an integer array with values from 11-88 (but no 0s or 9s).
+	 *            Does not need to be sorted.
 	 * @param values
 	 *            an equal-length integer array with values from 1-64.
 	 */
