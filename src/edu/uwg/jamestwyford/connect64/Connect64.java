@@ -174,13 +174,17 @@ public class Connect64 extends Activity {
 	 *            the row of the desired button [1-8]
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
-	private boolean hasCorrectNeighbors(final int x, final int y) {
+	private boolean hasCorrectNeighbors(final Button button) {
+		final int tag = getTag(button);
+		final int x = tag / 10;
+		final int y = tag % 10;
+		final int value = getValue(button);
+
 		// TODO come up with more efficient solution
-		final int value = this.getValue(this.getButton("" + x + y));
-		final Button left = this.getButton("" + (x - 1) + y);
-		final Button right = this.getButton("" + (x + 1) + y);
-		final Button up = this.getButton("" + x + (y - 1));
-		final Button down = this.getButton("" + x + (y + 1));
+		final Button left = getButton("" + (x - 1) + y);
+		final Button right = getButton("" + (x + 1) + y);
+		final Button up = getButton("" + x + (y - 1));
+		final Button down = getButton("" + x + (y + 1));
 
 		final boolean hasNext = (value == 64) || hasNext(value, left)
 				|| hasNext(value, right) || hasNext(value, up)
@@ -196,20 +200,21 @@ public class Connect64 extends Activity {
 		if (otherButton == null) {
 			return false;
 		}
-		return (this.getValue(otherButton) == thisValue + 1);
+		return getValue(otherButton) == thisValue + 1;
 	}
 
 	private boolean hasPrev(final int thisValue, final Button otherButton) {
 		if (otherButton == null) {
 			return false;
 		}
-		return this.getValue(otherButton) == thisValue - 1;
+		return getValue(otherButton) == thisValue - 1;
 	}
 
 	private boolean isBoardCorrect() {
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
-				if (isEmpty(i, j) || !this.hasCorrectNeighbors(i, j)) {
+				final Button button = getButton("" + i + j);
+				if (this.isEmpty(button) || !this.hasCorrectNeighbors(button)) {
 					return false;
 				}
 			}
@@ -217,8 +222,7 @@ public class Connect64 extends Activity {
 		return true;
 	}
 
-	private boolean isEmpty(final int x, final int y) {
-		final Button button = this.getButton("" + x + y);
+	private boolean isEmpty(final Button button) {
 		if (button == null || button.getText().equals("")) {
 			return true;
 		}
@@ -256,7 +260,7 @@ public class Connect64 extends Activity {
 
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
-				final Button button = this.getButton("" + i + j);
+				final Button button = getButton("" + i + j);
 				button.setText("");
 				button.setEnabled(true);
 			}
@@ -272,11 +276,11 @@ public class Connect64 extends Activity {
 		if (this.input < 1) {
 			return;
 		}
-		if (this.getValue(button) > 0) {
-			this.clearText(button);
+		if (getValue(button) > 0) {
+			clearText(button);
 		}
 		button.setText("" + this.input);
-		final int pos = this.getTag(button);
+		final int pos = getTag(button);
 		this.gridState.put(pos, this.input);
 		this.input = NO_INPUT;
 	}
@@ -305,7 +309,7 @@ public class Connect64 extends Activity {
 
 	private void storeInitialValues() {
 		for (int i = 0; i < this.initialPositions.length; i++) {
-			final Button button = this.getButton("" + this.initialPositions[i]);
+			final Button button = getButton("" + this.initialPositions[i]);
 			button.setText("" + this.initialValues[i]);
 			button.setEnabled(false);
 			this.gridState.put(this.initialPositions[i], this.initialValues[i]);
