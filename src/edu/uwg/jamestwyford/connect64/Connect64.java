@@ -101,16 +101,23 @@ public class Connect64 extends Activity {
 
 		if (savedState == null) {
 			Log.d(LOG_TAG, "savedState = null. Initializing");
-			this.puzzle = 0;
-			this.puzzleLabel.setText("Puzzle " + this.puzzle);
-			this.input = BAD_VALUE;
-			Puzzle puzzle = PuzzleFactory.getPuzzle(this.puzzle);
-			this.initialPositions = puzzle.getPositions();
-			this.initialValues = puzzle.getValues();
-			resetAndInitialize();
+			loadPuzzle(0);
 		} else {
 			Log.d(LOG_TAG, "savedState != null");
 		}
+	}
+
+	private void loadPuzzle(int puzzle) {
+		resetBoard();
+		this.puzzle = puzzle;
+		this.puzzleLabel.setText("Puzzle " + this.puzzle);
+		Puzzle newPuzzle = PuzzleFactory.getPuzzle(this.puzzle);
+		this.initialPositions = newPuzzle.getPositions();
+		this.initialValues = newPuzzle.getValues();
+		Log.d(LOG_TAG, "Loading puzzle " + puzzle + ". posLength: "
+				+ this.initialPositions.length + " valLength: "
+				+ this.initialValues.length);
+		resetAndInitialize();
 	}
 
 	@Override
@@ -127,7 +134,6 @@ public class Connect64 extends Activity {
 			this.puzzleLabel.setText("Puzzle " + this.puzzle);
 			resetAndInitialize();
 			this.rangeSpinner.setSelection(this.range);
-			
 
 			SparseIntArray state = this.boardState;
 			int[] positions = savedState.getIntArray("statePositions");
@@ -172,11 +178,17 @@ public class Connect64 extends Activity {
 		Toast toast = null;
 		final boolean boardValid = isBoardCorrect();
 		if (boardValid) {
-			toast = Toast.makeText(this, R.string.youWin, Toast.LENGTH_LONG);
-			// TODO reset board and load next board
-
+			if (this.puzzle < PuzzleFactory.numPuzzles()) {
+				toast = Toast.makeText(this, R.string.youWin,
+						Toast.LENGTH_SHORT);
+				int nextPuzzle = this.puzzle += 1;
+				loadPuzzle(nextPuzzle);
+			} else {
+				toast = Toast.makeText(this, "All puzzles complete!",
+						Toast.LENGTH_SHORT);
+			}
 		} else if (this.boardState.size() == BOARD_MAX && !boardValid) {
-			toast = Toast.makeText(this, R.string.youLose, Toast.LENGTH_LONG);
+			toast = Toast.makeText(this, R.string.youLose, Toast.LENGTH_SHORT);
 		}
 		if (toast != null) {
 			toast.show();
@@ -184,7 +196,11 @@ public class Connect64 extends Activity {
 	}
 
 	private Button getButton(final String tag) {
-		return (Button) this.gameBoard.findViewWithTag(tag);
+		Button button = (Button) this.gameBoard.findViewWithTag(tag);
+		if (button == null) {
+			Log.e(LOG_TAG, "invalid tag passed: " + tag);
+		}
+		return button;
 	}
 
 	private int getTag(final Button button) {
@@ -281,6 +297,7 @@ public class Connect64 extends Activity {
 	}
 
 	private void resetBoard() {
+		Log.d(LOG_TAG, "resetting board");
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
 				final Button button = this.getButton("" + i + j);
@@ -290,16 +307,21 @@ public class Connect64 extends Activity {
 		}
 		this.boardState.clear();
 		this.rangeSpinner.setSelection(0);
+		this.input = BAD_VALUE;
 	}
 
 	private void setInitialValues() {
-		for (int i = 0; i < this.initialPositions.length; i++) {
-			final Button button = this.getButton(String
-					.valueOf(this.initialPositions[i]));
-			button.setText(String.valueOf(this.initialValues[i]));
+		Log.d(LOG_TAG, "loading initial values.");
+		int[] pos = this.initialPositions;
+		int[] vals = this.initialValues;
+		if (pos.length < 1) {
+			Log.e(LOG_TAG, "no data in initialPositions");
+		}
+		for (int i = 0; i < pos.length; i++) {
+			final Button button = this.getButton(String.valueOf(pos[i]));
+			button.setText(String.valueOf(vals[i]));
 			button.setEnabled(false);
-			this.boardState
-					.put(this.initialPositions[i], this.initialValues[i]);
+			this.boardState.put(pos[i], vals[i]);
 		}
 	}
 

@@ -15,7 +15,7 @@ public final class PuzzleFactory {
 					42, 41, 51, 52, 53, 54, 55, 56, 57, 58, 68, 67, 66, 65, 64,
 					63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78, 88, 87, 86, 85,
 					84, 83, 82 }, /* 1 */{ 11, 18, 88, 81, 27, 33, 66, 54 }, /* 2 */
-			{ 1, 2, 3, 4, 5 } };
+			{ 11, 12, 13, 14, 15 } };
 	private static int[][] puzzleVals = {
 			/* 0 */{ 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17,
 					18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32,
@@ -31,7 +31,11 @@ public final class PuzzleFactory {
 	 *            the Puzzle to create
 	 * @return the newly-constructed specified Puzzle
 	 */
-	public static Puzzle getPuzzle(int puzzle) {
+	public final static Puzzle getPuzzle(int puzzle) {
 		return new Puzzle(puzzlePos[puzzle], puzzleVals[puzzle]);
+	}
+	
+	public final static int numPuzzles() {
+		return puzzlePos.length - 1;
 	}
 }
