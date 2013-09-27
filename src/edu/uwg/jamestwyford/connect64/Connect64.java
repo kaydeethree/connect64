@@ -49,25 +49,6 @@ public class Connect64 extends Activity {
 		checkWinCondition();
 	}
 
-	private void clearText(final Button button) {
-		final int pos = Integer.valueOf(button.getTag().toString());
-		this.gridState.delete(pos);
-		button.setText("");
-	}
-
-	private void setText(final Button button) {
-		if (this.input < 1) {
-			return;
-		}
-		if (getValue(button) > 0) {
-			clearText(button);
-		}
-		button.setText("" + this.input);
-		final int pos = Integer.valueOf(button.getTag().toString());
-		this.gridState.put(pos, this.input);
-		this.input = -1;
-	}
-
 	/**
 	 * Input handler for the 16 input buttons.
 	 * 
@@ -127,6 +108,12 @@ public class Connect64 extends Activity {
 			}
 			toast.show();
 		}
+	}
+
+	private void clearText(final Button button) {
+		final int pos = Integer.valueOf(button.getTag().toString());
+		this.gridState.delete(pos);
+		button.setText("");
 	}
 
 	/**
@@ -272,6 +259,19 @@ public class Connect64 extends Activity {
 
 	private void setRange(final int pos) {
 		this.range = pos;
+	}
+
+	private void setText(final Button button) {
+		if (this.input < 1) {
+			return;
+		}
+		if (getValue(button) > 0) {
+			clearText(button);
+		}
+		button.setText("" + this.input);
+		final int pos = Integer.valueOf(button.getTag().toString());
+		this.gridState.put(pos, this.input);
+		this.input = -1;
 	}
 
 	private void setupRangeSpinner() {
