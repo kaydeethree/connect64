@@ -40,7 +40,7 @@ public class Connect64 extends Activity {
 		final Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag());
 		button.setText("" + this.clickedButton);
-		int pos = Integer.valueOf(button.getTag().toString().substring(1));
+		int pos = Integer.valueOf(button.getTag().toString());
 		inputs.put(pos, this.clickedButton);
 		setupInputButtons();
 
@@ -81,19 +81,22 @@ public class Connect64 extends Activity {
 
 		setupRangeSpinner();
 
-		// final int[] testPositions = new int[] { 11, 18, 88, 81, 27, 33, 66,
-		// 54 };
-		// final int[] testValues = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
-		final int[] testPositions = new int[] { 12, 13, 14, 15, 16, 17, 18, 28,
-				27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38, 48,
-				47, 46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58, 68,
-				67, 66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78, 88,
-				87, 86, 85, 84, 83, 82 };
-		final int[] testValues = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
-				12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27,
-				28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43,
-				44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59,
-				60, 61, 62, 63 };
+		final int[] testPositions = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
+		final int[] testValues = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
+		/*
+		 * final int[] testPositions = new int[] { 12, 13, 14, 15, 16, 17, 18,
+		 * 28, 27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38, 48,
+		 * 47, 46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58, 68, 67,
+		 * 66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78, 88, 87, 86,
+		 * 85, 84, 83, 82 };
+		 */
+		/*
+		 * final int[] testValues = new int[] { 2, 3, 4, 5, 6, 7, 8, 9, 10, 11,
+		 * 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
+		 * 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+		 * 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
+		 * 63 };
+		 */
 		resetAndInitializePuzzle(testPositions, testValues);
 	}
 
@@ -140,11 +143,11 @@ public class Connect64 extends Activity {
 	 */
 	private boolean hasCorrectNeighbors(final int x, final int y) {
 		// TODO come up with more efficient solution
-		final int value = getValue(getButton("g" + x + y));
-		final Button left = getButton("g" + (x - 1) + y);
-		final Button right = getButton("g" + (x + 1) + y);
-		final Button up = getButton("g" + x + (y - 1));
-		final Button down = getButton("g" + x + (y + 1));
+		final int value = getValue(getButton("" + x + y));
+		final Button left = getButton("" + (x - 1) + y);
+		final Button right = getButton("" + (x + 1) + y);
+		final Button up = getButton("" + x + (y - 1));
+		final Button down = getButton("" + x + (y + 1));
 
 		final boolean hasNext = (value == 64) || hasNext(value, left)
 				|| hasNext(value, right) || hasNext(value, up)
@@ -182,7 +185,7 @@ public class Connect64 extends Activity {
 	}
 
 	private boolean isEmpty(final int x, final int y) {
-		Button button = getButton("g" + x + y);
+		Button button = getButton("" + x + y);
 		if (button == null || button.getText().equals("")) {
 			return true;
 		}
@@ -220,7 +223,7 @@ public class Connect64 extends Activity {
 
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
-				final Button button = getButton("g" + i + j);
+				final Button button = getButton("" + i + j);
 				button.setText("");
 				button.setEnabled(true);
 			}
@@ -228,6 +231,11 @@ public class Connect64 extends Activity {
 		inputs.clear();
 	}
 
+	/**
+	 * Sets the text on the input buttons to the current range, and sets the
+	 * enabled state for each button as appropriate. Buttons whose freshly-set
+	 * text appears on the game grid will be disabled.
+	 */
 	private void setupInputButtons() {
 		this.inputGrid = (TableLayout) findViewById(R.id.inputButtons);
 		int buttonVal;
@@ -243,6 +251,7 @@ public class Connect64 extends Activity {
 			}
 		}
 	}
+
 	private void setRange(int pos) {
 		this.range = pos;
 	}
@@ -271,7 +280,7 @@ public class Connect64 extends Activity {
 
 	private void storeInitialValues() {
 		for (int i = 0; i < this.initialPositions.length; i++) {
-			final Button button = getButton("g" + this.initialPositions[i]);
+			final Button button = getButton("" + this.initialPositions[i]);
 			button.setText("" + this.initialValues[i]);
 			button.setEnabled(false);
 			inputs.put(this.initialPositions[i], this.initialValues[i]);

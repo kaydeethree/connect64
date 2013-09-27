@@ -12,42 +12,42 @@
             <Button
                 android:id="@+id/button1"
                 style="@style/MarginlessButton"
-                android:tag="g11" />
+                android:tag="11" />
 
             <Button
                 android:id="@+id/button2"
                 style="@style/MarginlessButton"
-                android:tag="g12" />
+                android:tag="12" />
 
             <Button
                 android:id="@+id/button3"
                 style="@style/MarginlessButton"
-                android:tag="g13" />
+                android:tag="13" />
 
             <Button
                 android:id="@+id/button4"
                 style="@style/MarginlessButton"
-                android:tag="g14" />
+                android:tag="14" />
 
             <Button
                 android:id="@+id/button5"
                 style="@style/MarginlessButton"
-                android:tag="g15" />
+                android:tag="15" />
 
             <Button
                 android:id="@+id/button6"
                 style="@style/MarginlessButton"
-                android:tag="g16" />
+                android:tag="16" />
 
             <Button
                 android:id="@+id/button7"
                 style="@style/MarginlessButton"
-                android:tag="g17" />
+                android:tag="17" />
 
             <Button
                 android:id="@+id/button8"
                 style="@style/MarginlessButton"
-                android:tag="g18" />
+                android:tag="18" />
         </TableRow>
 
         <TableRow
@@ -58,42 +58,42 @@
             <Button
                 android:id="@+id/button9"
                 style="@style/MarginlessButton"
-                android:tag="g21" />
+                android:tag="21" />
 
             <Button
                 android:id="@+id/button10"
                 style="@style/MarginlessButton"
-                android:tag="g22" />
+                android:tag="22" />
 
             <Button
                 android:id="@+id/button11"
                 style="@style/MarginlessButton"
-                android:tag="g23" />
+                android:tag="23" />
 
             <Button
                 android:id="@+id/button12"
                 style="@style/MarginlessButton"
-                android:tag="g24" />
+                android:tag="24" />
 
             <Button
                 android:id="@+id/button13"
                 style="@style/MarginlessButton"
-                android:tag="g25" />
+                android:tag="25" />
 
             <Button
                 android:id="@+id/button14"
                 style="@style/MarginlessButton"
-                android:tag="g26" />
+                android:tag="26" />
 
             <Button
                 android:id="@+id/button15"
                 style="@style/MarginlessButton"
-                android:tag="g27" />
+                android:tag="27" />
 
             <Button
                 android:id="@+id/button16"
                 style="@style/MarginlessButton"
-                android:tag="g28" />
+                android:tag="28" />
         </TableRow>
 
         <TableRow
@@ -104,42 +104,42 @@
             <Button
                 android:id="@+id/button17"
                 style="@style/MarginlessButton"
-                android:tag="g31" />
+                android:tag="31" />
 
             <Button
                 android:id="@+id/button18"
                 style="@style/MarginlessButton"
-                android:tag="g32" />
+                android:tag="32" />
 
             <Button
                 android:id="@+id/button19"
                 style="@style/MarginlessButton"
-                android:tag="g33" />
+                android:tag="33" />
 
             <Button
                 android:id="@+id/button20"
                 style="@style/MarginlessButton"
-                android:tag="g34" />
+                android:tag="34" />
 
             <Button
                 android:id="@+id/button21"
                 style="@style/MarginlessButton"
-                android:tag="g35" />
+                android:tag="35" />
 
             <Button
                 android:id="@+id/button22"
                 style="@style/MarginlessButton"
-                android:tag="g36" />
+                android:tag="36" />
 
             <Button
                 android:id="@+id/button23"
                 style="@style/MarginlessButton"
-                android:tag="g37" />
+                android:tag="37" />
 
             <Button
                 android:id="@+id/button24"
                 style="@style/MarginlessButton"
-                android:tag="g38" />
+                android:tag="38" />
         </TableRow>
 
         <TableRow
@@ -150,42 +150,42 @@
             <Button
                 android:id="@+id/button25"
                 style="@style/MarginlessButton"
-                android:tag="g41" />
+                android:tag="41" />
 
             <Button
                 android:id="@+id/button26"
                 style="@style/MarginlessButton"
-                android:tag="g42" />
+                android:tag="42" />
 
             <Button
                 android:id="@+id/button27"
                 style="@style/MarginlessButton"
-                android:tag="g43" />
+                android:tag="43" />
 
             <Button
                 android:id="@+id/button28"
                 style="@style/MarginlessButton"
-                android:tag="g44" />
+                android:tag="44" />
 
             <Button
                 android:id="@+id/button29"
                 style="@style/MarginlessButton"
-                android:tag="g45" />
+                android:tag="45" />
 
             <Button
                 android:id="@+id/button30"
                 style="@style/MarginlessButton"
-                android:tag="g46" />
+                android:tag="46" />
 
             <Button
                 android:id="@+id/button31"
                 style="@style/MarginlessButton"
-                android:tag="g47" />
+                android:tag="47" />
 
             <Button
                 android:id="@+id/button32"
                 style="@style/MarginlessButton"
-                android:tag="g48" />
+                android:tag="48" />
         </TableRow>
 
         <TableRow
@@ -196,42 +196,42 @@
             <Button
                 android:id="@+id/button33"
                 style="@style/MarginlessButton"
-                android:tag="g51" />
+                android:tag="51" />
 
             <Button
                 android:id="@+id/button34"
                 style="@style/MarginlessButton"
-                android:tag="g52" />
+                android:tag="52" />
 
             <Button
                 android:id="@+id/button35"
                 style="@style/MarginlessButton"
-                android:tag="g53" />
+                android:tag="53" />
 
             <Button
                 android:id="@+id/button36"
                 style="@style/MarginlessButton"
-                android:tag="g54" />
+                android:tag="54" />
 
             <Button
                 android:id="@+id/button37"
                 style="@style/MarginlessButton"
-                android:tag="g55" />
+                android:tag="55" />
 
             <Button
                 android:id="@+id/button38"
                 style="@style/MarginlessButton"
-                android:tag="g56" />
+                android:tag="56" />
 
             <Button
                 android:id="@+id/button39"
                 style="@style/MarginlessButton"
-                android:tag="g57" />
+                android:tag="57" />
 
             <Button
                 android:id="@+id/button40"
                 style="@style/MarginlessButton"
-                android:tag="g58" />
+                android:tag="58" />
         </TableRow>
 
         <TableRow
@@ -242,42 +242,42 @@
             <Button
                 android:id="@+id/button41"
                 style="@style/MarginlessButton"
-                android:tag="g61" />
+                android:tag="61" />
 
             <Button
                 android:id="@+id/button42"
                 style="@style/MarginlessButton"
-                android:tag="g62" />
+                android:tag="62" />
 
             <Button
                 android:id="@+id/button43"
                 style="@style/MarginlessButton"
-                android:tag="g63" />
+                android:tag="63" />
 
             <Button
                 android:id="@+id/button44"
                 style="@style/MarginlessButton"
-                android:tag="g64" />
+                android:tag="64" />
 
             <Button
                 android:id="@+id/button45"
                 style="@style/MarginlessButton"
-                android:tag="g65" />
+                android:tag="65" />
 
             <Button
                 android:id="@+id/button46"
                 style="@style/MarginlessButton"
-                android:tag="g66" />
+                android:tag="66" />
 
             <Button
                 android:id="@+id/button47"
                 style="@style/MarginlessButton"
-                android:tag="g67" />
+                android:tag="67" />
 
             <Button
                 android:id="@+id/button48"
                 style="@style/MarginlessButton"
-                android:tag="g68" />
+                android:tag="68" />
         </TableRow>
 
         <TableRow
@@ -288,42 +288,42 @@
             <Button
                 android:id="@+id/button49"
                 style="@style/MarginlessButton"
-                android:tag="g71" />
+                android:tag="71" />
 
             <Button
                 android:id="@+id/button50"
                 style="@style/MarginlessButton"
-                android:tag="g72" />
+                android:tag="72" />
 
             <Button
                 android:id="@+id/button51"
                 style="@style/MarginlessButton"
-                android:tag="g73" />
+                android:tag="73" />
 
             <Button
                 android:id="@+id/button52"
                 style="@style/MarginlessButton"
-                android:tag="g74" />
+                android:tag="74" />
 
             <Button
                 android:id="@+id/button53"
                 style="@style/MarginlessButton"
-                android:tag="g75" />
+                android:tag="75" />
 
             <Button
                 android:id="@+id/button54"
                 style="@style/MarginlessButton"
-                android:tag="g76" />
+                android:tag="76" />
 
             <Button
                 android:id="@+id/button55"
                 style="@style/MarginlessButton"
-                android:tag="g77" />
+                android:tag="77" />
 
             <Button
                 android:id="@+id/button56"
                 style="@style/MarginlessButton"
-                android:tag="g78" />
+                android:tag="78" />
         </TableRow>
 
         <TableRow
@@ -334,41 +334,41 @@
             <Button
                 android:id="@+id/button57"
                 style="@style/MarginlessButton"
-                android:tag="g81" />
+                android:tag="81" />
 
             <Button
                 android:id="@+id/button58"
                 style="@style/MarginlessButton"
-                android:tag="g82" />
+                android:tag="82" />
 
             <Button
                 android:id="@+id/button59"
                 style="@style/MarginlessButton"
-                android:tag="g83" />
+                android:tag="83" />
 
             <Button
                 android:id="@+id/button60"
                 style="@style/MarginlessButton"
-                android:tag="g84" />
+                android:tag="84" />
 
             <Button
                 android:id="@+id/button61"
                 style="@style/MarginlessButton"
-                android:tag="g85" />
+                android:tag="85" />
 
             <Button
                 android:id="@+id/button62"
                 style="@style/MarginlessButton"
-                android:tag="g86" />
+                android:tag="86" />
 
             <Button
                 android:id="@+id/button63"
                 style="@style/MarginlessButton"
-                android:tag="g87" />
+                android:tag="87" />
 
             <Button
                 android:id="@+id/button64"
                 style="@style/MarginlessButton"
-                android:tag="g88" />
+                android:tag="88" />
         </TableRow>
 </TableLayout>
