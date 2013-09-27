@@ -7,20 +7,20 @@ package edu.uwg.jamestwyford.connect64;
  * @version assignment3
  */
 public class Puzzle {
-	final private int[] positions;
-	final private int[] values;
+	private final int[] positions;
+	private final int[] values;
 
 	/**
 	 * Constructs a Puzzle using the specified integer arrays.
 	 * 
-	 * @param positions
+	 * @param newPositions
 	 *            the initial positions of the puzzle
-	 * @param values
+	 * @param newValues
 	 *            the initial values for the puzzle
 	 */
-	public Puzzle(final int[] positions, final int[] values) {
-		this.positions = positions;
-		this.values = values;
+	public Puzzle(final int[] newPositions, final int[] newValues) {
+		this.positions = newPositions;
+		this.values = newValues;
 	}
 
 	/**
@@ -33,7 +33,7 @@ public class Puzzle {
 	}
 
 	/**
-	 * Returns the values array for this Puzzle
+	 * Returns the values array for this Puzzle.
 	 * 
 	 * @return the initial values
 	 */

@@ -25,13 +25,13 @@ public class Connect64 extends Activity {
 	// keep negative so isNext() and isPrev() will always return false
 	private static final int BAD_VALUE = -1;
 	private static final int BOARD_MAX = 64;
-	private static final int ROW_SIZE = 8;
 	private static final int COL_SIZE = 8;
+	private static final int ROW_SIZE = 8;
 
 	private TableLayout gameBoard;
 	private TableLayout inputButtons;
-	private Spinner rangeSpinner;
 	private TextView puzzleLabel;
+	private Spinner rangeSpinner;
 
 	private int range;
 	private int[] initialPositions;
@@ -107,21 +107,8 @@ public class Connect64 extends Activity {
 		}
 	}
 
-	private void loadPuzzle(int puzzle) {
-		resetBoard();
-		this.puzzle = puzzle;
-		this.puzzleLabel.setText("Puzzle " + this.puzzle);
-		Puzzle newPuzzle = PuzzleFactory.getPuzzle(this.puzzle);
-		this.initialPositions = newPuzzle.getPositions();
-		this.initialValues = newPuzzle.getValues();
-		Log.d(LOG_TAG, "Loading puzzle " + puzzle + ". posLength: "
-				+ this.initialPositions.length + " valLength: "
-				+ this.initialValues.length);
-		resetAndInitialize();
-	}
-
 	@Override
-	protected void onRestoreInstanceState(Bundle savedState) {
+	protected final void onRestoreInstanceState(final Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
 		Log.d(LOG_TAG, "onRestoreInstanceState()");
 
@@ -135,9 +122,9 @@ public class Connect64 extends Activity {
 			resetAndInitialize();
 			this.rangeSpinner.setSelection(this.range);
 
-			SparseIntArray state = this.boardState;
-			int[] positions = savedState.getIntArray("statePositions");
-			int[] values = savedState.getIntArray("stateValues");
+			final SparseIntArray state = this.boardState;
+			final int[] positions = savedState.getIntArray("statePositions");
+			final int[] values = savedState.getIntArray("stateValues");
 			for (int i = 0; i < positions.length; i++) {
 				state.put(positions[i], values[i]);
 				getButton(String.valueOf(positions[i])).setText(
@@ -147,7 +134,7 @@ public class Connect64 extends Activity {
 	}
 
 	@Override
-	protected void onSaveInstanceState(Bundle outState) {
+	protected final void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
 		Log.d(LOG_TAG, "onSaveInstanceState()");
 
@@ -157,10 +144,10 @@ public class Connect64 extends Activity {
 		outState.putInt("range", this.range);
 		outState.putInt("puzzle", this.puzzle);
 
-		SparseIntArray state = this.boardState;
-		int size = state.size();
-		int[] positions = new int[size];
-		int[] values = new int[size];
+		final SparseIntArray state = this.boardState;
+		final int size = state.size();
+		final int[] positions = new int[size];
+		final int[] values = new int[size];
 		for (int i = 0; i < size; i++) {
 			positions[i] = state.keyAt(i);
 			values[i] = state.valueAt(i);
@@ -177,16 +164,14 @@ public class Connect64 extends Activity {
 	private void checkWinCondition() {
 		Toast toast = null;
 		final boolean boardValid = isBoardCorrect();
-		if (boardValid) {
-			if (this.puzzle < PuzzleFactory.numPuzzles()) {
-				toast = Toast.makeText(this, R.string.youWin,
-						Toast.LENGTH_SHORT);
-				int nextPuzzle = this.puzzle += 1;
-				loadPuzzle(nextPuzzle);
-			} else {
-				toast = Toast.makeText(this, "All puzzles complete!",
-						Toast.LENGTH_SHORT);
-			}
+		if (boardValid && this.puzzle < PuzzleFactory.numPuzzles()) {
+			toast = Toast.makeText(this, R.string.youWin, Toast.LENGTH_SHORT);
+			final int nextPuzzle = this.puzzle + 1;
+			loadPuzzle(nextPuzzle);
+		} else if (boardValid && this.puzzle == PuzzleFactory.numPuzzles()) {
+			toast = Toast.makeText(this, "All puzzles complete!",
+					Toast.LENGTH_SHORT);
+
 		} else if (this.boardState.size() == BOARD_MAX && !boardValid) {
 			toast = Toast.makeText(this, R.string.youLose, Toast.LENGTH_SHORT);
 		}
@@ -196,7 +181,7 @@ public class Connect64 extends Activity {
 	}
 
 	private Button getButton(final String tag) {
-		Button button = (Button) this.gameBoard.findViewWithTag(tag);
+		final Button button = (Button) this.gameBoard.findViewWithTag(tag);
 		if (button == null) {
 			Log.e(LOG_TAG, "invalid tag passed: " + tag);
 		}
@@ -245,9 +230,9 @@ public class Connect64 extends Activity {
 		final int up = this.boardState.get(tag - yDelta, BAD_VALUE);
 		final int down = this.boardState.get(tag + yDelta, BAD_VALUE);
 
-		final boolean hasNext = (value == BOARD_MAX)
-				|| this.isNext(value, left) || this.isNext(value, right)
-				|| this.isNext(value, up) || this.isNext(value, down);
+		final boolean hasNext = (value == BOARD_MAX) || this.isNext(value, left)
+				|| this.isNext(value, right) || this.isNext(value, up)
+				|| this.isNext(value, down);
 		final boolean hasPrev = (value == 1) || this.isPrev(value, left)
 				|| this.isPrev(value, right) || this.isPrev(value, up)
 				|| this.isPrev(value, down);
@@ -281,6 +266,19 @@ public class Connect64 extends Activity {
 		return thisValue == otherValue + 1;
 	}
 
+	private void loadPuzzle(final int newPuzzle) {
+		resetBoard();
+		this.puzzle = newPuzzle;
+		this.puzzleLabel.setText("Puzzle " + this.puzzle);
+		final Puzzle newPuzzleObj = PuzzleFactory.getPuzzle(this.puzzle);
+		this.initialPositions = newPuzzleObj.getPositions();
+		this.initialValues = newPuzzleObj.getValues();
+		Log.d(LOG_TAG, "Loading puzzle " + newPuzzle + ". posLength: "
+				+ this.initialPositions.length + " valLength: "
+				+ this.initialValues.length);
+		resetAndInitialize();
+	}
+
 	/**
 	 * Resets the game board and loads values at <code>initialValues</code> into
 	 * the positions at <code>initialPositions</code>.
@@ -312,8 +310,8 @@ public class Connect64 extends Activity {
 
 	private void setInitialValues() {
 		Log.d(LOG_TAG, "loading initial values.");
-		int[] pos = this.initialPositions;
-		int[] vals = this.initialValues;
+		final int[] pos = this.initialPositions;
+		final int[] vals = this.initialValues;
 		if (pos.length < 1) {
 			Log.e(LOG_TAG, "no data in initialPositions");
 		}
