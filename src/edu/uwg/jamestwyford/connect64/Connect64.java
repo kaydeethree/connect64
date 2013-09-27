@@ -39,7 +39,8 @@ public class Connect64 extends Activity {
 		button.setText(this.clickedButton);
 		enableValidButtons();
 		if (checkWinCondition()) {
-			Toast toast = Toast.makeText(this, "Winner!", Toast.LENGTH_LONG);
+			final Toast toast = Toast.makeText(this, "Winner!",
+					Toast.LENGTH_LONG);
 			toast.show();
 		}
 	}
@@ -100,11 +101,7 @@ public class Connect64 extends Activity {
 	 * @see hasValidNeighbor(x, y) for win-condition checking
 	 */
 	private boolean canEnablePosition(final int x, final int y) {
-		/*
-		 * this is not the most efficient. if we're looping through the board
-		 * starting top-left, we only need to check down and right... until I
-		 * get around to that, we'll end up checking each button up to 4 times
-		 */
+		// TODO come up with more efficient solution
 		final Button left = getButton("g" + (x - 1) + y);
 		final Button right = getButton("g" + (x + 1) + y);
 		final Button up = getButton("g" + x + (y - 1));
@@ -137,22 +134,24 @@ public class Connect64 extends Activity {
 		storeInitialValues();
 	}
 
+	private Button getButton(final String tag) {
+		return (Button) this.grid.findViewWithTag(tag);
+	}
+
 	/**
 	 * returns the value as an integer of the button or -2 if empty
-	 * @param button the button to get the value of
+	 * 
+	 * @param button
+	 *            the button to get the value of
 	 * @return the integer value of the button or -2 if empty
 	 */
-	private int getValue(Button button) {
-		String val = button.getText().toString();
+	private int getValue(final Button button) {
+		final String val = button.getText().toString();
 		if (!val.equals("")) {
-		return Integer.valueOf(val);
+			return Integer.valueOf(val);
 		} else {
 			return -2;
 		}
-	}
-
-	private Button getButton(final String tag) {
-		return (Button) this.grid.findViewWithTag(tag);
 	}
 
 	/**
@@ -166,30 +165,31 @@ public class Connect64 extends Activity {
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
 	private boolean hasCorrectNeighbors(final int x, final int y) {
+		// TODO come up with more efficient solution
 		final int value = getValue(getButton("g" + x + y));
 		final Button left = getButton("g" + (x - 1) + y);
 		final Button right = getButton("g" + (x + 1) + y);
 		final Button up = getButton("g" + x + (y - 1));
 		final Button down = getButton("g" + x + (y + 1));
 
-		boolean hasNext = value == 64 || hasNext(value, left)
+		final boolean hasNext = value == 64 || hasNext(value, left)
 				|| hasNext(value, right) || hasNext(value, up)
 				|| hasNext(value, down);
-		boolean hasPrev = value == 1 || hasPrev(value, left)
+		final boolean hasPrev = value == 1 || hasPrev(value, left)
 				|| hasPrev(value, right) || hasPrev(value, up)
 				|| hasPrev(value, down);
 
 		return hasNext && hasPrev;
 	}
 
-	private boolean hasNext(int thisValue, Button otherButton) {
+	private boolean hasNext(final int thisValue, final Button otherButton) {
 		if (otherButton == null) {
 			return false;
 		}
 		return getValue(otherButton) == thisValue + 1;
 	}
 
-	private boolean hasPrev(int thisValue, Button otherButton) {
+	private boolean hasPrev(final int thisValue, final Button otherButton) {
 		if (otherButton == null) {
 			return false;
 		}
