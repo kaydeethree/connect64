@@ -47,11 +47,7 @@ public class Connect64 extends Activity {
 		final Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag() + " input: " + this.input);
 
-		if (this.input != BAD_VALUE) {
-			setText(button);
-		} else {
-			clearText(button);
-		}
+		setText(button);
 		configureInputButtons();
 
 		if (this.gridState.size() == 64) {
@@ -108,7 +104,7 @@ public class Connect64 extends Activity {
 	 */
 	private void checkWinCondition() {
 		Toast toast = null;
-		boolean boardValid = isBoardCorrect();
+		final boolean boardValid = isBoardCorrect();
 		if (boardValid) {
 			toast = Toast.makeText(this, R.string.youWin, Toast.LENGTH_LONG);
 			// TODO reset grid and load next board
@@ -119,20 +115,6 @@ public class Connect64 extends Activity {
 		if (toast != null) {
 			toast.show();
 		}
-	}
-
-	/**
-	 * Clears the text of the specified button. Sets <code>input</code> to the
-	 * removed value so it may be quickly set elsewhere.
-	 * 
-	 * @param button
-	 *            the button to clear text from
-	 */
-	private void clearText(final Button button) {
-		final int pos = getTag(button);
-		this.gridState.delete(pos);
-		this.input = getValue(button);
-		button.setText("");
 	}
 
 	/**
@@ -147,7 +129,7 @@ public class Connect64 extends Activity {
 		for (int i = 1; i <= 16; i++) {
 			buttonVal = 16 * this.range + i;
 			inputButton = (Button) this.inputGrid.findViewWithTag("in" + i);
-			inputButton.setText("" + buttonVal);
+			inputButton.setText(String.valueOf(buttonVal));
 			if (this.gridState.indexOfValue(buttonVal) >= 0) {
 				inputButton.setEnabled(false);
 			} else {
@@ -238,7 +220,7 @@ public class Connect64 extends Activity {
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
 				final Button button = getButton("" + i + j);
-				if (this.isEmpty(button) || !this.hasCorrectNeighbors(button)) {
+				if (isEmpty(button) || !hasCorrectNeighbors(button)) {
 					return false;
 				}
 			}
@@ -297,21 +279,24 @@ public class Connect64 extends Activity {
 	}
 
 	/**
-	 * Sets the text of the specified button to the value of <code>input</code>.
-	 * Analogously to <code>clearText()</code>, if a value already exists at the
+	 * Sets the text of the specified button to the value of <code>input</code>
+	 * if valid, clearing the button otherwise. If a value already exists at the
 	 * specified button, sets <code>input</code> to that value.
 	 * 
 	 * @param button
 	 *            the button to set the text for.
 	 */
 	private void setText(final Button button) {
-		if (this.input == BAD_VALUE) {
-			return;
-		}
 		final int pos = getTag(button);
-		int tempInput = getValue(button);
-		button.setText("" + this.input);
-		this.gridState.put(pos, this.input);
+		final int tempInput = getValue(button);
+
+		if (this.input == BAD_VALUE) {
+			button.setText("");
+			this.gridState.delete(pos);
+		} else {
+			button.setText(String.valueOf(this.input));
+			this.gridState.put(pos, this.input);
+		}
 		this.input = tempInput;
 	}
 
@@ -339,8 +324,9 @@ public class Connect64 extends Activity {
 
 	private void storeInitialValues() {
 		for (int i = 0; i < this.initialPositions.length; i++) {
-			final Button button = getButton("" + this.initialPositions[i]);
-			button.setText("" + this.initialValues[i]);
+			final Button button = getButton(String
+					.valueOf(this.initialPositions[i]));
+			button.setText(String.valueOf(this.initialValues[i]));
 			button.setEnabled(false);
 			this.gridState.put(this.initialPositions[i], this.initialValues[i]);
 		}
