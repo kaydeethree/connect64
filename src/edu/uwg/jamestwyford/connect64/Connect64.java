@@ -21,10 +21,11 @@ import android.widget.Toast;
  */
 public class Connect64 extends Activity {
 	private static final String LOG_TAG = "C64";
+	private static final int NO_INPUT = -1;
 	private TableLayout grid;
 	private TableLayout inputGrid;
 	private Spinner rangeSpinner;
-	private int input = -1;
+	private int input;
 	private int[] initialPositions;
 	private int[] initialValues;
 	private SparseIntArray gridState;
@@ -40,13 +41,15 @@ public class Connect64 extends Activity {
 		final Button button = (Button) view;
 		Log.d(LOG_TAG, "" + button.getTag());
 
-		if (getValue(button) < 0 || this.input > 0) {
+		if (this.input > 0) {
 			setText(button);
 		} else {
 			clearText(button);
 		}
 		configureInputButtons();
-		checkWinCondition();
+		if (this.gridState.size() == 64) {
+			checkWinCondition();
+		}
 	}
 
 	/**
@@ -72,6 +75,7 @@ public class Connect64 extends Activity {
 		setContentView(R.layout.activity_connect64);
 		this.grid = (TableLayout) findViewById(R.id.connect64);
 		this.gridState = new SparseIntArray(64);
+		this.input = NO_INPUT;
 
 		setupRangeSpinner();
 
@@ -100,18 +104,17 @@ public class Connect64 extends Activity {
 	 */
 	private void checkWinCondition() {
 		final Toast toast;
-		if (this.gridState.size() == 64) {
-			if (isBoardCorrect()) {
-				toast = Toast.makeText(this, "Winner!", Toast.LENGTH_LONG);
-			} else {
-				toast = Toast.makeText(this, "Loser!", Toast.LENGTH_LONG);
-			}
-			toast.show();
+
+		if (isBoardCorrect()) {
+			toast = Toast.makeText(this, "Winner!", Toast.LENGTH_LONG);
+		} else {
+			toast = Toast.makeText(this, "Loser!", Toast.LENGTH_LONG);
 		}
+		toast.show();
 	}
 
 	private void clearText(final Button button) {
-		final int pos = Integer.valueOf(button.getTag().toString());
+		final int pos = getTag(button);
 		this.gridState.delete(pos);
 		button.setText("");
 	}
@@ -139,6 +142,10 @@ public class Connect64 extends Activity {
 
 	private Button getButton(final String tag) {
 		return (Button) this.grid.findViewWithTag(tag);
+	}
+
+	private Integer getTag(final Button button) {
+		return Integer.valueOf(button.getTag().toString());
 	}
 
 	/**
@@ -169,11 +176,11 @@ public class Connect64 extends Activity {
 	 */
 	private boolean hasCorrectNeighbors(final int x, final int y) {
 		// TODO come up with more efficient solution
-		final int value = getValue(getButton("" + x + y));
-		final Button left = getButton("" + (x - 1) + y);
-		final Button right = getButton("" + (x + 1) + y);
-		final Button up = getButton("" + x + (y - 1));
-		final Button down = getButton("" + x + (y + 1));
+		final int value = this.getValue(this.getButton("" + x + y));
+		final Button left = this.getButton("" + (x - 1) + y);
+		final Button right = this.getButton("" + (x + 1) + y);
+		final Button up = this.getButton("" + x + (y - 1));
+		final Button down = this.getButton("" + x + (y + 1));
 
 		final boolean hasNext = (value == 64) || hasNext(value, left)
 				|| hasNext(value, right) || hasNext(value, up)
@@ -189,20 +196,20 @@ public class Connect64 extends Activity {
 		if (otherButton == null) {
 			return false;
 		}
-		return getValue(otherButton) == thisValue + 1;
+		return (this.getValue(otherButton) == thisValue + 1);
 	}
 
 	private boolean hasPrev(final int thisValue, final Button otherButton) {
 		if (otherButton == null) {
 			return false;
 		}
-		return getValue(otherButton) == thisValue - 1;
+		return this.getValue(otherButton) == thisValue - 1;
 	}
 
 	private boolean isBoardCorrect() {
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
-				if (isEmpty(i, j) || !hasCorrectNeighbors(i, j)) {
+				if (isEmpty(i, j) || !this.hasCorrectNeighbors(i, j)) {
 					return false;
 				}
 			}
@@ -211,7 +218,7 @@ public class Connect64 extends Activity {
 	}
 
 	private boolean isEmpty(final int x, final int y) {
-		final Button button = getButton("" + x + y);
+		final Button button = this.getButton("" + x + y);
 		if (button == null || button.getText().equals("")) {
 			return true;
 		}
@@ -249,7 +256,7 @@ public class Connect64 extends Activity {
 
 		for (int i = 1; i <= 8; i++) {
 			for (int j = 1; j <= 8; j++) {
-				final Button button = getButton("" + i + j);
+				final Button button = this.getButton("" + i + j);
 				button.setText("");
 				button.setEnabled(true);
 			}
@@ -265,13 +272,13 @@ public class Connect64 extends Activity {
 		if (this.input < 1) {
 			return;
 		}
-		if (getValue(button) > 0) {
-			clearText(button);
+		if (this.getValue(button) > 0) {
+			this.clearText(button);
 		}
 		button.setText("" + this.input);
-		final int pos = Integer.valueOf(button.getTag().toString());
+		final int pos = this.getTag(button);
 		this.gridState.put(pos, this.input);
-		this.input = -1;
+		this.input = NO_INPUT;
 	}
 
 	private void setupRangeSpinner() {
@@ -298,7 +305,7 @@ public class Connect64 extends Activity {
 
 	private void storeInitialValues() {
 		for (int i = 0; i < this.initialPositions.length; i++) {
-			final Button button = getButton("" + this.initialPositions[i]);
+			final Button button = this.getButton("" + this.initialPositions[i]);
 			button.setText("" + this.initialValues[i]);
 			button.setEnabled(false);
 			this.gridState.put(this.initialPositions[i], this.initialValues[i]);
