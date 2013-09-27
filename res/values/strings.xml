@@ -12,7 +12,7 @@
     </string-array>
 
     <string name="puzzleNum">Puzzle</string>
-    <string name="backButton">Undo</string>
+    <string name="clear">Clear</string>
     <string name="youWin">You win!</string>
     <string name="youLose">Try again</string>
 

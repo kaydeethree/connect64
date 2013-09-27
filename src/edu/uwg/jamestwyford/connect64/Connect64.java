@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TableLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 /**
@@ -30,6 +31,7 @@ public class Connect64 extends Activity {
 	private TableLayout gameBoard;
 	private TableLayout inputButtons;
 	private Spinner rangeSpinner;
+	private TextView puzzleLabel;
 
 	private int range;
 	private int[] initialPositions;
@@ -39,9 +41,20 @@ public class Connect64 extends Activity {
 	private int input;
 
 	/**
+	 * Resets the game board.
+	 * 
+	 * @param view
+	 *            ignored
+	 */
+	public final void clearButtonClick(final View view) {
+		resetAndInitialize(this.initialPositions, this.initialValues);
+	}
+
+	/**
 	 * Input handler for the 64 game board buttons. If <code>input</code> is
 	 * valid, sets the clicked button to that value. Clears the button
-	 * otherwise. If the board is full, calls <code>checkWinCondition()</code>.
+	 * otherwise. Updates the input buttons to dis/enable buttons as
+	 * appropriate. If the board is full, calls <code>checkWinCondition()</code>
 	 * 
 	 * @param view
 	 *            the button clicked
@@ -80,14 +93,19 @@ public class Connect64 extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_connect64);
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
+		if (this.gameBoard == null) {
+			Log.e(LOG_TAG, "game board empty?");
+		}
 		this.inputButtons = (TableLayout) findViewById(R.id.inputButtons);
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.input = BAD_VALUE;
+		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
+		puzzleLabel.setText("Puzzle 1");
 		setupRangeSpinner();
 
-		// final int[] testPos = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
-		// final int[] testVals = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
-		final int[] testPos = new int[] { 12, 13, 14, 15, 16, 17, 18, 28, 27,
+		 final int[] testPos = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
+		 final int[] testVals = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
+		/*final int[] testPos = new int[] { 12, 13, 14, 15, 16, 17, 18, 28, 27,
 				26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38, 48, 47,
 				46, 45, 44, 43, 42, 41, 51, 52, 53, 54, 55, 56, 57, 58, 68, 67,
 				66, 65, 64, 63, 62, 61, 71, 72, 73, 74, 75, 76, 77, 78, 88, 87,
@@ -96,7 +114,7 @@ public class Connect64 extends Activity {
 				13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28,
 				29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44,
 				45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60,
-				61, 62, 63 };
+				61, 62, 63 };*/
 		resetAndInitialize(testPos, testVals);
 	}
 
@@ -160,7 +178,7 @@ public class Connect64 extends Activity {
 		final int xDelta = 1;
 		final int yDelta = 10;
 		final int tag = this.getTag(button);
-	
+
 		final int left = this.boardState.get(tag - xDelta, BAD_VALUE);
 		final int right = this.boardState.get(tag + xDelta, BAD_VALUE);
 		final int up = this.boardState.get(tag - yDelta, BAD_VALUE);
@@ -224,11 +242,12 @@ public class Connect64 extends Activity {
 		this.initialPositions = positions;
 		this.initialValues = values;
 
-		resetboard();
+		resetBoard();
 		setInitialValues();
+		setupInputButtons();
 	}
 
-	private void resetboard() {
+	private void resetBoard() {
 		this.rangeSpinner.setSelection(0);
 
 		for (int i = 1; i <= COL_SIZE; i++) {
