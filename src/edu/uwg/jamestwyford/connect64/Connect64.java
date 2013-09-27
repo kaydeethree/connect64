@@ -61,8 +61,6 @@ public class Connect64 extends Activity {
 	 */
 	public final void gameButtonClick(final View view) {
 		final Button button = (Button) view;
-		Log.d(LOG_TAG, "button: " + button.getTag() + " input: " + this.input);
-
 		setText(button);
 		setupInputButtons();
 
@@ -97,17 +95,14 @@ public class Connect64 extends Activity {
 		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
 		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		this.boardState = new SparseIntArray(BOARD_MAX);
-		this.input = BAD_VALUE;
 		setupRangeSpinner();
 		
 		if (savedState == null) {
 			Log.d(LOG_TAG, "savedState = null. Initializing");
 			this.puzzleLabel.setText("Puzzle 1");
-			
-			 final int[] testPos = new int[] { 11, 18, 88, 81, 27, 33, 66, 54
-			 };
-			 final int[] testVals = new int[] { 1, 8, 15, 22, 34, 49, 55, 64
-			 };
+			this.input = BAD_VALUE;
+			final int[] testPos = new int[] { 11, 18, 88, 81, 27, 33, 66, 54 };
+			final int[] testVals = new int[] { 1, 8, 15, 22, 34, 49, 55, 64 };
 
 			/*final int[] testPos = new int[] { 12, 13, 14, 15, 16, 17, 18, 28,
 					27, 26, 25, 24, 23, 22, 21, 31, 32, 33, 34, 35, 36, 37, 38,
@@ -134,13 +129,14 @@ public class Connect64 extends Activity {
 			this.range = savedState.getInt("range");
 			this.puzzleLabel.setText(savedState.getCharSequence("label"));
 			resetAndInitialize(this.initialPositions, this.initialValues);
+			this.rangeSpinner.setSelection(range);
 			
 			SparseIntArray state = this.boardState;
 			int[] positions = savedState.getIntArray("statePositions");
 			int[] values = savedState.getIntArray("stateValues");
 			for (int i = 0; i < positions.length; i++) {
 				state.put(positions[i], values[i]);
-				setText(getButton(String.valueOf(positions[i])),String.valueOf(values[i]));
+				getButton(String.valueOf(positions[i])).setText(String.valueOf(values[i]));
 			}
 		}
 	}
@@ -149,15 +145,13 @@ public class Connect64 extends Activity {
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 
-		// iterating through the board state, get a local copy to speed access
-		SparseIntArray state = this.boardState;
-
 		outState.putIntArray("initialPositions", this.initialPositions);
 		outState.putIntArray("initialValues", this.initialValues);
 		outState.putInt("input", this.input);
 		outState.putInt("range", this.range);
 		outState.putCharSequence("label", this.puzzleLabel.getText());
 
+		SparseIntArray state = this.boardState;
 		int[] positions = new int[state.size()];
 		int[] values = new int[state.size()];
 		for (int i = 0; i < state.size(); i++) {
@@ -306,6 +300,7 @@ public class Connect64 extends Activity {
 			}
 		}
 		this.boardState.clear();
+		this.rangeSpinner.setSelection(0);
 	}
 
 	private void setInitialValues() {
@@ -343,10 +338,6 @@ public class Connect64 extends Activity {
 			this.boardState.put(pos, this.input);
 		}
 		this.input = tempInput;
-	}
-	
-	private void setText(final Button button, final String text) {
-		button.setText(text);
 	}
 
 	/**
