@@ -4,7 +4,6 @@ import java.util.Locale;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
@@ -123,19 +122,36 @@ public class Connect64 extends Activity implements
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		boolean retVal = true;
+	public final boolean onOptionsItemSelected(final MenuItem item) {
+		final boolean retVal = true;
 		switch (item.getItemId()) {
 		case R.id.clearPrefs:
-			SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-			Editor editor = prefs.edit();
+			final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+			final SharedPreferences.Editor editor = prefs.edit();
 			editor.clear();
 			editor.apply();
 			break;
 		case R.id.loadPuzzle:
 			break;
+		default:
+			break;
 		}
 		return retVal;
+	}
+
+	@Override
+	public final void onWindowFocusChanged(final boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		Log.d(LOG_TAG, "onWindowFocusedChanged(" + hasFocus + ") timer? "
+				+ this.timerRunning);
+		if (hasFocus && this.timerRunning) {
+			resumeTimer();
+		} else if (hasFocus && !this.timerRunning) {
+			this.timer.setText(convertTime());
+		} else if (!hasFocus && this.timerRunning) {
+			pauseTimer();
+			this.timerRunning = true;
+		}
 	}
 
 	/**
@@ -180,7 +196,7 @@ public class Connect64 extends Activity implements
 		// @formatter:off
 		/*
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-		final Editor editor = prefs.edit();
+		final SharedPreferences.Editor editor = prefs.edit();
 		editor.putInt(INPUT_VALUE, this.currentInput);
 		editor.putInt(RANGE_VALUE, this.currentRange);
 		editor.putInt(PUZZLE_VALUE, this.currentPuzzle);
@@ -284,21 +300,6 @@ public class Connect64 extends Activity implements
 		}
 		outState.putIntArray(STATE_POSITIONS, positions);
 		outState.putIntArray(STATE_VALUES, values);
-	}
-
-	@Override
-	public void onWindowFocusChanged(boolean hasFocus) {
-		super.onWindowFocusChanged(hasFocus);
-		Log.d(LOG_TAG, "onWindowFocusedChanged(" + hasFocus + ") timer? "
-				+ this.timerRunning);
-		if (hasFocus && this.timerRunning) {
-			resumeTimer();
-		} else if (hasFocus && !this.timerRunning) {
-			this.timer.setText(convertTime());
-		} else if (!hasFocus && this.timerRunning) {
-			pauseTimer();
-			this.timerRunning = true;
-		}
 	}
 
 	/**

@@ -1,22 +1,19 @@
 Android Assignment 3: Connect64
 
 Checkstyle issues:
-* Something something array initialization indents.
+* Something something array initialization and switch indents.
 * this.localField is ok, but the Source Cleanup tool removes "this" on method
-  calls defined in the Class. Checkstyle doesn't seem to care about methods
-  defined in parent Classes that I'm calling without this, though...
+  calls defined elsewhere in the Class. Checkstyle doesn't seem to care about
+  methods defined in parent Classes or straight calls to methods (that is, not
+  calls as part of an assignment operation), though...
 
 Implementation notes:
 * The solution I came up with storing puzzles is meh. 2-dimensional arrays are
-  not efficient, but at least they only get accessed _once_ on puzzle creation.
-  I'd store them as HashMaps (or SparseIntArrays on Android) if there was a
-  better way to initialize them without having to iterate through the array to
-  load them up anyway.
+  not efficient, but at least they only get accessed _once_ on puzzle
+  initialization. I'd store them as HashMaps (or SparseIntArrays on Android)
+  if there was a better way to initialize them without having to iterate
+  through the array to load them up anyway.
 * It'd be nice if more Android-defined classes (like SparseIntArray) could be
-  put in Bundles, but oh well.
+  put in Bundles/saved preferences, but oh well.
 * I've got a boatload of member fields this time around, most of which are
   static tags or references to Views. Only 7 actual state members...
-* I keep wanting to factor game-logic handling methods out to separate
-  classes, but there's a lot of state that most methods need to be aware of
-  without passing around 38 arguments, However, most of the state is encoded in
-  the boardState hashmap...
