@@ -1,10 +1,5 @@
 package edu.uwg.jamestwyford.connect64;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -63,8 +58,6 @@ public class Connect64 extends Activity implements
 	private int currentPuzzle;
 	private int currentRange;
 	private long elapsedTime;
-	private int[] initialPositions;
-	private int[] initialValues;
 	private boolean timerRunning;
 
 	/**
@@ -127,6 +120,20 @@ public class Connect64 extends Activity implements
 	public final void onNothingSelected(final AdapterView<?> parent) {
 	}
 
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean retVal = true;
+		switch (item.getItemId()) {
+		case R.id.clearPrefs:
+			SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+			Editor editor = prefs.edit();
+			editor.clear();
+			editor.apply();
+			break;
+		}
+		return retVal;
+	}
+
 	/**
 	 * Input handler for the pause/resume button.
 	 * 
@@ -144,6 +151,7 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onCreate(final Bundle savedState) {
 		super.onCreate(savedState);
+		Log.d(LOG_TAG, "onCreate()");
 		setContentView(R.layout.activity_connect64);
 
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
@@ -152,31 +160,18 @@ public class Connect64 extends Activity implements
 		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		this.pauseResume = (ImageButton) findViewById(R.id.pauseResumeButton);
 		this.timer = (Chronometer) findViewById(R.id.chronometer);
+		
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		setupRangeSpinner();
-
 		if (savedState == null) {
 			loadPuzzle(0);
 		}
 	}
 
 	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		boolean retVal = true;
-		switch (item.getItemId()) {
-		case R.id.clearPrefs:
-			SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-			Editor editor = prefs.edit();
-			editor.clear();
-			editor.apply();
-			break;
-		}
-		return retVal;
-	}
-
-	@Override
-	protected void onPause() {
+	protected final void onPause() {
 		super.onPause();
+		Log.d(LOG_TAG, "onPause()");
 		/*
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		final Editor editor = prefs.edit();
@@ -184,14 +179,12 @@ public class Connect64 extends Activity implements
 		editor.putInt(RANGE_VALUE, this.currentRange);
 		editor.putInt(PUZZLE_VALUE, this.currentPuzzle);
 		editor.putBoolean(TIMER_RUNNING, this.timerRunning);
-		pauseTimer();
+		if (this.timerRunning) {
+			pauseTimer();
+		}
 		editor.putLong(ELAPSED_TIME, this.elapsedTime);
 		
 		// grr prefs only taking primitives... (de)serialization sucks!
-		editor.putString(INITIAL_POSITIONS,
-				serializeIntArray(this.initialPositions));
-		editor.putString(INITIAL_VALUES, serializeIntArray(this.initialValues));
-
 		final SparseIntArray state = this.boardState;
 		final int size = state.size();
 		final int[] positions = new int[size];
@@ -218,10 +211,10 @@ public class Connect64 extends Activity implements
 		this.currentInput = savedState.getInt(INPUT_VALUE);
 		this.currentRange = savedState.getInt(RANGE_VALUE);
 		this.currentPuzzle = savedState.getInt(PUZZLE_VALUE);
-		this.puzzleLabel.setText("Puzzle " + this.currentPuzzle);
 		loadPuzzle(this.currentPuzzle);
 		pauseTimer();
 		
+		this.rangeSpinner.setSelection(this.currentRange);
 		this.elapsedTime = savedState.getLong(ELAPSED_TIME);
 		this.timerRunning = savedState.getBoolean(TIMER_RUNNING);
 		
@@ -230,8 +223,6 @@ public class Connect64 extends Activity implements
 		} else {
 			this.timer.setText(convertTime());
 		}
-		//resetAndInitialize();
-		this.rangeSpinner.setSelection(this.currentRange);
 
 		final SparseIntArray state = this.boardState;
 		final int[] positions = savedState.getIntArray(STATE_POSITIONS);
@@ -244,8 +235,9 @@ public class Connect64 extends Activity implements
 	}
 
 	@Override
-	protected void onResume() {
+	protected final void onResume() {
 		super.onResume();
+		Log.d(LOG_TAG, "onResume()");
 		/*
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		this.currentInput = prefs.getInt(INPUT_VALUE, BAD_VALUE);
@@ -258,13 +250,6 @@ public class Connect64 extends Activity implements
 		}
 		resetAndInitialize();
 	
-		final String intPos = prefs.getString(INITIAL_POSITIONS, null);
-		final String intVals = prefs.getString(INITIAL_VALUES, null);
-		if (intPos != null && intVals != null) {
-			this.initialPositions = deserializeIntArray(intPos);
-			this.initialValues = deserializeIntArray(intVals);
-		}
-
 		final SparseIntArray state = this.boardState;
 		final String posString = prefs.getString(STATE_POSITIONS, null);
 		final String valString = prefs.getString(STATE_VALUES, null);
@@ -288,7 +273,6 @@ public class Connect64 extends Activity implements
 		outState.putInt(RANGE_VALUE, this.currentRange);
 		outState.putInt(PUZZLE_VALUE, this.currentPuzzle);
 		outState.putBoolean(TIMER_RUNNING, this.timerRunning);
-
 		if (this.timerRunning) {
 			pauseTimer();
 		}
@@ -343,7 +327,7 @@ public class Connect64 extends Activity implements
 				elapsed % secToMin);
 	}
 
-	private int[] deserializeIntArray(final String string) {
+	/* private int[] deserializeIntArray(final String string) {
 		try {
 			final byte[] bytes = string.getBytes();
 			final ObjectInputStream in = new ObjectInputStream(
@@ -353,7 +337,7 @@ public class Connect64 extends Activity implements
 		} catch (final Exception ex) {
 			return null;
 		} 
-	}
+	}*/
 
 	private Button getButton(final String tag) {
 		final Button button = (Button) this.gameBoard.findViewWithTag(tag);
@@ -454,9 +438,6 @@ public class Connect64 extends Activity implements
 		resetBoard();
 		this.currentPuzzle = newPuzzle;
 		this.puzzleLabel.setText("Puzzle " + this.currentPuzzle);
-		final Puzzle newPuzzleObj = PuzzleFactory.getPuzzle(this.currentPuzzle);
-		this.initialPositions = newPuzzleObj.getPositions();
-		this.initialValues = newPuzzleObj.getValues();
 		this.elapsedTime = 0;
 		resumeTimer();
 		resetAndInitialize();
@@ -499,7 +480,7 @@ public class Connect64 extends Activity implements
 		this.gameBoard.setAlpha(1);
 	}
 
-	private String serializeIntArray(final int[] array) {
+	/*private String serializeIntArray(final int[] array) {
 		try {
 			final ObjectOutputStream out = new ObjectOutputStream(
 					new ByteArrayOutputStream());
@@ -509,11 +490,12 @@ public class Connect64 extends Activity implements
 		} catch (final IOException ex) {
 			return null;
 		}
-	}
+	}*/
 
 	private void setInitialValues() {
-		final int[] pos = this.initialPositions;
-		final int[] vals = this.initialValues;
+		final Puzzle newPuzzleObj = PuzzleFactory.getPuzzle(this.currentPuzzle);
+		final int[] pos = newPuzzleObj.getPositions();
+		final int[] vals = newPuzzleObj.getValues();
 
 		for (int i = 0; i < pos.length; i++) {
 			final Button button = getButton(String.valueOf(pos[i]));
