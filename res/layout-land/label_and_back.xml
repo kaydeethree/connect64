@@ -28,6 +28,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_above="@+id/clearButton"
+        android:text="@string/puzzle_s"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button

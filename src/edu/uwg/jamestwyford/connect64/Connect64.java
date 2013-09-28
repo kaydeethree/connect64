@@ -38,6 +38,7 @@ public class Connect64 extends Activity implements
 	private static final String ELAPSED_TIME = "elapsedTime";
 	private static final String INPUT_VALUE = "input";
 	private static final String LOG_TAG = "C64";
+	private static final String MAX_PUZZLE_ATTEMPTED = "maxPuzzleAttempted";
 	private static final String PUZZLE_VALUE = "puzzle";
 	private static final String RANGE_VALUE = "range";
 	private static final String STATE_POSITIONS = "statePositions";
@@ -58,6 +59,7 @@ public class Connect64 extends Activity implements
 	private int currentPuzzle;
 	private int currentRange;
 	private long elapsedTime;
+	private int maxPuzzleAttempted;
 	private boolean timerRunning;
 
 	/**
@@ -130,6 +132,8 @@ public class Connect64 extends Activity implements
 			editor.clear();
 			editor.apply();
 			break;
+		case R.id.loadPuzzle:
+			break;
 		}
 		return retVal;
 	}
@@ -160,8 +164,9 @@ public class Connect64 extends Activity implements
 		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		this.pauseResume = (ImageButton) findViewById(R.id.pauseResumeButton);
 		this.timer = (Chronometer) findViewById(R.id.chronometer);
-		
+
 		this.boardState = new SparseIntArray(BOARD_MAX);
+		this.maxPuzzleAttempted = 0;
 		setupRangeSpinner();
 		if (savedState == null) {
 			loadPuzzle(0);
@@ -172,6 +177,7 @@ public class Connect64 extends Activity implements
 	protected final void onPause() {
 		super.onPause();
 		Log.d(LOG_TAG, "onPause()");
+		// @formatter:off
 		/*
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		final Editor editor = prefs.edit();
@@ -179,11 +185,8 @@ public class Connect64 extends Activity implements
 		editor.putInt(RANGE_VALUE, this.currentRange);
 		editor.putInt(PUZZLE_VALUE, this.currentPuzzle);
 		editor.putBoolean(TIMER_RUNNING, this.timerRunning);
-		if (this.timerRunning) {
-			pauseTimer();
-		}
 		editor.putLong(ELAPSED_TIME, this.elapsedTime);
-		
+
 		// grr prefs only taking primitives... (de)serialization sucks!
 		final SparseIntArray state = this.boardState;
 		final int size = state.size();
@@ -195,9 +198,9 @@ public class Connect64 extends Activity implements
 		}
 		editor.putString(STATE_POSITIONS, serializeIntArray(positions));
 		editor.putString(STATE_VALUES, serializeIntArray(values));
-
 		editor.apply();
 		*/
+		// @formatter:on
 	}
 
 	@Override
@@ -211,18 +214,13 @@ public class Connect64 extends Activity implements
 		this.currentInput = savedState.getInt(INPUT_VALUE);
 		this.currentRange = savedState.getInt(RANGE_VALUE);
 		this.currentPuzzle = savedState.getInt(PUZZLE_VALUE);
+		this.maxPuzzleAttempted = savedState.getInt(MAX_PUZZLE_ATTEMPTED);
 		loadPuzzle(this.currentPuzzle);
 		pauseTimer();
-		
+
 		this.rangeSpinner.setSelection(this.currentRange);
 		this.elapsedTime = savedState.getLong(ELAPSED_TIME);
 		this.timerRunning = savedState.getBoolean(TIMER_RUNNING);
-		
-		if (this.timerRunning) {
-			resumeTimer();
-		} else {
-			this.timer.setText(convertTime());
-		}
 
 		final SparseIntArray state = this.boardState;
 		final int[] positions = savedState.getIntArray(STATE_POSITIONS);
@@ -238,6 +236,7 @@ public class Connect64 extends Activity implements
 	protected final void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "onResume()");
+		// @formatter:off
 		/*
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		this.currentInput = prefs.getInt(INPUT_VALUE, BAD_VALUE);
@@ -245,11 +244,8 @@ public class Connect64 extends Activity implements
 		this.currentPuzzle = prefs.getInt(PUZZLE_VALUE, 0);
 		this.timerRunning = prefs.getBoolean(TIMER_RUNNING, true);
 		this.elapsedTime = prefs.getLong(ELAPSED_TIME, 0);
-		if (this.timerRunning) {
-			resumeTimer();
-		}
 		resetAndInitialize();
-	
+
 		final SparseIntArray state = this.boardState;
 		final String posString = prefs.getString(STATE_POSITIONS, null);
 		final String valString = prefs.getString(STATE_VALUES, null);
@@ -261,7 +257,9 @@ public class Connect64 extends Activity implements
 				getButton(String.valueOf(positions[i])).setText(
 						String.valueOf(values[i]));
 			}
-		}*/
+		}
+		*/
+		// @formatter:on
 	}
 
 	@Override
@@ -272,10 +270,8 @@ public class Connect64 extends Activity implements
 		outState.putInt(INPUT_VALUE, this.currentInput);
 		outState.putInt(RANGE_VALUE, this.currentRange);
 		outState.putInt(PUZZLE_VALUE, this.currentPuzzle);
+		outState.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
 		outState.putBoolean(TIMER_RUNNING, this.timerRunning);
-		if (this.timerRunning) {
-			pauseTimer();
-		}
 		outState.putLong(ELAPSED_TIME, this.elapsedTime);
 
 		final SparseIntArray state = this.boardState;
@@ -290,6 +286,21 @@ public class Connect64 extends Activity implements
 		outState.putIntArray(STATE_VALUES, values);
 	}
 
+	@Override
+	public void onWindowFocusChanged(boolean hasFocus) {
+		super.onWindowFocusChanged(hasFocus);
+		Log.d(LOG_TAG, "onWindowFocusedChanged(" + hasFocus + ") timer? "
+				+ this.timerRunning);
+		if (hasFocus && this.timerRunning) {
+			resumeTimer();
+		} else if (hasFocus && !this.timerRunning) {
+			this.timer.setText(convertTime());
+		} else if (!hasFocus && this.timerRunning) {
+			pauseTimer();
+			this.timerRunning = true;
+		}
+	}
+
 	/**
 	 * Overall board win condition check. Board must be full and all Buttons
 	 * must have a valid higher and lower neighbor to fulfill the win condition.
@@ -297,22 +308,24 @@ public class Connect64 extends Activity implements
 	 */
 	private void checkWinCondition() {
 		Toast toast = null;
-		final boolean boardValid = isBoardCorrect();
+		final boolean boardCorrect = isBoardCorrect();
 		final boolean onLastPuzzle = isOnLastPuzzle();
 
-		if (boardValid && onLastPuzzle) {
-			toast = Toast.makeText(this, "All puzzles complete!",
+		if (boardCorrect && onLastPuzzle) {
+			toast = Toast.makeText(this, R.string.all_puzzles_complete,
 					Toast.LENGTH_SHORT);
+			this.timerRunning = false;
 			this.timer.stop();
-		} else if (boardValid && !onLastPuzzle) {
+		} else if (boardCorrect && !onLastPuzzle) {
 			pauseTimer();
-			final String outString = getResources().getString(R.string.youWin)
-					+ " " + convertTime() + "!";
+			final String outString = String.format(Locale.US, getResources()
+					.getString(R.string.you_won_in_s), convertTime());
 			toast = Toast.makeText(this, outString, Toast.LENGTH_SHORT);
 			final int nextPuzzle = this.currentPuzzle + 1;
 			loadPuzzle(nextPuzzle);
-		} else if (!boardValid && onLastPuzzle) {
-			toast = Toast.makeText(this, R.string.youLose, Toast.LENGTH_SHORT);
+		} else if (!boardCorrect && onLastPuzzle) {
+			toast = Toast
+					.makeText(this, R.string.try_again, Toast.LENGTH_SHORT);
 		}
 		if (toast != null) {
 			toast.show();
@@ -327,7 +340,9 @@ public class Connect64 extends Activity implements
 				elapsed % secToMin);
 	}
 
-	/* private int[] deserializeIntArray(final String string) {
+	// @formatter:off
+	/*
+	private int[] deserializeIntArray(final String string) {
 		try {
 			final byte[] bytes = string.getBytes();
 			final ObjectInputStream in = new ObjectInputStream(
@@ -336,8 +351,10 @@ public class Connect64 extends Activity implements
 			return inArray;
 		} catch (final Exception ex) {
 			return null;
-		} 
-	}*/
+		}
+	}
+	*/
+	// @formatter:on
 
 	private Button getButton(final String tag) {
 		final Button button = (Button) this.gameBoard.findViewWithTag(tag);
@@ -422,7 +439,6 @@ public class Connect64 extends Activity implements
 	}
 
 	private boolean isOnLastPuzzle() {
-		Log.d(LOG_TAG,"current puzzle:" + this.currentPuzzle + " numPuzzles: " + PuzzleFactory.numPuzzles());
 		return this.currentPuzzle == PuzzleFactory.numPuzzles();
 	}
 
@@ -437,7 +453,11 @@ public class Connect64 extends Activity implements
 	private void loadPuzzle(final int newPuzzle) {
 		resetBoard();
 		this.currentPuzzle = newPuzzle;
-		this.puzzleLabel.setText("Puzzle " + this.currentPuzzle);
+		this.puzzleLabel.setText(String.format(Locale.US, getResources()
+				.getString(R.string.puzzle_s), this.currentPuzzle));
+		if (newPuzzle > this.maxPuzzleAttempted) {
+			this.maxPuzzleAttempted = newPuzzle;
+		}
 		this.elapsedTime = 0;
 		resumeTimer();
 		resetAndInitialize();
@@ -480,7 +500,9 @@ public class Connect64 extends Activity implements
 		this.gameBoard.setAlpha(1);
 	}
 
-	/*private String serializeIntArray(final int[] array) {
+	// @formatter:off
+	/*
+	private String serializeIntArray(final int[] array) {
 		try {
 			final ObjectOutputStream out = new ObjectOutputStream(
 					new ByteArrayOutputStream());
@@ -490,7 +512,9 @@ public class Connect64 extends Activity implements
 		} catch (final IOException ex) {
 			return null;
 		}
-	}*/
+	}
+	*/
+	// @formatter:on
 
 	private void setInitialValues() {
 		final Puzzle newPuzzleObj = PuzzleFactory.getPuzzle(this.currentPuzzle);

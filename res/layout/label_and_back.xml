@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_toLeftOf="@+id/clear"
-        android:text="@string/puzzleNum"
+        android:text="@string/puzzle_s"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button

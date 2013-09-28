@@ -4,8 +4,7 @@ Checkstyle issues:
 * Something something array initialization indents.
 * this.localField is ok, but the Source Cleanup tool removes "this" on method
   calls defined in the Class. Checkstyle doesn't seem to care about methods
-  defined in parent Classes that I'm calling without this, though... TBQH I
-  don't see the need. 
+  defined in parent Classes that I'm calling without this, though...
 
 Implementation notes:
 * The solution I came up with storing puzzles is meh. 2-dimensional arrays are
@@ -16,7 +15,7 @@ Implementation notes:
 * It'd be nice if more Android-defined classes (like SparseIntArray) could be
   put in Bundles, but oh well.
 * I've got a boatload of member fields this time around, most of which are
-  static tags or references to Views. Only 6 actual state members...
+  static tags or references to Views. Only 7 actual state members...
 * I keep wanting to factor game-logic handling methods out to separate
   classes, but there's a lot of state that most methods need to be aware of
   without passing around 38 arguments, However, most of the state is encoded in
