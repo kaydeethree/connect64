@@ -15,5 +15,6 @@
     <string name="clear">Clear</string>
     <string name="youWin">You win!</string>
     <string name="youLose">Try again</string>
+    <string name="pause">Pause</string>
 
 </resources>

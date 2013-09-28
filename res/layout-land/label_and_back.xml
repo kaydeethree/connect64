@@ -4,12 +4,30 @@
     android:layout_width="wrap_content"
     android:layout_height="wrap_content" >
 
+    <ImageButton
+        android:id="@+id/pauseResumeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:contentDescription="@string/pause"
+        android:onClick="pauseResumeClick"
+        android:src="@android:drawable/ic_media_pause" />
+
+    <Chronometer
+        android:id="@+id/chronometer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pauseResumeButton"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
+
     <TextView
         android:id="@+id/puzzleLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
+        android:layout_above="@+id/clearButton"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
@@ -18,7 +36,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:layout_below="@+id/puzzleLabel"
+        android:layout_alignParentBottom="true"
         android:onClick="clearButtonClick"
         android:text="@string/clear" />
 
