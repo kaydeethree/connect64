@@ -16,5 +16,6 @@
     <string name="youWin">You won in</string>
     <string name="youLose">Try again</string>
     <string name="pause">Pause</string>
+    <string name="clear_prefs">Clear preferences</string>
 
 </resources>

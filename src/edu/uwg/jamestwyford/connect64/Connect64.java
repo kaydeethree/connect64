@@ -1,13 +1,21 @@
 package edu.uwg.jamestwyford.connect64;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -33,8 +41,6 @@ public class Connect64 extends Activity implements
 	private static final int COL_SIZE = 8;
 	private static final int ROW_SIZE = 8;
 	private static final String ELAPSED_TIME = "elapsedTime";
-	private static final String INITIAL_POSITIONS = "initialPositions";
-	private static final String INITIAL_VALUES = "initialValues";
 	private static final String INPUT_VALUE = "input";
 	private static final String LOG_TAG = "C64";
 	private static final String PUZZLE_VALUE = "puzzle";
@@ -155,26 +161,76 @@ public class Connect64 extends Activity implements
 	}
 
 	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		boolean retVal = true;
+		switch (item.getItemId()) {
+		case R.id.clearPrefs:
+			SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+			Editor editor = prefs.edit();
+			editor.clear();
+			editor.apply();
+			break;
+		}
+		return retVal;
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		/*
+		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+		final Editor editor = prefs.edit();
+		editor.putInt(INPUT_VALUE, this.currentInput);
+		editor.putInt(RANGE_VALUE, this.currentRange);
+		editor.putInt(PUZZLE_VALUE, this.currentPuzzle);
+		editor.putBoolean(TIMER_RUNNING, this.timerRunning);
+		pauseTimer();
+		editor.putLong(ELAPSED_TIME, this.elapsedTime);
+		
+		// grr prefs only taking primitives... (de)serialization sucks!
+		editor.putString(INITIAL_POSITIONS,
+				serializeIntArray(this.initialPositions));
+		editor.putString(INITIAL_VALUES, serializeIntArray(this.initialValues));
+
+		final SparseIntArray state = this.boardState;
+		final int size = state.size();
+		final int[] positions = new int[size];
+		final int[] values = new int[size];
+		for (int i = 0; i < size; i++) {
+			positions[i] = state.keyAt(i);
+			values[i] = state.valueAt(i);
+		}
+		editor.putString(STATE_POSITIONS, serializeIntArray(positions));
+		editor.putString(STATE_VALUES, serializeIntArray(values));
+
+		editor.apply();
+		*/
+	}
+
+	@Override
 	protected final void onRestoreInstanceState(final Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
+		Log.d(LOG_TAG, "onRestoreInstanceState()");
 		if (savedState == null) {
 			return;
 		}
 
-		this.initialPositions = savedState.getIntArray(INITIAL_POSITIONS);
-		this.initialValues = savedState.getIntArray(INITIAL_VALUES);
 		this.currentInput = savedState.getInt(INPUT_VALUE);
 		this.currentRange = savedState.getInt(RANGE_VALUE);
 		this.currentPuzzle = savedState.getInt(PUZZLE_VALUE);
 		this.puzzleLabel.setText("Puzzle " + this.currentPuzzle);
+		loadPuzzle(this.currentPuzzle);
+		pauseTimer();
+		
 		this.elapsedTime = savedState.getLong(ELAPSED_TIME);
 		this.timerRunning = savedState.getBoolean(TIMER_RUNNING);
+		
 		if (this.timerRunning) {
 			resumeTimer();
 		} else {
 			this.timer.setText(convertTime());
 		}
-		resetAndInitialize();
+		//resetAndInitialize();
 		this.rangeSpinner.setSelection(this.currentRange);
 
 		final SparseIntArray state = this.boardState;
@@ -188,11 +244,46 @@ public class Connect64 extends Activity implements
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		/*
+		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
+		this.currentInput = prefs.getInt(INPUT_VALUE, BAD_VALUE);
+		this.currentRange = prefs.getInt(RANGE_VALUE, 0);
+		this.currentPuzzle = prefs.getInt(PUZZLE_VALUE, 0);
+		this.timerRunning = prefs.getBoolean(TIMER_RUNNING, true);
+		this.elapsedTime = prefs.getLong(ELAPSED_TIME, 0);
+		if (this.timerRunning) {
+			resumeTimer();
+		}
+		resetAndInitialize();
+	
+		final String intPos = prefs.getString(INITIAL_POSITIONS, null);
+		final String intVals = prefs.getString(INITIAL_VALUES, null);
+		if (intPos != null && intVals != null) {
+			this.initialPositions = deserializeIntArray(intPos);
+			this.initialValues = deserializeIntArray(intVals);
+		}
+
+		final SparseIntArray state = this.boardState;
+		final String posString = prefs.getString(STATE_POSITIONS, null);
+		final String valString = prefs.getString(STATE_VALUES, null);
+		if (posString != null && valString != null) {
+			final int[] positions = deserializeIntArray(posString);
+			final int[] values = deserializeIntArray(valString);
+			for (int i = 0; i < positions.length; i++) {
+				state.put(positions[i], values[i]);
+				getButton(String.valueOf(positions[i])).setText(
+						String.valueOf(values[i]));
+			}
+		}*/
+	}
+
+	@Override
 	protected final void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
+		Log.d(LOG_TAG, "onSaveInstanceState()");
 
-		outState.putIntArray(INITIAL_POSITIONS, this.initialPositions);
-		outState.putIntArray(INITIAL_VALUES, this.initialValues);
 		outState.putInt(INPUT_VALUE, this.currentInput);
 		outState.putInt(RANGE_VALUE, this.currentRange);
 		outState.putInt(PUZZLE_VALUE, this.currentPuzzle);
@@ -250,6 +341,18 @@ public class Connect64 extends Activity implements
 		final long elapsed = this.elapsedTime / millisToSec;
 		return String.format(Locale.US, "%02d:%02d", elapsed / secToMin,
 				elapsed % secToMin);
+	}
+
+	private int[] deserializeIntArray(final String string) {
+		try {
+			final byte[] bytes = string.getBytes();
+			final ObjectInputStream in = new ObjectInputStream(
+					new ByteArrayInputStream(bytes));
+			final int[] inArray = (int[]) in.readObject();
+			return inArray;
+		} catch (final Exception ex) {
+			return null;
+		} 
 	}
 
 	private Button getButton(final String tag) {
@@ -335,6 +438,7 @@ public class Connect64 extends Activity implements
 	}
 
 	private boolean isOnLastPuzzle() {
+		Log.d(LOG_TAG,"current puzzle:" + this.currentPuzzle + " numPuzzles: " + PuzzleFactory.numPuzzles());
 		return this.currentPuzzle == PuzzleFactory.numPuzzles();
 	}
 
@@ -393,6 +497,18 @@ public class Connect64 extends Activity implements
 		this.timer.start();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_pause);
 		this.gameBoard.setAlpha(1);
+	}
+
+	private String serializeIntArray(final int[] array) {
+		try {
+			final ObjectOutputStream out = new ObjectOutputStream(
+					new ByteArrayOutputStream());
+			out.writeObject(array);
+			out.flush();
+			return out.toString();
+		} catch (final IOException ex) {
+			return null;
+		}
 	}
 
 	private void setInitialValues() {

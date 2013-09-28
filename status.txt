@@ -2,7 +2,7 @@ Android Assignment 3: Connect64
 
 Checkstyle issues:
 * Something something array initialization indents.
-* this.localField is ok, but my Source Cleanup tool removes this on method
+* this.localField is ok, but the Source Cleanup tool removes "this" on method
   calls defined in the Class. Checkstyle doesn't seem to care about methods
   defined in parent Classes that I'm calling without this, though... TBQH I
   don't see the need. 
