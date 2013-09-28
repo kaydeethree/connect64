@@ -24,7 +24,6 @@ import android.widget.Toast;
  * @version assignment3
  */
 public class Connect64 extends Activity {
-	// keep negative so isNext() and isPrev() will always return false
 	private static final int BAD_VALUE = -1;
 	private static final int BOARD_MAX = 64;
 	private static final String LOG_TAG = "C64";
@@ -63,6 +62,8 @@ public class Connect64 extends Activity {
 	 *            ignored
 	 */
 	public final void clearButtonClick(final View view) {
+		this.elapsedTime = 0;
+		resumeTimer();
 		resetAndInitialize();
 	}
 
@@ -95,6 +96,12 @@ public class Connect64 extends Activity {
 		this.input = getValue((Button) view);
 	}
 
+	@Override
+	public final boolean onCreateOptionsMenu(final Menu menu) {
+		getMenuInflater().inflate(R.menu.connect64, menu);
+		return true;
+	}
+
 	/**
 	 * Input handler for the pause/resume button.
 	 * 
@@ -107,29 +114,6 @@ public class Connect64 extends Activity {
 		} else {
 			resumeTimer();
 		}
-	}
-
-	private void pauseTimer() {
-		this.timerRunning = false;
-		this.elapsedTime = SystemClock.elapsedRealtime() - timer.getBase();
-		this.timer.stop();
-		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
-		this.gameBoard.setAlpha(0);
-		
-	}
-
-	private void resumeTimer() {
-		this.timerRunning = true;
-		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
-		this.timer.start();
-		this.pauseResume.setImageResource(android.R.drawable.ic_media_pause);
-		this.gameBoard.setAlpha(1);
-	}
-
-	@Override
-	public final boolean onCreateOptionsMenu(final Menu menu) {
-		getMenuInflater().inflate(R.menu.connect64, menu);
-		return true;
 	}
 
 	@Override
@@ -166,6 +150,10 @@ public class Connect64 extends Activity {
 			this.timerRunning = savedState.getBoolean("timerRunning");
 			if (this.timerRunning) {
 				resumeTimer();
+			} else {
+				final long elapsed = this.elapsedTime / 1000;
+				this.timer.setText(String.format("%02d:%02d", elapsed / 60,
+						elapsed % 60));
 			}
 			resetAndInitialize();
 			this.rangeSpinner.setSelection(this.range);
@@ -196,7 +184,7 @@ public class Connect64 extends Activity {
 			pauseTimer();
 		}
 		outState.putLong("elapsedTime", this.elapsedTime);
-		
+
 		final SparseIntArray state = this.boardState;
 		final int size = state.size();
 		final int[] positions = new int[size];
@@ -222,6 +210,7 @@ public class Connect64 extends Activity {
 		if (boardValid && onLastPuzzle) {
 			toast = Toast.makeText(this, "All puzzles complete!",
 					Toast.LENGTH_SHORT);
+			this.timer.stop();
 		} else if (boardValid && !onLastPuzzle) {
 			toast = Toast.makeText(this, R.string.youWin, Toast.LENGTH_SHORT);
 			final int nextPuzzle = this.puzzle + 1;
@@ -336,9 +325,17 @@ public class Connect64 extends Activity {
 		this.initialPositions = newPuzzleObj.getPositions();
 		this.initialValues = newPuzzleObj.getValues();
 		this.elapsedTime = 0;
-		this.resumeTimer();
-
+		resumeTimer();
 		resetAndInitialize();
+	}
+
+	private void pauseTimer() {
+		this.timerRunning = false;
+		this.elapsedTime = SystemClock.elapsedRealtime() - this.timer.getBase();
+		this.timer.stop();
+		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
+		this.gameBoard.setAlpha(0);
+
 	}
 
 	private void resetAndInitialize() {
@@ -359,6 +356,14 @@ public class Connect64 extends Activity {
 		this.boardState.clear();
 		this.rangeSpinner.setSelection(0);
 		this.input = BAD_VALUE;
+	}
+
+	private void resumeTimer() {
+		this.timerRunning = true;
+		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
+		this.timer.start();
+		this.pauseResume.setImageResource(android.R.drawable.ic_media_pause);
+		this.gameBoard.setAlpha(1);
 	}
 
 	private void setInitialValues() {
