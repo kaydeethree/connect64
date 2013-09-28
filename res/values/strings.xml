@@ -13,7 +13,7 @@
 
     <string name="puzzleNum">Puzzle</string>
     <string name="clear">Clear</string>
-    <string name="youWin">You win!</string>
+    <string name="youWin">You won in</string>
     <string name="youLose">Try again</string>
     <string name="pause">Pause</string>
 

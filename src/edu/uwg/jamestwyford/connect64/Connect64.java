@@ -1,5 +1,7 @@
 package edu.uwg.jamestwyford.connect64;
 
+import java.util.Locale;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -23,21 +25,25 @@ import android.widget.Toast;
  * @author jtwyford
  * @version assignment3
  */
-public class Connect64 extends Activity {
+public class Connect64 extends Activity implements
+		AdapterView.OnItemSelectedListener {
+
 	private static final int BAD_VALUE = -1;
 	private static final int BOARD_MAX = 64;
-	private static final String LOG_TAG = "C64";
 	private static final int COL_SIZE = 8;
 	private static final int ROW_SIZE = 8;
-
-	private static final String STATE_VALUES = "stateValues";
-	private static final String STATE_POSITIONS = "statePositions";
+	private static final String ELAPSED_TIME = "elapsedTime";
+	private static final String INITIAL_POSITIONS = "initialPositions";
+	private static final String INITIAL_VALUES = "initialValues";
+	private static final String INPUT_VALUE = "input";
+	private static final String LOG_TAG = "C64";
 	private static final String PUZZLE_VALUE = "puzzle";
 	private static final String RANGE_VALUE = "range";
-	private static final String INPUT_VALUE = "input";
-	private static final String INITIAL_VALUES = "initialValues";
-	private static final String INITIAL_POSITIONS = "initialPositions";
+	private static final String STATE_POSITIONS = "statePositions";
+	private static final String STATE_VALUES = "stateValues";
+	private static final String TIMER_RUNNING = "timerRunning";
 
+	// views
 	private TableLayout gameBoard;
 	private TableLayout inputButtons;
 	private ImageButton pauseResume;
@@ -45,18 +51,19 @@ public class Connect64 extends Activity {
 	private Spinner rangeSpinner;
 	private Chronometer timer;
 
-	private int range;
+	// game state
+	private SparseIntArray boardState;
+	private int currentInput;
+	private int currentPuzzle;
+	private int currentRange;
+	private long elapsedTime;
 	private int[] initialPositions;
 	private int[] initialValues;
-	private SparseIntArray boardState;
-	private int input;
-	private int puzzle;
 	private boolean timerRunning;
-	private long elapsedTime;
 
 	/**
 	 * Input handler for the clear button. Resets the game board to the initial
-	 * state.
+	 * state and resets the timer.
 	 * 
 	 * @param view
 	 *            ignored
@@ -68,10 +75,11 @@ public class Connect64 extends Activity {
 	}
 
 	/**
-	 * Input handler for the 64 game board Buttons. If <code>input</code> is
+	 * Input handler for the 64 game board Buttons. If the current input is
 	 * valid, sets the clicked Button to that value. Clears the Button
 	 * otherwise. Updates the input Buttons to dis/enable them as appropriate.
-	 * If the board is full, calls {@link #checkWinCondition()}
+	 * If the board is full, checks if the player has won and moves to the next
+	 * puzzle if so.
 	 * 
 	 * @param view
 	 *            the Button clicked
@@ -86,20 +94,31 @@ public class Connect64 extends Activity {
 	}
 
 	/**
-	 * Input handler for the 16 input buttons. Sets <code>input</code> to the
+	 * Input handler for the 16 input buttons. Sets the current input to the
 	 * value of the Button.
 	 * 
 	 * @param view
 	 *            the Button clicked
 	 */
 	public final void inputButtonClick(final View view) {
-		this.input = getValue((Button) view);
+		this.currentInput = getValue((Button) view);
 	}
 
 	@Override
 	public final boolean onCreateOptionsMenu(final Menu menu) {
 		getMenuInflater().inflate(R.menu.connect64, menu);
 		return true;
+	}
+
+	@Override
+	public final void onItemSelected(final AdapterView<?> parent,
+			final View view, final int pos, final long id) {
+		this.currentRange = pos;
+		setupInputButtons();
+	}
+
+	@Override
+	public final void onNothingSelected(final AdapterView<?> parent) {
 	}
 
 	/**
@@ -138,34 +157,33 @@ public class Connect64 extends Activity {
 	@Override
 	protected final void onRestoreInstanceState(final Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
+		if (savedState == null) {
+			return;
+		}
 
-		if (savedState != null) {
-			this.initialPositions = savedState.getIntArray(INITIAL_POSITIONS);
-			this.initialValues = savedState.getIntArray(INITIAL_VALUES);
-			this.input = savedState.getInt(INPUT_VALUE);
-			this.range = savedState.getInt(RANGE_VALUE);
-			this.puzzle = savedState.getInt(PUZZLE_VALUE);
-			this.puzzleLabel.setText("Puzzle " + this.puzzle);
-			this.elapsedTime = savedState.getLong("elapsedTime");
-			this.timerRunning = savedState.getBoolean("timerRunning");
-			if (this.timerRunning) {
-				resumeTimer();
-			} else {
-				final long elapsed = this.elapsedTime / 1000;
-				this.timer.setText(String.format("%02d:%02d", elapsed / 60,
-						elapsed % 60));
-			}
-			resetAndInitialize();
-			this.rangeSpinner.setSelection(this.range);
+		this.initialPositions = savedState.getIntArray(INITIAL_POSITIONS);
+		this.initialValues = savedState.getIntArray(INITIAL_VALUES);
+		this.currentInput = savedState.getInt(INPUT_VALUE);
+		this.currentRange = savedState.getInt(RANGE_VALUE);
+		this.currentPuzzle = savedState.getInt(PUZZLE_VALUE);
+		this.puzzleLabel.setText("Puzzle " + this.currentPuzzle);
+		this.elapsedTime = savedState.getLong(ELAPSED_TIME);
+		this.timerRunning = savedState.getBoolean(TIMER_RUNNING);
+		if (this.timerRunning) {
+			resumeTimer();
+		} else {
+			this.timer.setText(convertTime());
+		}
+		resetAndInitialize();
+		this.rangeSpinner.setSelection(this.currentRange);
 
-			final SparseIntArray state = this.boardState;
-			final int[] positions = savedState.getIntArray(STATE_POSITIONS);
-			final int[] values = savedState.getIntArray(STATE_VALUES);
-			for (int i = 0; i < positions.length; i++) {
-				state.put(positions[i], values[i]);
-				getButton(String.valueOf(positions[i])).setText(
-						String.valueOf(values[i]));
-			}
+		final SparseIntArray state = this.boardState;
+		final int[] positions = savedState.getIntArray(STATE_POSITIONS);
+		final int[] values = savedState.getIntArray(STATE_VALUES);
+		for (int i = 0; i < positions.length; i++) {
+			state.put(positions[i], values[i]);
+			getButton(String.valueOf(positions[i])).setText(
+					String.valueOf(values[i]));
 		}
 	}
 
@@ -175,15 +193,15 @@ public class Connect64 extends Activity {
 
 		outState.putIntArray(INITIAL_POSITIONS, this.initialPositions);
 		outState.putIntArray(INITIAL_VALUES, this.initialValues);
-		outState.putInt(INPUT_VALUE, this.input);
-		outState.putInt(RANGE_VALUE, this.range);
-		outState.putInt(PUZZLE_VALUE, this.puzzle);
-		outState.putBoolean("timerRunning", this.timerRunning);
+		outState.putInt(INPUT_VALUE, this.currentInput);
+		outState.putInt(RANGE_VALUE, this.currentRange);
+		outState.putInt(PUZZLE_VALUE, this.currentPuzzle);
+		outState.putBoolean(TIMER_RUNNING, this.timerRunning);
 
 		if (this.timerRunning) {
 			pauseTimer();
 		}
-		outState.putLong("elapsedTime", this.elapsedTime);
+		outState.putLong(ELAPSED_TIME, this.elapsedTime);
 
 		final SparseIntArray state = this.boardState;
 		final int size = state.size();
@@ -212,8 +230,11 @@ public class Connect64 extends Activity {
 					Toast.LENGTH_SHORT);
 			this.timer.stop();
 		} else if (boardValid && !onLastPuzzle) {
-			toast = Toast.makeText(this, R.string.youWin, Toast.LENGTH_SHORT);
-			final int nextPuzzle = this.puzzle + 1;
+			pauseTimer();
+			final String outString = getResources().getString(R.string.youWin)
+					+ " " + convertTime() + "!";
+			toast = Toast.makeText(this, outString, Toast.LENGTH_SHORT);
+			final int nextPuzzle = this.currentPuzzle + 1;
 			loadPuzzle(nextPuzzle);
 		} else if (!boardValid && onLastPuzzle) {
 			toast = Toast.makeText(this, R.string.youLose, Toast.LENGTH_SHORT);
@@ -221,6 +242,14 @@ public class Connect64 extends Activity {
 		if (toast != null) {
 			toast.show();
 		}
+	}
+
+	private String convertTime() {
+		final int millisToSec = 1000;
+		final int secToMin = 60;
+		final long elapsed = this.elapsedTime / millisToSec;
+		return String.format(Locale.US, "%02d:%02d", elapsed / secToMin,
+				elapsed % secToMin);
 	}
 
 	private Button getButton(final String tag) {
@@ -239,8 +268,8 @@ public class Connect64 extends Activity {
 	 * Returns the value of the Button as an integer.
 	 * 
 	 * @param button
-	 *            the button to get the value of
-	 * @return the integer value of the button or <code>BAD_VALUE</code> if
+	 *            the Button to get the value of
+	 * @return the integer value of the Button or <code>BAD_VALUE</code> if
 	 *         empty/null
 	 */
 	private int getValue(final Button button) {
@@ -256,7 +285,7 @@ public class Connect64 extends Activity {
 	 * value+1 and a neighbor with value-1.
 	 * 
 	 * @param button
-	 *            the button to check against
+	 *            the Button to check against
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
 	private boolean hasValidNeighbors(final Button button) {
@@ -305,23 +334,23 @@ public class Connect64 extends Activity {
 		return thisValue == otherValue - 1;
 	}
 
-	private boolean isOnBoard(final int value) {
-		return this.boardState.indexOfValue(value) >= 0;
-	}
-
 	private boolean isOnLastPuzzle() {
-		return this.puzzle == PuzzleFactory.numPuzzles();
+		return this.currentPuzzle == PuzzleFactory.numPuzzles();
 	}
 
 	private boolean isPrev(final int thisValue, final int otherValue) {
 		return thisValue == otherValue + 1;
 	}
 
+	private boolean isValueOnBoard(final int value) {
+		return this.boardState.indexOfValue(value) >= 0;
+	}
+
 	private void loadPuzzle(final int newPuzzle) {
 		resetBoard();
-		this.puzzle = newPuzzle;
-		this.puzzleLabel.setText("Puzzle " + this.puzzle);
-		final Puzzle newPuzzleObj = PuzzleFactory.getPuzzle(this.puzzle);
+		this.currentPuzzle = newPuzzle;
+		this.puzzleLabel.setText("Puzzle " + this.currentPuzzle);
+		final Puzzle newPuzzleObj = PuzzleFactory.getPuzzle(this.currentPuzzle);
 		this.initialPositions = newPuzzleObj.getPositions();
 		this.initialValues = newPuzzleObj.getValues();
 		this.elapsedTime = 0;
@@ -355,7 +384,7 @@ public class Connect64 extends Activity {
 
 		this.boardState.clear();
 		this.rangeSpinner.setSelection(0);
-		this.input = BAD_VALUE;
+		this.currentInput = BAD_VALUE;
 	}
 
 	private void resumeTimer() {
@@ -378,48 +407,43 @@ public class Connect64 extends Activity {
 		}
 	}
 
-	private void setRange(final int pos) {
-		this.range = pos;
-	}
-
 	/**
-	 * Sets the text of the specified button to the value of <code>input</code>
-	 * if valid, clearing the button otherwise. If a value already exists at the
-	 * specified button, sets <code>input</code> to that value.
+	 * Sets the text of the specified Button to the value of the current input
+	 * if valid, clearing the Button otherwise. If a value already exists at the
+	 * specified Button, sets the current input to that value.
 	 * 
 	 * @param button
-	 *            the button to set the text for.
+	 *            the Button to set the text for.
 	 */
 	private void setText(final Button button) {
 		final int pos = getTag(button);
 		final int tempInput = getValue(button);
 
-		if (this.input == BAD_VALUE) {
+		if (this.currentInput == BAD_VALUE) {
 			button.setText("");
 			this.boardState.delete(pos);
 		} else {
-			button.setText(String.valueOf(this.input));
-			this.boardState.put(pos, this.input);
+			button.setText(String.valueOf(this.currentInput));
+			this.boardState.put(pos, this.currentInput);
 		}
-		this.input = tempInput;
+		this.currentInput = tempInput;
 	}
 
 	/**
-	 * Sets the text on the input buttons based on the current
-	 * <code>range</code>. Buttons whose freshly-set text appears on the game
-	 * board will be disabled.
+	 * Sets the text on the input Buttons based on the current range. Buttons
+	 * whose freshly-set text appears on the game board will be disabled.
 	 */
 	private void setupInputButtons() {
 		final int numInputButtons = 16;
 		final TableLayout inputs = this.inputButtons;
-		final int newRange = this.range;
+		final int newRange = this.currentRange;
 
 		for (int i = 1; i <= numInputButtons; i++) {
 			final int value = numInputButtons * newRange + i;
 			final Button inputButton = (Button) inputs
 					.findViewWithTag("in" + i);
 			inputButton.setText(String.valueOf(value));
-			inputButton.setEnabled(!isOnBoard(value));
+			inputButton.setEnabled(!isValueOnBoard(value));
 		}
 	}
 
@@ -429,18 +453,6 @@ public class Connect64 extends Activity {
 						android.R.layout.simple_spinner_item);
 		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		this.rangeSpinner.setAdapter(adapter);
-		this.rangeSpinner
-				.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-					@Override
-					public void onItemSelected(final AdapterView<?> parent,
-							final View view, final int pos, final long id) {
-						setRange(pos);
-						setupInputButtons();
-					}
-
-					@Override
-					public void onNothingSelected(final AdapterView<?> parent) {
-					}
-				});
+		this.rangeSpinner.setOnItemSelectedListener(this);
 	}
 }
