@@ -103,7 +103,8 @@ public class Connect64 extends Activity implements
 	 *            the Button clicked
 	 */
 	public final void inputButtonClick(final View view) {
-		this.currentInput = getValue((Button) view);
+		this.currentInput = Integer.valueOf(((Button) view).getText()
+				.toString());
 	}
 
 	@Override
@@ -369,6 +370,7 @@ public class Connect64 extends Activity implements
 	}
 
 	private String convertTime() {
+		// if there's a built-in version of this, I'd much rather use it.
 		final int millisToSec = 1000;
 		final int secToMin = 60;
 		final long elapsed = this.elapsedTime / millisToSec;
@@ -400,24 +402,16 @@ public class Connect64 extends Activity implements
 		return button;
 	}
 
-	private int getTag(final Button button) {
-		return Integer.valueOf(button.getTag().toString());
-	}
-
 	/**
-	 * Returns the value of the Button as an integer.
+	 * Returns the value on the board at the specified position.
 	 * 
-	 * @param button
-	 *            the Button to get the value of
+	 * @param pos
+	 *            the position to get the value of
 	 * @return the integer value of the Button or <code>BAD_VALUE</code> if
 	 *         empty/null
 	 */
-	private int getValue(final Button button) {
-		try {
-			return Integer.valueOf(button.getText().toString());
-		} catch (final NumberFormatException ex) {
-			return BAD_VALUE;
-		}
+	private int getValue(int pos) {
+		return this.boardState.get(pos, BAD_VALUE);
 	}
 
 	/**
@@ -428,19 +422,18 @@ public class Connect64 extends Activity implements
 	 *            the Button to check against
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
-	private boolean hasValidNeighbors(final Button button) {
-		final int value = getValue(button);
+	private boolean hasValidNeighbors(final int pos) {
+		final int value = boardState.get(pos, BAD_VALUE);
 		if (value == BAD_VALUE) {
 			return false;
 		}
 		final int xDelta = 1;
 		final int yDelta = 10;
-		final int tag = getTag(button);
 
-		final int left = this.boardState.get(tag - xDelta, BAD_VALUE);
-		final int right = this.boardState.get(tag + xDelta, BAD_VALUE);
-		final int up = this.boardState.get(tag - yDelta, BAD_VALUE);
-		final int down = this.boardState.get(tag + yDelta, BAD_VALUE);
+		final int left = this.boardState.get(pos - xDelta, BAD_VALUE);
+		final int right = this.boardState.get(pos + xDelta, BAD_VALUE);
+		final int up = this.boardState.get(pos - yDelta, BAD_VALUE);
+		final int down = this.boardState.get(pos + yDelta, BAD_VALUE);
 
 		final boolean hasNext = (value == BOARD_MAX) || isNext(value, left)
 				|| isNext(value, right) || isNext(value, up)
@@ -461,8 +454,7 @@ public class Connect64 extends Activity implements
 	private boolean isBoardCorrect() {
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				final Button button = getButton("" + i + j);
-				if (!hasValidNeighbors(button)) {
+				if (!hasValidNeighbors(i * 10 + j)) {
 					return false;
 				}
 			}
@@ -557,9 +549,9 @@ public class Connect64 extends Activity implements
 	// @formatter:on
 
 	private void setInitialValues() {
-		final Puzzle newPuzzleObj = PuzzleFactory.getPuzzle(this.currentPuzzle);
-		final int[] pos = newPuzzleObj.getPositions();
-		final int[] vals = newPuzzleObj.getValues();
+		final Puzzle puzzle = PuzzleFactory.getPuzzle(this.currentPuzzle);
+		final int[] pos = puzzle.getPositions();
+		final int[] vals = puzzle.getValues();
 
 		for (int i = 0; i < pos.length; i++) {
 			final Button button = getButton(String.valueOf(pos[i]));
@@ -578,8 +570,8 @@ public class Connect64 extends Activity implements
 	 *            the Button to set the text for.
 	 */
 	private void setText(final Button button) {
-		final int pos = getTag(button);
-		final int tempInput = getValue(button);
+		final int pos = Integer.valueOf(button.getTag().toString());
+		final int oldValue = getValue(pos);
 
 		if (this.currentInput == BAD_VALUE) {
 			button.setText("");
@@ -588,7 +580,7 @@ public class Connect64 extends Activity implements
 			button.setText(String.valueOf(this.currentInput));
 			this.boardState.put(pos, this.currentInput);
 		}
-		this.currentInput = tempInput;
+		this.currentInput = oldValue;
 	}
 
 	/**
