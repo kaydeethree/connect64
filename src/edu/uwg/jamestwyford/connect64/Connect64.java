@@ -1,11 +1,16 @@
 package edu.uwg.jamestwyford.connect64;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.util.Base64;
 import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Menu;
@@ -98,7 +103,7 @@ public class Connect64 extends Activity implements
 
 	/**
 	 * Input handler for the 16 input buttons. Sets the current input to the
-	 * value of the Button.
+	 * value of the clicked Button.
 	 * 
 	 * @param view
 	 *            the Button clicked
@@ -217,17 +222,17 @@ public class Connect64 extends Activity implements
 	protected final void onPause() {
 		super.onPause();
 		Log.d(LOG_TAG, "onPause()");
-		// @formatter:off
-		/*
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 		final SharedPreferences.Editor editor = prefs.edit();
-		editor.putInt(INPUT_VALUE, this.currentInput);
-		editor.putInt(RANGE_VALUE, this.currentRange);
-		editor.putInt(PUZZLE_VALUE, this.currentPuzzle);
+		editor.putInt(CURRENT_INPUT, this.currentInput);
+		editor.putInt(CURRENT_RANGE, this.currentRange);
+		editor.putInt(CURRENT_PUZZLE, this.currentPuzzle);
+		editor.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
 		editor.putBoolean(TIMER_RUNNING, this.timerRunning);
+		if (this.timerRunning) {
+			setElapsedTime();
+		}
 		editor.putLong(ELAPSED_TIME, this.elapsedTime);
-
-		// grr prefs only taking primitives... (de)serialization sucks!
 		final SparseIntArray state = this.boardState;
 		final int size = state.size();
 		final int[] positions = new int[size];
@@ -239,31 +244,30 @@ public class Connect64 extends Activity implements
 		editor.putString(STATE_POSITIONS, serializeIntArray(positions));
 		editor.putString(STATE_VALUES, serializeIntArray(values));
 		editor.apply();
-		*/
-		// @formatter:on
 	}
 
 	@Override
 	protected final void onRestoreInstanceState(final Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
 		if (savedState == null) {
-			return;
+			return; // sanity, as this shouldn't happen...
 		}
 		Log.d(LOG_TAG,
-				"onRestoreInstanceState(); local elapsedTime = "
-						+ this.elapsedTime + " bundle elapsed time: "
+				"onRestoreInstanceState(); local elapsed: " + this.elapsedTime
+						+ " bundle elapsed: "
 						+ savedState.getLong(ELAPSED_TIME));
 
-		this.currentInput = savedState.getInt(CURRENT_INPUT);
-		this.currentRange = savedState.getInt(CURRENT_RANGE);
-		this.currentPuzzle = savedState.getInt(CURRENT_PUZZLE);
-		this.maxPuzzleAttempted = savedState.getInt(MAX_PUZZLE_ATTEMPTED);
-		loadPuzzle(this.currentPuzzle); // this resets the timer, but...
-		pauseTimer(); // the timer will be resumed in onWindowFocusChanged()
+		this.currentInput = savedState.getInt(CURRENT_INPUT, BAD_VALUE);
+		this.currentRange = savedState.getInt(CURRENT_RANGE, 0);
+		this.currentPuzzle = savedState.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
+		this.maxPuzzleAttempted = savedState.getInt(MAX_PUZZLE_ATTEMPTED,
+				STARTING_PUZZLE);
+		loadPuzzle(this.currentPuzzle); // this resets the timer to 0, but...
+		pauseTimer(); // it will be resumed correctly in onWindowFocusChanged()
 
 		this.rangeSpinner.setSelection(this.currentRange);
-		this.elapsedTime = savedState.getLong(ELAPSED_TIME);
-		this.timerRunning = savedState.getBoolean(TIMER_RUNNING);
+		this.elapsedTime = savedState.getLong(ELAPSED_TIME, 0L);
+		this.timerRunning = savedState.getBoolean(TIMER_RUNNING, true);
 
 		final SparseIntArray state = this.boardState;
 		final int[] positions = savedState.getIntArray(STATE_POSITIONS);
@@ -279,20 +283,23 @@ public class Connect64 extends Activity implements
 	protected final void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "onResume()");
-		// @formatter:off
-		/*
 		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-		this.currentInput = prefs.getInt(INPUT_VALUE, BAD_VALUE);
-		this.currentRange = prefs.getInt(RANGE_VALUE, 0);
-		this.currentPuzzle = prefs.getInt(PUZZLE_VALUE, 0);
-		this.timerRunning = prefs.getBoolean(TIMER_RUNNING, true);
-		this.elapsedTime = prefs.getLong(ELAPSED_TIME, 0);
-		resetAndInitialize();
+		this.currentInput = prefs.getInt(CURRENT_INPUT, BAD_VALUE);
+		this.currentRange = prefs.getInt(CURRENT_RANGE, 0);
+		this.currentPuzzle = prefs.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
+		this.maxPuzzleAttempted = prefs.getInt(MAX_PUZZLE_ATTEMPTED,
+				STARTING_PUZZLE);
+		loadPuzzle(this.currentPuzzle); // this resets the timer to 0, but...
+		pauseTimer(); // it will be resumed correctly in onWindowFocusChanged()
 
-		final SparseIntArray state = this.boardState;
+		this.rangeSpinner.setSelection(this.currentRange);
+		this.elapsedTime = prefs.getLong(ELAPSED_TIME, 0L);
+		this.timerRunning = prefs.getBoolean(TIMER_RUNNING, true);
+
 		final String posString = prefs.getString(STATE_POSITIONS, null);
 		final String valString = prefs.getString(STATE_VALUES, null);
 		if (posString != null && valString != null) {
+			final SparseIntArray state = this.boardState;
 			final int[] positions = deserializeIntArray(posString);
 			final int[] values = deserializeIntArray(valString);
 			for (int i = 0; i < positions.length; i++) {
@@ -301,8 +308,6 @@ public class Connect64 extends Activity implements
 						String.valueOf(values[i]));
 			}
 		}
-		*/
-		// @formatter:on
 	}
 
 	@Override
@@ -316,7 +321,9 @@ public class Connect64 extends Activity implements
 		outState.putInt(CURRENT_PUZZLE, this.currentPuzzle);
 		outState.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
 		outState.putBoolean(TIMER_RUNNING, this.timerRunning);
-		setElapsedTime();
+		if (this.timerRunning) {
+			setElapsedTime();
+		}
 		outState.putLong(ELAPSED_TIME, this.elapsedTime);
 
 		final SparseIntArray state = this.boardState;
@@ -332,9 +339,9 @@ public class Connect64 extends Activity implements
 	}
 
 	/**
-	 * Overall board win condition check. Board must be full and all Buttons
+	 * Overall board win condition check. Board must be full and all positions
 	 * must have a valid higher and lower neighbor to fulfill the win condition.
-	 * If the player has won, switch to the next Puzzle if one exists.
+	 * If the player has won, load the next Puzzle if one exists.
 	 */
 	private void checkWinCondition() {
 		Toast toast = null;
@@ -380,39 +387,38 @@ public class Connect64 extends Activity implements
 	}
 
 	/**
-	 * Returns the value on the board at the specified position.
+	 * Returns the value at the specified position.
 	 * 
 	 * @param pos
 	 *            the position to get the value of
-	 * @return the integer value of the Button or <code>BAD_VALUE</code> if
-	 *         empty/null
+	 * @return the value of the position or <code>BAD_VALUE</code> if empty
 	 */
 	private int getValue(final int pos) {
 		return this.boardState.get(pos, BAD_VALUE);
 	}
 
 	// @formatter:off
-	/*
+	
 	private int[] deserializeIntArray(final String string) {
 		try {
-			final byte[] bytes = string.getBytes();
-			final ObjectInputStream in = new ObjectInputStream(
-					new ByteArrayInputStream(bytes));
+			final byte[] bytes = Base64.decode(string, Base64.DEFAULT);
+			final ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+			final ObjectInputStream in = new ObjectInputStream(bin);
 			final int[] inArray = (int[]) in.readObject();
 			return inArray;
 		} catch (final Exception ex) {
 			return null;
 		}
 	}
-	*/
+	
 	// @formatter:on
 
 	/**
-	 * Win-condition checking at the Button level. Looks for a neighbor with
+	 * Win-condition checking at the position level. Looks for a neighbor with
 	 * value+1 and a neighbor with value-1.
 	 * 
-	 * @param button
-	 *            the Button to check against
+	 * @param pos
+	 *            the position to check against
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
 	private boolean hasValidNeighbors(final int pos) {
@@ -439,15 +445,16 @@ public class Connect64 extends Activity implements
 	}
 
 	/**
-	 * Win-condition checking at the board level. Iterates through each Button
+	 * Win-condition checking at the board level. Iterates through each position
 	 * to check that it isn't empty and that it has valid neighbors.
 	 * 
-	 * @return true if no Button is empty or has all invalid neighbors.
+	 * @return true if no position is empty or has all invalid neighbors.
 	 */
 	private boolean isBoardCorrect() {
+		final int rowOffset = 10;
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				if (!hasValidNeighbors(i * 10 + j)) {
+				if (!hasValidNeighbors(i * rowOffset + j)) {
 					return false;
 				}
 			}
@@ -473,7 +480,6 @@ public class Connect64 extends Activity implements
 
 	private void loadPuzzle(final int newPuzzle) {
 		Log.d(LOG_TAG, "loadPuzzle(" + newPuzzle + ")");
-		resetBoard();
 		this.currentPuzzle = newPuzzle;
 		this.puzzleLabel.setText(String.format(Locale.US, getResources()
 				.getString(R.string.puzzle_s), this.currentPuzzle));
@@ -493,16 +499,17 @@ public class Connect64 extends Activity implements
 		this.timer.stop();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
 		this.gameBoard.setAlpha(0);
-
 	}
 
 	private void resetAndInitialize() {
-		resetBoard();
+		Log.d(LOG_TAG, "resetAndInitialize()");
+		resetGame();
 		setInitialValues();
 		setupInputButtons();
 	}
 
-	private void resetBoard() {
+	private void resetGame() {
+		Log.d(LOG_TAG, "resetBoard()");
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
 				final Button button = getButton("" + i + j);
@@ -532,12 +539,14 @@ public class Connect64 extends Activity implements
 	/**
 	 * Sets the text of the specified Button to the value of the current input
 	 * if valid, clearing the Button otherwise. If a value already exists at the
-	 * specified Button, sets the current input to that value.
+	 * specified Button, sets the current input to that value. Also updates the
+	 * internal state as appropriate.
 	 * 
 	 * @param button
 	 *            the Button to set the text for.
 	 */
 	private void setGameButtonText(final Button button) {
+		Log.d(LOG_TAG, "setGameButtonText(): " + this.currentInput);
 		final int pos = Integer.valueOf(button.getTag().toString());
 		final int oldValue = getValue(pos);
 
@@ -552,22 +561,29 @@ public class Connect64 extends Activity implements
 	}
 
 	// @formatter:off
-	/*
+	
 	private String serializeIntArray(final int[] array) {
 		try {
-			final ObjectOutputStream out = new ObjectOutputStream(
-					new ByteArrayOutputStream());
+			final ByteArrayOutputStream bo = new ByteArrayOutputStream();
+			final ObjectOutputStream out = new ObjectOutputStream(bo);
 			out.writeObject(array);
 			out.flush();
-			return out.toString();
-		} catch (final IOException ex) {
+			return Base64.encodeToString(bo.toByteArray(), Base64.DEFAULT);
+		} catch (final Exception ex) {
 			return null;
 		}
 	}
-	*/
+	
 	// @formatter:on
 
+	/**
+	 * Fills the (assumed clear) board with values specified by the current
+	 * puzzle at the appropriate positions and disables those positions so
+	 * players can't modify them. Also inserts those (position, value) pairs
+	 * specified by the current puzzle into the internal state.
+	 */
 	private void setInitialValues() {
+		Log.d(LOG_TAG, "setInitialValues()");
 		final Puzzle puzzle = PuzzleFactory.getPuzzle(this.currentPuzzle);
 		final int[] pos = puzzle.getPositions();
 		final int[] vals = puzzle.getValues();
@@ -585,6 +601,7 @@ public class Connect64 extends Activity implements
 	 * whose freshly-set text appears on the game board will be disabled.
 	 */
 	private void setupInputButtons() {
+		Log.d(LOG_TAG, "setupInputButtons()");
 		final int numInputButtons = 16;
 		final TableLayout inputs = this.inputButtons;
 		final int newRange = this.currentRange;
