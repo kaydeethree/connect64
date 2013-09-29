@@ -8,7 +8,7 @@
         android:id="@+id/pauseResumeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:contentDescription="@string/pause"
         android:onClick="pauseResumeClick"
@@ -18,17 +18,8 @@
         android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
         android:layout_below="@+id/pauseResumeButton"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/puzzleLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_above="@+id/clearButton"
-        android:text="@string/puzzle_s"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <Button
@@ -36,9 +27,18 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
         android:onClick="clearButtonClick"
         android:text="@string/clear" />
+
+    <TextView
+        android:id="@+id/puzzleLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/clearButton"
+        android:layout_alignParentRight="true"
+        android:text="@string/puzzle_s"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

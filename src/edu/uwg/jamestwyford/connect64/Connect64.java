@@ -94,6 +94,7 @@ public class Connect64 extends Activity implements
 	 */
 	public final void gameButtonClick(final View view) {
 		setGameButtonText((Button) view);
+		Log.d(LOG_TAG, "calling setupInputButtons() from gameButtonClick()");
 		setupInputButtons();
 
 		if (this.boardState.size() == BOARD_MAX) {
@@ -125,6 +126,7 @@ public class Connect64 extends Activity implements
 			final View view, final int pos, final long id) {
 		if (parent.getId() == R.id.rangeSpinner) {
 			this.currentRange = pos;
+			Log.d(LOG_TAG, "calling setupInputButtons from onItemSelected");
 			setupInputButtons();
 		}
 	}
@@ -188,6 +190,8 @@ public class Connect64 extends Activity implements
 			pauseTimer();
 			this.timerRunning = true;
 		}
+		Log.d(LOG_TAG, "calling setupInputButtons from onWindowFocusChanged");
+		setupInputButtons();
 	}
 
 	/**
@@ -488,13 +492,16 @@ public class Connect64 extends Activity implements
 		Log.d(LOG_TAG, "pauseTimer(). elapsed: " + this.elapsedTime);
 		this.timer.stop();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
-		this.gameBoard.setAlpha(0);
+		this.gameBoard.setVisibility(View.INVISIBLE);
+		Log.d(LOG_TAG, "calling setupInputButtons() from pauseTimer");
+		setupInputButtons();
 	}
 
 	private void resetAndInitialize() {
 		Log.d(LOG_TAG, "resetAndInitialize()");
 		resetGame();
 		setInitialValues();
+		Log.d(LOG_TAG, "calling setupInputButtons from resetAndInitialize");
 		setupInputButtons();
 	}
 
@@ -519,7 +526,9 @@ public class Connect64 extends Activity implements
 		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
 		this.timer.start();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_pause);
-		this.gameBoard.setAlpha(1);
+		this.gameBoard.setVisibility(View.VISIBLE);
+		Log.d(LOG_TAG, "calling setupInputButtons from resumeTimer()");
+		setupInputButtons();
 	}
 
 	private String serializeIntArray(final int[] array) {
@@ -597,10 +606,10 @@ public class Connect64 extends Activity implements
 			final Button inputButton = (Button) inputs
 					.findViewWithTag("in" + i);
 			inputButton.setText(String.valueOf(value));
-			inputButton.setEnabled(!isValueOnBoard(value));
+			inputButton.setEnabled(this.timerRunning && !isValueOnBoard(value));
 		}
 	}
-
+	
 	private void setupViews() {
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
 		this.inputButtons = (TableLayout) findViewById(R.id.inputButtons);
