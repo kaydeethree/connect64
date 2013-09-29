@@ -10,6 +10,7 @@ import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -22,7 +23,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 /**
- * Game logic for the 8x8 board.
+ * Game logic and GUI handling for the 8x8 board.
  * 
  * @author jtwyford
  * @version assignment3
@@ -34,6 +35,7 @@ public class Connect64 extends Activity implements
 	private static final int BOARD_MAX = 64;
 	private static final int COL_SIZE = 8;
 	private static final int ROW_SIZE = 8;
+	private static final int STARTING_PUZZLE = 0;
 	private static final String ELAPSED_TIME = "elapsedTime";
 	private static final String INPUT_VALUE = "input";
 	private static final String LOG_TAG = "C64";
@@ -106,6 +108,7 @@ public class Connect64 extends Activity implements
 
 	@Override
 	public final boolean onCreateOptionsMenu(final Menu menu) {
+		Log.d(LOG_TAG, "onCreateOptionsMenu()");
 		getMenuInflater().inflate(R.menu.connect64, menu);
 		return true;
 	}
@@ -131,12 +134,51 @@ public class Connect64 extends Activity implements
 			editor.clear();
 			editor.apply();
 			break;
-		case R.id.loadPuzzle:
+		case 100:
+		case 101:
+		case 102:
+		case 103:
+		case 104:
+		case 105:
+		case 106:
+		case 107:
+		case 108:
+		case 109:
+		case 110:
+		case 111:
+		case 112:
+		case 113:
+		case 114:
+		case 115:
+		case 116:
+		case 117:
+		case 118:
+		case 119:
+		case 120:
+			Toast toast = Toast.makeText(this,
+					String.format("Loading puzzle %d", 100 - item.getItemId()),
+					Toast.LENGTH_SHORT);
+			toast.show();
+			loadPuzzle(100 - item.getItemId());
 			break;
 		default:
 			break;
 		}
 		return retVal;
+	}
+
+	@Override
+	public boolean onPrepareOptionsMenu(Menu menu) {
+		Log.d(LOG_TAG, "onPrepareOptionsMenu(). maxPuzzle: "
+				+ this.maxPuzzleAttempted);
+		SubMenu submenu = menu.getItem(2).getSubMenu();
+		submenu.clear();
+
+		for (int i = STARTING_PUZZLE; i <= this.maxPuzzleAttempted; i++) {
+			submenu.add(Menu.NONE, 100 + i, Menu.NONE, String.format(
+					getResources().getString(R.string.puzzle_s), i));
+		}
+		return super.onPrepareOptionsMenu(menu);
 	}
 
 	@Override
@@ -185,7 +227,7 @@ public class Connect64 extends Activity implements
 		this.maxPuzzleAttempted = 0;
 		setupRangeSpinner();
 		if (savedState == null) {
-			loadPuzzle(0);
+			loadPuzzle(STARTING_PUZZLE);
 		}
 	}
 
@@ -459,6 +501,7 @@ public class Connect64 extends Activity implements
 		if (newPuzzle > this.maxPuzzleAttempted) {
 			this.maxPuzzleAttempted = newPuzzle;
 		}
+		invalidateOptionsMenu(); // to add the new puzzle to the menu
 		this.elapsedTime = 0;
 		resumeTimer();
 		resetAndInitialize();

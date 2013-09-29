@@ -10,6 +10,10 @@
     <item
         android:id="@+id/loadPuzzle"
         android:showAsAction="never"
-        android:title="@string/load_puzzle"/>
+        android:title="@string/load_puzzle">
+        <menu>
+            <item android:id="@+id/tempSubmenu" android:title="@string/puzzle_s"/>
+        </menu>
+    </item>
 
 </menu>
