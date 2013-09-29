@@ -116,66 +116,54 @@ public class Connect64 extends Activity implements
 	@Override
 	public final void onItemSelected(final AdapterView<?> parent,
 			final View view, final int pos, final long id) {
-		this.currentRange = pos;
-		setupInputButtons();
+		if (parent.getId() == R.id.rangeSpinner) {
+			this.currentRange = pos;
+			setupInputButtons();
+		}
 	}
 
 	@Override
 	public final void onNothingSelected(final AdapterView<?> parent) {
+		// shouldn't be possible
 	}
 
 	@Override
 	public final boolean onOptionsItemSelected(final MenuItem item) {
 		final boolean retVal = true;
-		switch (item.getItemId()) {
-		case R.id.clearPrefs:
+		final int id = item.getItemId();
+		final int puzzleOffset = 100;
+		if (id == R.id.clearPrefs) {
 			final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 			final SharedPreferences.Editor editor = prefs.edit();
 			editor.clear();
 			editor.apply();
-			break;
-		case 100:
-		case 101:
-		case 102:
-		case 103:
-		case 104:
-		case 105:
-		case 106:
-		case 107:
-		case 108:
-		case 109:
-		case 110:
-		case 111:
-		case 112:
-		case 113:
-		case 114:
-		case 115:
-		case 116:
-		case 117:
-		case 118:
-		case 119:
-		case 120:
-			Toast toast = Toast.makeText(this,
-					String.format("Loading puzzle %d", 100 - item.getItemId()),
-					Toast.LENGTH_SHORT);
+		} else if (id >= puzzleOffset
+				&& id <= puzzleOffset + PuzzleFactory.numPuzzles()) {
+			final int puzzle = id - puzzleOffset;
+			Log.d(LOG_TAG, "Loading old puzzle " + puzzle);
+			final Toast toast = Toast
+					.makeText(
+							this,
+							String.format(
+									getResources().getString(
+											R.string.loading_puzzle_s), puzzle),
+							Toast.LENGTH_SHORT);
 			toast.show();
-			loadPuzzle(100 - item.getItemId());
-			break;
-		default:
-			break;
+			loadPuzzle(puzzle);
 		}
 		return retVal;
 	}
 
 	@Override
-	public boolean onPrepareOptionsMenu(Menu menu) {
+	public final boolean onPrepareOptionsMenu(final Menu menu) {
 		Log.d(LOG_TAG, "onPrepareOptionsMenu(). maxPuzzle: "
 				+ this.maxPuzzleAttempted);
-		SubMenu submenu = menu.getItem(2).getSubMenu();
+		final SubMenu submenu = menu.findItem(R.id.loadPuzzle).getSubMenu();
+		final int puzzleOffset = 100;
 		submenu.clear();
 
 		for (int i = STARTING_PUZZLE; i <= this.maxPuzzleAttempted; i++) {
-			submenu.add(Menu.NONE, 100 + i, Menu.NONE, String.format(
+			submenu.add(Menu.NONE, puzzleOffset + i, Menu.NONE, String.format(
 					getResources().getString(R.string.puzzle_s), i));
 		}
 		return super.onPrepareOptionsMenu(menu);
@@ -224,7 +212,7 @@ public class Connect64 extends Activity implements
 		this.timer = (Chronometer) findViewById(R.id.chronometer);
 
 		this.boardState = new SparseIntArray(BOARD_MAX);
-		this.maxPuzzleAttempted = 0;
+		this.maxPuzzleAttempted = STARTING_PUZZLE;
 		setupRangeSpinner();
 		if (savedState == null) {
 			loadPuzzle(STARTING_PUZZLE);
@@ -264,10 +252,13 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onRestoreInstanceState(final Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
-		Log.d(LOG_TAG, "onRestoreInstanceState()");
 		if (savedState == null) {
 			return;
 		}
+		Log.d(LOG_TAG,
+				"onRestoreInstanceState(); local elapsedTime = "
+						+ this.elapsedTime + " bundle elapsed time: "
+						+ savedState.getLong(ELAPSED_TIME));
 
 		this.currentInput = savedState.getInt(INPUT_VALUE);
 		this.currentRange = savedState.getInt(RANGE_VALUE);
@@ -323,13 +314,15 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
-		Log.d(LOG_TAG, "onSaveInstanceState()");
+		Log.d(LOG_TAG, "onSaveInstanceState(). elapsedTime: "
+				+ this.elapsedTime);
 
 		outState.putInt(INPUT_VALUE, this.currentInput);
 		outState.putInt(RANGE_VALUE, this.currentRange);
 		outState.putInt(PUZZLE_VALUE, this.currentPuzzle);
 		outState.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
 		outState.putBoolean(TIMER_RUNNING, this.timerRunning);
+		pauseTimer();
 		outState.putLong(ELAPSED_TIME, this.elapsedTime);
 
 		final SparseIntArray state = this.boardState;
@@ -494,6 +487,7 @@ public class Connect64 extends Activity implements
 	}
 
 	private void loadPuzzle(final int newPuzzle) {
+		Log.d(LOG_TAG, "loadPuzzle(" + newPuzzle + ")");
 		resetBoard();
 		this.currentPuzzle = newPuzzle;
 		this.puzzleLabel.setText(String.format(Locale.US, getResources()
@@ -510,6 +504,7 @@ public class Connect64 extends Activity implements
 	private void pauseTimer() {
 		this.timerRunning = false;
 		this.elapsedTime = SystemClock.elapsedRealtime() - this.timer.getBase();
+		Log.d(LOG_TAG, "pauseTimer(). elapsed: " + this.elapsedTime);
 		this.timer.stop();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
 		this.gameBoard.setAlpha(0);
@@ -537,6 +532,7 @@ public class Connect64 extends Activity implements
 	}
 
 	private void resumeTimer() {
+		Log.d(LOG_TAG, "resumeTimer(); elapsed: " + this.elapsedTime);
 		this.timerRunning = true;
 		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
 		this.timer.start();
