@@ -34,14 +34,15 @@ public class Connect64 extends Activity implements
 	private static final int BAD_VALUE = -1;
 	private static final int BOARD_MAX = 64;
 	private static final int COL_SIZE = 8;
+	private static final int MENU_PUZZLE_OFFSET = 100;
 	private static final int ROW_SIZE = 8;
 	private static final int STARTING_PUZZLE = 0;
+	private static final String CURRENT_INPUT = "currentInput";
+	private static final String CURRENT_PUZZLE = "currentPuzzle";
+	private static final String CURRENT_RANGE = "currentRange";
 	private static final String ELAPSED_TIME = "elapsedTime";
-	private static final String INPUT_VALUE = "input";
 	private static final String LOG_TAG = "C64";
 	private static final String MAX_PUZZLE_ATTEMPTED = "maxPuzzleAttempted";
-	private static final String PUZZLE_VALUE = "puzzle";
-	private static final String RANGE_VALUE = "range";
 	private static final String STATE_POSITIONS = "statePositions";
 	private static final String STATE_VALUES = "stateValues";
 	private static final String TIMER_RUNNING = "timerRunning";
@@ -87,7 +88,7 @@ public class Connect64 extends Activity implements
 	 *            the Button clicked
 	 */
 	public final void gameButtonClick(final View view) {
-		setText((Button) view);
+		setGameButtonText((Button) view);
 		setupInputButtons();
 
 		if (this.boardState.size() == BOARD_MAX) {
@@ -132,23 +133,19 @@ public class Connect64 extends Activity implements
 	public final boolean onOptionsItemSelected(final MenuItem item) {
 		final boolean retVal = true;
 		final int id = item.getItemId();
-		final int puzzleOffset = 100;
 		if (id == R.id.clearPrefs) {
 			final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
 			final SharedPreferences.Editor editor = prefs.edit();
 			editor.clear();
 			editor.apply();
-		} else if (id >= puzzleOffset
-				&& id <= puzzleOffset + PuzzleFactory.numPuzzles()) {
-			final int puzzle = id - puzzleOffset;
+		} else if (id >= MENU_PUZZLE_OFFSET
+				&& id <= MENU_PUZZLE_OFFSET + PuzzleFactory.numPuzzles()) {
+			final int puzzle = id - MENU_PUZZLE_OFFSET;
+			final String outString = String.format(Locale.US, getResources()
+					.getString(R.string.loading_puzzle_s), puzzle);
 			Log.d(LOG_TAG, "Loading old puzzle " + puzzle);
-			final Toast toast = Toast
-					.makeText(
-							this,
-							String.format(
-									getResources().getString(
-											R.string.loading_puzzle_s), puzzle),
-							Toast.LENGTH_SHORT);
+			final Toast toast = Toast.makeText(this, outString,
+					Toast.LENGTH_SHORT);
 			toast.show();
 			loadPuzzle(puzzle);
 		}
@@ -160,12 +157,15 @@ public class Connect64 extends Activity implements
 		Log.d(LOG_TAG, "onPrepareOptionsMenu(). maxPuzzle: "
 				+ this.maxPuzzleAttempted);
 		final SubMenu submenu = menu.findItem(R.id.loadPuzzle).getSubMenu();
-		final int puzzleOffset = 100;
 		submenu.clear();
 
 		for (int i = STARTING_PUZZLE; i <= this.maxPuzzleAttempted; i++) {
-			submenu.add(Menu.NONE, puzzleOffset + i, Menu.NONE, String.format(
-					getResources().getString(R.string.puzzle_s), i));
+			submenu.add(
+					Menu.NONE,
+					MENU_PUZZLE_OFFSET + i,
+					Menu.NONE,
+					String.format(Locale.US,
+							getResources().getString(R.string.puzzle_s), i));
 		}
 		return super.onPrepareOptionsMenu(menu);
 	}
@@ -178,7 +178,7 @@ public class Connect64 extends Activity implements
 		if (hasFocus && this.timerRunning) {
 			resumeTimer();
 		} else if (hasFocus && !this.timerRunning) {
-			this.timer.setText(convertTime());
+			this.timer.setText(formatElapsedTime());
 		} else if (!hasFocus && this.timerRunning) {
 			pauseTimer();
 			this.timerRunning = true;
@@ -204,20 +204,13 @@ public class Connect64 extends Activity implements
 		super.onCreate(savedState);
 		Log.d(LOG_TAG, "onCreate()");
 		setContentView(R.layout.activity_connect64);
-
-		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
-		this.inputButtons = (TableLayout) findViewById(R.id.inputButtons);
-		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
-		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
-		this.pauseResume = (ImageButton) findViewById(R.id.pauseResumeButton);
-		this.timer = (Chronometer) findViewById(R.id.chronometer);
+		setupViews();
 
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.maxPuzzleAttempted = STARTING_PUZZLE;
-		setupRangeSpinner();
 		if (savedState == null) {
 			loadPuzzle(STARTING_PUZZLE);
-		}
+		} // else let onRestoreInstanceState() handle it
 	}
 
 	@Override
@@ -261,12 +254,12 @@ public class Connect64 extends Activity implements
 						+ this.elapsedTime + " bundle elapsed time: "
 						+ savedState.getLong(ELAPSED_TIME));
 
-		this.currentInput = savedState.getInt(INPUT_VALUE);
-		this.currentRange = savedState.getInt(RANGE_VALUE);
-		this.currentPuzzle = savedState.getInt(PUZZLE_VALUE);
+		this.currentInput = savedState.getInt(CURRENT_INPUT);
+		this.currentRange = savedState.getInt(CURRENT_RANGE);
+		this.currentPuzzle = savedState.getInt(CURRENT_PUZZLE);
 		this.maxPuzzleAttempted = savedState.getInt(MAX_PUZZLE_ATTEMPTED);
-		loadPuzzle(this.currentPuzzle);
-		pauseTimer();
+		loadPuzzle(this.currentPuzzle); // this resets the timer, but...
+		pauseTimer(); // the timer will be resumed in onWindowFocusChanged()
 
 		this.rangeSpinner.setSelection(this.currentRange);
 		this.elapsedTime = savedState.getLong(ELAPSED_TIME);
@@ -318,12 +311,12 @@ public class Connect64 extends Activity implements
 		Log.d(LOG_TAG, "onSaveInstanceState(). elapsedTime: "
 				+ this.elapsedTime);
 
-		outState.putInt(INPUT_VALUE, this.currentInput);
-		outState.putInt(RANGE_VALUE, this.currentRange);
-		outState.putInt(PUZZLE_VALUE, this.currentPuzzle);
+		outState.putInt(CURRENT_INPUT, this.currentInput);
+		outState.putInt(CURRENT_RANGE, this.currentRange);
+		outState.putInt(CURRENT_PUZZLE, this.currentPuzzle);
 		outState.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
 		outState.putBoolean(TIMER_RUNNING, this.timerRunning);
-		pauseTimer();
+		setElapsedTime();
 		outState.putLong(ELAPSED_TIME, this.elapsedTime);
 
 		final SparseIntArray state = this.boardState;
@@ -354,9 +347,9 @@ public class Connect64 extends Activity implements
 			this.timerRunning = false;
 			this.timer.stop();
 		} else if (boardCorrect && !onLastPuzzle) {
-			pauseTimer();
+			setElapsedTime();
 			final String outString = String.format(Locale.US, getResources()
-					.getString(R.string.you_won_in_s), convertTime());
+					.getString(R.string.you_won_in_s), formatElapsedTime());
 			toast = Toast.makeText(this, outString, Toast.LENGTH_SHORT);
 			final int nextPuzzle = this.currentPuzzle + 1;
 			loadPuzzle(nextPuzzle);
@@ -369,13 +362,33 @@ public class Connect64 extends Activity implements
 		}
 	}
 
-	private String convertTime() {
+	private String formatElapsedTime() {
 		// if there's a built-in version of this, I'd much rather use it.
 		final int millisToSec = 1000;
 		final int secToMin = 60;
 		final long elapsed = this.elapsedTime / millisToSec;
 		return String.format(Locale.US, "%02d:%02d", elapsed / secToMin,
 				elapsed % secToMin);
+	}
+
+	private Button getButton(final String tag) {
+		final Button button = (Button) this.gameBoard.findViewWithTag(tag);
+		if (button == null) {
+			Log.e(LOG_TAG, "invalid tag passed: " + tag);
+		}
+		return button;
+	}
+
+	/**
+	 * Returns the value on the board at the specified position.
+	 * 
+	 * @param pos
+	 *            the position to get the value of
+	 * @return the integer value of the Button or <code>BAD_VALUE</code> if
+	 *         empty/null
+	 */
+	private int getValue(final int pos) {
+		return this.boardState.get(pos, BAD_VALUE);
 	}
 
 	// @formatter:off
@@ -394,26 +407,6 @@ public class Connect64 extends Activity implements
 	*/
 	// @formatter:on
 
-	private Button getButton(final String tag) {
-		final Button button = (Button) this.gameBoard.findViewWithTag(tag);
-		if (button == null) {
-			Log.e(LOG_TAG, "invalid tag passed: " + tag);
-		}
-		return button;
-	}
-
-	/**
-	 * Returns the value on the board at the specified position.
-	 * 
-	 * @param pos
-	 *            the position to get the value of
-	 * @return the integer value of the Button or <code>BAD_VALUE</code> if
-	 *         empty/null
-	 */
-	private int getValue(int pos) {
-		return this.boardState.get(pos, BAD_VALUE);
-	}
-
 	/**
 	 * Win-condition checking at the Button level. Looks for a neighbor with
 	 * value+1 and a neighbor with value-1.
@@ -423,7 +416,7 @@ public class Connect64 extends Activity implements
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
 	private boolean hasValidNeighbors(final int pos) {
-		final int value = boardState.get(pos, BAD_VALUE);
+		final int value = this.boardState.get(pos, BAD_VALUE);
 		if (value == BAD_VALUE) {
 			return false;
 		}
@@ -486,16 +479,16 @@ public class Connect64 extends Activity implements
 				.getString(R.string.puzzle_s), this.currentPuzzle));
 		if (newPuzzle > this.maxPuzzleAttempted) {
 			this.maxPuzzleAttempted = newPuzzle;
+			invalidateOptionsMenu(); // to add the new puzzle to the menu
 		}
-		invalidateOptionsMenu(); // to add the new puzzle to the menu
+		resetAndInitialize();
 		this.elapsedTime = 0;
 		resumeTimer();
-		resetAndInitialize();
 	}
 
 	private void pauseTimer() {
+		setElapsedTime();
 		this.timerRunning = false;
-		this.elapsedTime = SystemClock.elapsedRealtime() - this.timer.getBase();
 		Log.d(LOG_TAG, "pauseTimer(). elapsed: " + this.elapsedTime);
 		this.timer.stop();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
@@ -532,6 +525,32 @@ public class Connect64 extends Activity implements
 		this.gameBoard.setAlpha(1);
 	}
 
+	private void setElapsedTime() {
+		this.elapsedTime = SystemClock.elapsedRealtime() - this.timer.getBase();
+	}
+
+	/**
+	 * Sets the text of the specified Button to the value of the current input
+	 * if valid, clearing the Button otherwise. If a value already exists at the
+	 * specified Button, sets the current input to that value.
+	 * 
+	 * @param button
+	 *            the Button to set the text for.
+	 */
+	private void setGameButtonText(final Button button) {
+		final int pos = Integer.valueOf(button.getTag().toString());
+		final int oldValue = getValue(pos);
+
+		if (this.currentInput == BAD_VALUE) {
+			button.setText("");
+			this.boardState.delete(pos);
+		} else {
+			button.setText(String.valueOf(this.currentInput));
+			this.boardState.put(pos, this.currentInput);
+		}
+		this.currentInput = oldValue;
+	}
+
 	// @formatter:off
 	/*
 	private String serializeIntArray(final int[] array) {
@@ -562,28 +581,6 @@ public class Connect64 extends Activity implements
 	}
 
 	/**
-	 * Sets the text of the specified Button to the value of the current input
-	 * if valid, clearing the Button otherwise. If a value already exists at the
-	 * specified Button, sets the current input to that value.
-	 * 
-	 * @param button
-	 *            the Button to set the text for.
-	 */
-	private void setText(final Button button) {
-		final int pos = Integer.valueOf(button.getTag().toString());
-		final int oldValue = getValue(pos);
-
-		if (this.currentInput == BAD_VALUE) {
-			button.setText("");
-			this.boardState.delete(pos);
-		} else {
-			button.setText(String.valueOf(this.currentInput));
-			this.boardState.put(pos, this.currentInput);
-		}
-		this.currentInput = oldValue;
-	}
-
-	/**
 	 * Sets the text on the input Buttons based on the current range. Buttons
 	 * whose freshly-set text appears on the game board will be disabled.
 	 */
@@ -601,7 +598,13 @@ public class Connect64 extends Activity implements
 		}
 	}
 
-	private void setupRangeSpinner() {
+	private void setupViews() {
+		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
+		this.inputButtons = (TableLayout) findViewById(R.id.inputButtons);
+		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
+		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
+		this.pauseResume = (ImageButton) findViewById(R.id.pauseResumeButton);
+		this.timer = (Chronometer) findViewById(R.id.chronometer);
 		final ArrayAdapter<CharSequence> adapter = ArrayAdapter
 				.createFromResource(this, R.array.ranges,
 						android.R.layout.simple_spinner_item);
