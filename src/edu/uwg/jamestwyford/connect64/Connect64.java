@@ -131,7 +131,7 @@ public class Connect64 extends Activity implements
 
 	@Override
 	public final void onNothingSelected(final AdapterView<?> parent) {
-		// shouldn't be possible
+		// no-op
 	}
 
 	@Override
@@ -249,9 +249,6 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onRestoreInstanceState(final Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
-		if (savedState == null) {
-			return; // sanity, as this shouldn't happen...
-		}
 		Log.d(LOG_TAG,
 				"onRestoreInstanceState(); local elapsed: " + this.elapsedTime
 						+ " bundle elapsed: "
@@ -269,9 +266,9 @@ public class Connect64 extends Activity implements
 		this.elapsedTime = savedState.getLong(ELAPSED_TIME, 0L);
 		this.timerRunning = savedState.getBoolean(TIMER_RUNNING, true);
 
-		final SparseIntArray state = this.boardState;
 		final int[] positions = savedState.getIntArray(STATE_POSITIONS);
 		final int[] values = savedState.getIntArray(STATE_VALUES);
+		final SparseIntArray state = this.boardState;
 		for (int i = 0; i < positions.length; i++) {
 			state.put(positions[i], values[i]);
 			getButton(String.valueOf(positions[i])).setText(
@@ -298,15 +295,13 @@ public class Connect64 extends Activity implements
 
 		final String posString = prefs.getString(STATE_POSITIONS, null);
 		final String valString = prefs.getString(STATE_VALUES, null);
-		if (posString != null && valString != null) {
-			final SparseIntArray state = this.boardState;
-			final int[] positions = deserializeIntArray(posString);
-			final int[] values = deserializeIntArray(valString);
-			for (int i = 0; i < positions.length; i++) {
-				state.put(positions[i], values[i]);
-				getButton(String.valueOf(positions[i])).setText(
-						String.valueOf(values[i]));
-			}
+		final int[] positions = deserializeIntArray(posString);
+		final int[] values = deserializeIntArray(valString);
+		final SparseIntArray state = this.boardState;
+		for (int i = 0; i < positions.length; i++) {
+			state.put(positions[i], values[i]);
+			getButton(String.valueOf(positions[i])).setText(
+					String.valueOf(values[i]));
 		}
 	}
 
@@ -369,6 +364,17 @@ public class Connect64 extends Activity implements
 		}
 	}
 
+	private int[] deserializeIntArray(final String string) {
+		try {
+			final byte[] bytes = Base64.decode(string, Base64.DEFAULT);
+			final ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
+			final ObjectInputStream in = new ObjectInputStream(bin);
+			return (int[]) in.readObject();
+		} catch (final Exception ex) {
+			return null;
+		}
+	}
+
 	private String formatElapsedTime() {
 		// if there's a built-in version of this, I'd much rather use it.
 		final int millisToSec = 1000;
@@ -396,22 +402,6 @@ public class Connect64 extends Activity implements
 	private int getValue(final int pos) {
 		return this.boardState.get(pos, BAD_VALUE);
 	}
-
-	// @formatter:off
-	
-	private int[] deserializeIntArray(final String string) {
-		try {
-			final byte[] bytes = Base64.decode(string, Base64.DEFAULT);
-			final ByteArrayInputStream bin = new ByteArrayInputStream(bytes);
-			final ObjectInputStream in = new ObjectInputStream(bin);
-			final int[] inArray = (int[]) in.readObject();
-			return inArray;
-		} catch (final Exception ex) {
-			return null;
-		}
-	}
-	
-	// @formatter:on
 
 	/**
 	 * Win-condition checking at the position level. Looks for a neighbor with
@@ -532,6 +522,18 @@ public class Connect64 extends Activity implements
 		this.gameBoard.setAlpha(1);
 	}
 
+	private String serializeIntArray(final int[] array) {
+		try {
+			final ByteArrayOutputStream bo = new ByteArrayOutputStream();
+			final ObjectOutputStream out = new ObjectOutputStream(bo);
+			out.writeObject(array);
+			out.flush();
+			return Base64.encodeToString(bo.toByteArray(), Base64.DEFAULT);
+		} catch (final Exception ex) {
+			return null;
+		}
+	}
+
 	private void setElapsedTime() {
 		this.elapsedTime = SystemClock.elapsedRealtime() - this.timer.getBase();
 	}
@@ -559,22 +561,6 @@ public class Connect64 extends Activity implements
 		}
 		this.currentInput = oldValue;
 	}
-
-	// @formatter:off
-	
-	private String serializeIntArray(final int[] array) {
-		try {
-			final ByteArrayOutputStream bo = new ByteArrayOutputStream();
-			final ObjectOutputStream out = new ObjectOutputStream(bo);
-			out.writeObject(array);
-			out.flush();
-			return Base64.encodeToString(bo.toByteArray(), Base64.DEFAULT);
-		} catch (final Exception ex) {
-			return null;
-		}
-	}
-	
-	// @formatter:on
 
 	/**
 	 * Fills the (assumed clear) board with values specified by the current

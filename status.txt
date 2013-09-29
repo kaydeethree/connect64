@@ -13,7 +13,14 @@ Implementation notes:
   initialization. I'd store them as HashMaps (or SparseIntArrays on Android)
   if there was a better way to initialize them without having to iterate
   through the array to load them up anyway.
-* It'd be nice if more Android-defined classes (like SparseIntArray) could be
-  put in Bundles/saved preferences, but oh well.
+* Serialization/Parcelization is painful. I'm really curious to see how the
+  rest of the class saves state in onPause().
+* onPause/Resume() and onSave/RestoreInstanceState() do nearly the same thing.
+  I could generalize them to both stuff into preferences, but I'd rather not
+  suffer the serialization hit.
 * I've got a boatload of member fields this time around, most of which are
   static tags or references to Views. Only 7 actual state members...
+* I keep wanting to factor all of the game logic out into another class since
+  the game state's all localized into the seven fields (and leave the GUI
+  handling where it is...) but I'm worried about the performance hit of calling
+  across classes all the time.
