@@ -17,7 +17,7 @@ public class ScoresDBHelper extends SQLiteOpenHelper {
 	+ " INTEGER PRIMARY KEY AUTOINCREMENT" + COMMA_SEP
 	+ Scores.PLAYER + TEXT_TYPE + COMMA_SEP
 	+ Scores.PUZZLE + INTEGER_TYPE + COMMA_SEP
-	+ Scores.COMPLETION_TIME + INTEGER_TYPE + ");"
+	+ Scores.COMPLETION_TIME + TEXT_TYPE + ");"
 	;
 
 	public ScoresDBHelper(Context context) {

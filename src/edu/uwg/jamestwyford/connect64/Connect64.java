@@ -160,6 +160,8 @@ public class Connect64 extends Activity implements
 			final Intent intent = new Intent(getApplicationContext(),
 					TopScores.class);
 			startActivityForResult(intent, TOP_SCORES);
+		} else if (id == R.id.clearScores) {
+			clearScoresTable();
 		} else if (id == R.id.action_settings) {
 			final Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
 			startActivityForResult(intent, SETTINGS);
@@ -402,7 +404,11 @@ public class Connect64 extends Activity implements
 	}
 
 	private void addScoretoTable() {
-		dbAdapter.insertScore(PLAYER_NAME, currentPuzzle, elapsedTime);
+		dbAdapter.insertScore(PLAYER_NAME, currentPuzzle, formatTime(elapsedTime));
+	}
+	
+	private void clearScoresTable() {
+		dbAdapter.deleteAllScores();
 	}
 	
 	private int[] deserializeIntArray(final String string) {

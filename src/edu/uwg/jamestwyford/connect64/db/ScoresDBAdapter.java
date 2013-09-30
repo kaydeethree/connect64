@@ -31,7 +31,7 @@ public class ScoresDBAdapter {
 		}
 	}
 
-	public long insertScore(String player, int puzzle, long time) {
+	public long insertScore(String player, int puzzle, String time) {
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(Scores.PLAYER, player);
 		initialValues.put(Scores.PUZZLE, puzzle);
