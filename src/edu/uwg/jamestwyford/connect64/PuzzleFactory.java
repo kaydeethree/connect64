@@ -1,7 +1,7 @@
 package edu.uwg.jamestwyford.connect64;
 
 /**
- * Factory class for puzzles. Call {{@link #getPuzzle(int)} to construct the
+ * Factory class for puzzles. Call {@link #getPuzzle(int)} to construct the
  * specified Puzzle.
  * 
  * @author jtwyford
@@ -22,9 +22,6 @@ public final class PuzzleFactory {
 					48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
 					63 }, /* 1 */{ 1, 8, 15, 22, 34, 49, 55, 64 } };
 
-	private PuzzleFactory() {
-	}
-
 	/**
 	 * Returns a new Puzzle.
 	 * 
@@ -43,6 +40,9 @@ public final class PuzzleFactory {
 	 */
 	public static int numPuzzles() {
 		return puzzlePos.length - 1;
+	}
+
+	private PuzzleFactory() {
 	}
 
 }

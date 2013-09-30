@@ -23,8 +23,32 @@ import android.view.MenuItem;
  * Android Design: Settings</a> for design guidelines and the <a
  * href="http://developer.android.com/guide/topics/ui/settings.html">Settings
  * API Guide</a> for more information on developing a Settings UI.
+ * 
+ * @author jtwyford
+ * @version assignment3
  */
 public class SettingsActivity extends PreferenceActivity {
+	/**
+	 * This fragment shows general preferences only. It is used when the
+	 * activity is showing a two-pane settings UI.
+	 */
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static class GeneralPreferenceFragment extends PreferenceFragment {
+		@Override
+		public final void onCreate(final Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.pref_general);
+
+			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
+			// to their values. When their values change, their summaries are
+			// updated to reflect the new value, per the Android Design
+			// guidelines.
+			bindPreferenceSummaryToValue(findPreference("pref_cell_color"));
+			bindPreferenceSummaryToValue(findPreference("pref_text_color"));
+			bindPreferenceSummaryToValue(findPreference("pref_feedback"));
+		}
+	}
+
 	/**
 	 * Determines whether to always show the simplified settings UI, where
 	 * settings are presented in a single list. When false, settings are shown
@@ -33,92 +57,19 @@ public class SettingsActivity extends PreferenceActivity {
 	 */
 	private static final boolean ALWAYS_SIMPLE_PREFS = false;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setupActionBar();
-	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}, if the API is available.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	private void setupActionBar() {
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			// Show the Up button in the action bar.
-			getActionBar().setDisplayHomeAsUpEnabled(true);
-		}
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		switch (item.getItemId()) {
-		case android.R.id.home:
-			NavUtils.navigateUpFromSameTask(this);
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	protected void onPostCreate(Bundle savedInstanceState) {
-		super.onPostCreate(savedInstanceState);
-
-		setupSimplePreferencesScreen();
-	}
-
-	/**
-	 * Shows the simplified settings UI if the device configuration if the
-	 * device configuration dictates that a simplified, single-pane UI should be
-	 * shown.
-	 */
-	@SuppressWarnings("deprecation")
-	private void setupSimplePreferencesScreen() {
-		if (!isSimplePreferences(this)) {
-			return;
-		}
-		addPreferencesFromResource(R.xml.pref_general);
-	}
-
-	/** {@inheritDoc} */
-	@Override
-	public boolean onIsMultiPane() {
-		return isXLargeTablet(this) && !isSimplePreferences(this);
-	}
-
-	/**
-	 * Helper method to determine if the device has an extra-large screen. For
-	 * example, 10" tablets are extra-large.
-	 */
-	private static boolean isXLargeTablet(Context context) {
-		return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
-	}
-
-	/**
-	 * Determines whether the simplified settings UI should be shown. This is
-	 * true if this is forced via {@link #ALWAYS_SIMPLE_PREFS}, or the device
-	 * doesn't have newer APIs like {@link PreferenceFragment}, or the device
-	 * doesn't have an extra-large screen. In these cases, a single-pane
-	 * "simplified" settings UI should be shown.
-	 */
-	private static boolean isSimplePreferences(Context context) {
-		return ALWAYS_SIMPLE_PREFS
-				|| Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
-				|| !isXLargeTablet(context);
-	}
-
 	/**
 	 * A preference value change listener that updates the preference's summary
 	 * to reflect its new value.
 	 */
 	private static Preference.OnPreferenceChangeListener sBindPreferenceSummaryToValueListener = new Preference.OnPreferenceChangeListener() {
 		@Override
-		public boolean onPreferenceChange(Preference preference, Object value) {
-			String stringValue = value.toString();
+		public boolean onPreferenceChange(final Preference preference,
+				final Object value) {
+			final String stringValue = value.toString();
 
 			if (preference instanceof ListPreference) {
-				ListPreference listPreference = (ListPreference) preference;
-				int index = listPreference.findIndexOfValue(stringValue);
+				final ListPreference listPreference = (ListPreference) preference;
+				final int index = listPreference.findIndexOfValue(stringValue);
 				preference
 						.setSummary(index >= 0 ? listPreference.getEntries()[index]
 								: null);
@@ -136,9 +87,11 @@ public class SettingsActivity extends PreferenceActivity {
 	 * immediately updated upon calling this method. The exact display format is
 	 * dependent on the type of preference.
 	 * 
+	 * @param preference
+	 *            the Preference changed
 	 * @see #sBindPreferenceSummaryToValueListener
 	 */
-	private static void bindPreferenceSummaryToValue(Preference preference) {
+	private static void bindPreferenceSummaryToValue(final Preference preference) {
 		// Set the listener to watch for value changes.
 		preference
 				.setOnPreferenceChangeListener(sBindPreferenceSummaryToValueListener);
@@ -153,24 +106,85 @@ public class SettingsActivity extends PreferenceActivity {
 	}
 
 	/**
-	 * This fragment shows general preferences only. It is used when the
-	 * activity is showing a two-pane settings UI.
+	 * Determines whether the simplified settings UI should be shown. This is
+	 * true if this is forced via {@link #ALWAYS_SIMPLE_PREFS}, or the device
+	 * doesn't have newer APIs like {@link PreferenceFragment}, or the device
+	 * doesn't have an extra-large screen. In these cases, a single-pane
+	 * "simplified" settings UI should be shown.
+	 * 
+	 * @param context
+	 *            the activity context
+	 * @return true if the simplified settings UI should be shown
+	 */
+	private static boolean isSimplePreferences(final Context context) {
+		return ALWAYS_SIMPLE_PREFS
+				|| Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB
+				|| !isXLargeTablet(context);
+	}
+
+	/**
+	 * Helper method to determine if the device has an extra-large screen. For
+	 * example, 10" tablets are extra-large.
+	 * 
+	 * @param context
+	 *            the activty context
+	 * 
+	 * @return true if the device has an extra-large scren
+	 */
+	private static boolean isXLargeTablet(final Context context) {
+		return (context.getResources().getConfiguration().screenLayout & Configuration.SCREENLAYOUT_SIZE_MASK) >= Configuration.SCREENLAYOUT_SIZE_XLARGE;
+	}
+
+	@Override
+	public final boolean onIsMultiPane() {
+		return isXLargeTablet(this) && !isSimplePreferences(this);
+	}
+
+	@Override
+	public final boolean onOptionsItemSelected(final MenuItem item) {
+		final int id = item.getItemId();
+		if (id == android.R.id.home) {
+			NavUtils.navigateUpFromSameTask(this);
+			return true;
+		}
+		return super.onOptionsItemSelected(item);
+	}
+
+	@Override
+	protected final void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setupActionBar();
+	}
+
+	@Override
+	protected final void onPostCreate(final Bundle savedInstanceState) {
+		super.onPostCreate(savedInstanceState);
+
+		setupSimplePreferencesScreen();
+	}
+
+	/**
+	 * Set up the {@link android.app.ActionBar}, if the API is available.
 	 */
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class GeneralPreferenceFragment extends PreferenceFragment {
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_general);
-
-			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
-			// to their values. When their values change, their summaries are
-			// updated to reflect the new value, per the Android Design
-			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("pref_cell_color"));
-			bindPreferenceSummaryToValue(findPreference("pref_text_color"));
-			bindPreferenceSummaryToValue(findPreference("pref_feedback"));
+	private void setupActionBar() {
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			// Show the Up button in the action bar.
+			getActionBar().setDisplayHomeAsUpEnabled(true);
 		}
+	}
+
+	/**
+	 * Shows the simplified settings UI if the device configuration if the
+	 * device configuration dictates that a simplified, single-pane UI should be
+	 * shown.
+	 */
+	@SuppressWarnings("deprecation")
+	private void setupSimplePreferencesScreen() {
+		if (!isSimplePreferences(this)) {
+			return;
+		}
+		addPreferencesFromResource(R.xml.pref_general);
 	}
 
 }
