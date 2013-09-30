@@ -272,34 +272,6 @@ public class Connect64 extends Activity implements
 	}
 
 	@Override
-	protected final void onRestoreInstanceState(final Bundle savedState) {
-		super.onRestoreInstanceState(savedState);
-		Log.d(LOG_TAG, "onRestoreInstanceState() no-op");
-		// @formatter:off
-		/*
-		this.currentInput = savedState.getInt(CURRENT_INPUT, BAD_VALUE);
-		this.currentPuzzle = savedState.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
-		this.currentRange = savedState.getInt(CURRENT_RANGE, 0);
-		this.maxPuzzleAttempted = savedState.getInt(MAX_PUZZLE_ATTEMPTED,
-				STARTING_PUZZLE);
-		loadPuzzle(this.currentPuzzle, false);
-		this.rangeSpinner.setSelection(this.currentRange);
-		this.elapsedTime = savedState.getLong(ELAPSED_TIME, 0L);
-		this.timerRunning = savedState.getBoolean(TIMER_RUNNING, true);
-
-		final int[] positions = savedState.getIntArray(STATE_POSITIONS);
-		final int[] values = savedState.getIntArray(STATE_VALUES);
-		final SparseIntArray state = this.boardState;
-		for (int i = 0; i < positions.length; i++) {
-			state.put(positions[i], values[i]);
-			getButton(String.valueOf(positions[i])).setText(
-					String.valueOf(values[i]));
-		}
-		*/
-		// @formatter:on
-	}
-
-	@Override
 	protected final void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "onResume()");
@@ -330,36 +302,6 @@ public class Connect64 extends Activity implements
 			loadPuzzle(this.currentPuzzle, true);
 		}
 		this.database.open();
-	}
-
-	@Override
-	protected final void onSaveInstanceState(final Bundle outState) {
-		super.onSaveInstanceState(outState);
-		Log.d(LOG_TAG, "onSaveInstanceState() no-op");
-		// @formatter:off
-		/*
-		outState.putInt(CURRENT_INPUT, this.currentInput);
-		outState.putInt(CURRENT_PUZZLE, this.currentPuzzle);
-		outState.putInt(CURRENT_RANGE, this.currentRange);
-		outState.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
-		outState.putBoolean(TIMER_RUNNING, this.timerRunning);
-		if (this.timerRunning) {
-			setElapsedTime();
-		}
-		outState.putLong(ELAPSED_TIME, this.elapsedTime);
-
-		final SparseIntArray state = this.boardState;
-		final int size = state.size();
-		final int[] positions = new int[size];
-		final int[] values = new int[size];
-		for (int i = 0; i < size; i++) {
-			positions[i] = state.keyAt(i);
-			values[i] = state.valueAt(i);
-		}
-		outState.putIntArray(STATE_POSITIONS, positions);
-		outState.putIntArray(STATE_VALUES, values);
-		*/
-		// @formatter:on
 	}
 
 	private void addScoretoTable() {
@@ -616,14 +558,13 @@ public class Connect64 extends Activity implements
 	 */
 	private void setupInputButtons() {
 		Log.d(LOG_TAG, "setupInputButtons()");
-		final int numInputs = NUM_INPUT_BUTTONS;
 		final int range = this.currentRange;
 		final Button[] inputButtons = this.inputButtons;
 		final SparseIntArray state = this.boardState;
 		final boolean timerRunning = this.timerRunning;
 
-		for (int i = 0; i < numInputs; i++) {
-			final int value = numInputs * range + i + 1;
+		for (int i = 0; i < NUM_INPUT_BUTTONS; i++) {
+			final int value = NUM_INPUT_BUTTONS * range + i + 1;
 			final Button inputButton = inputButtons[i];
 			inputButton.setText(String.valueOf(value));
 			inputButton.setEnabled(timerRunning && state.indexOfValue(value) < 0);

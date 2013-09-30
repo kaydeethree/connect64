@@ -16,9 +16,6 @@ Checkstyle issues:
 Implementation notes:
 * Serialization/Parcelization is painful. I'm really curious to see how the
   rest of the class saves state in onPause().
-* onPause/Resume() and onSave/RestoreInstanceState() do nearly the same thing.
-  I could generalize them to both stuff into preferences, but I'd rather not
-  suffer the serialization hit.
 * I've got a boatload of member fields this time around, most of which are
   static tags or references to Views. Only 7 actual state members...
 * I keep wanting to factor all of the game logic out into another class since
