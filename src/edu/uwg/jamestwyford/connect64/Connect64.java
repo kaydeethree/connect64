@@ -490,10 +490,6 @@ public class Connect64 extends Activity implements
 		return thisValue == otherValue + 1;
 	}
 
-	private boolean isValueOnBoard(final int value) {
-		return this.boardState.indexOfValue(value) >= 0;
-	}
-
 	/**
 	 * Loads the specified Puzzle. Will reset the timer if restartTimer is true
 	 * 
@@ -620,13 +616,17 @@ public class Connect64 extends Activity implements
 	 */
 	private void setupInputButtons() {
 		Log.d(LOG_TAG, "setupInputButtons()");
-		final int newRange = this.currentRange;
+		final int numInputs = NUM_INPUT_BUTTONS;
+		final int range = this.currentRange;
+		final Button[] inputButtons = this.inputButtons;
+		final SparseIntArray state = this.boardState;
+		final boolean timerRunning = this.timerRunning;
 
-		for (int i = 0; i < NUM_INPUT_BUTTONS; i++) {
-			final int value = NUM_INPUT_BUTTONS * newRange + i + 1;
-			final Button inputButton = this.inputButtons[i];
+		for (int i = 0; i < numInputs; i++) {
+			final int value = numInputs * range + i + 1;
+			final Button inputButton = inputButtons[i];
 			inputButton.setText(String.valueOf(value));
-			inputButton.setEnabled(this.timerRunning && !isValueOnBoard(value));
+			inputButton.setEnabled(timerRunning && state.indexOfValue(value) < 0);
 		}
 	}
 }
