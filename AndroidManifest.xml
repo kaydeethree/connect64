@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="edu.uwg.jamestwyford.connect64"
     android:versionCode="1"
@@ -20,6 +21,22 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name="edu.uwg.jamestwyford.connect64.TopScores"
+            android:label="@string/title_activity_top_scores"
+            android:parentActivityName="edu.uwg.jamestwyford.connect64.Connect64" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.uwg.jamestwyford.connect64.Connect64" />
+        </activity>
+        <activity
+            android:name="edu.uwg.jamestwyford.connect64.SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName="edu.uwg.jamestwyford.connect64.Connect64" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="edu.uwg.jamestwyford.connect64.Connect64" />
         </activity>
     </application>
 

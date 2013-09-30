@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <string name="app_name">Connect64 by James Twyford</string>
@@ -21,5 +21,7 @@
     <string name="top_scores">Top scores</string>
     <string name="try_again">Try again</string>
     <string name="you_won_in_s">You won in %s!</string>
+    <string name="title_activity_top_scores">TopScores</string>
+    <string name="hello_world">Hello world!</string>
 
 </resources>

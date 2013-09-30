@@ -45,10 +45,12 @@ public class Connect64 extends Activity implements
 	private static final int ROW_SIZE = 8;
 	private static final int STARTING_PUZZLE = 0;
 	private static final int TOP_SCORES = 1;
+	private static final int SETTINGS = 2;
 	private static final String CURRENT_INPUT = "currentInput";
 	private static final String CURRENT_PUZZLE = "currentPuzzle";
 	private static final String CURRENT_RANGE = "currentRange";
 	private static final String ELAPSED_TIME = "elapsedTime";
+	private static final String GAME_STATE_PREFS = "gameStatePrefs";
 	private static final String LOG_TAG = "C64";
 	private static final String MAX_PUZZLE_ATTEMPTED = "maxPuzzleAttempted";
 	private static final String STATE_POSITIONS = "statePositions";
@@ -57,11 +59,11 @@ public class Connect64 extends Activity implements
 
 	// views
 	private TableLayout gameBoard;
+	private Button[] inputButtons;
 	private ImageButton pauseResume;
 	private TextView puzzleLabel;
 	private Spinner rangeSpinner;
 	private Chronometer timer;
-	private Button[] inputButtons;
 
 	// game state
 	private SparseIntArray boardState;
@@ -144,14 +146,18 @@ public class Connect64 extends Activity implements
 		final boolean retVal = true;
 		final int id = item.getItemId();
 		if (id == R.id.clearPrefs) {
-			final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-			final SharedPreferences.Editor editor = prefs.edit();
-			editor.clear();
-			editor.apply();
+			final SharedPreferences statePrefs = getSharedPreferences(
+					GAME_STATE_PREFS, MODE_PRIVATE);
+			final SharedPreferences.Editor stateEditor = statePrefs.edit();
+			stateEditor.clear();
+			stateEditor.apply();
 		} else if (id == R.id.topScores) {
 			final Intent intent = new Intent(getApplicationContext(),
 					TopScores.class);
 			startActivityForResult(intent, TOP_SCORES);
+		} else if (id == R.id.action_settings) {
+			final Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+			startActivityForResult(intent, SETTINGS);
 		} else if (id >= MENU_PUZZLE_OFFSET
 				&& id <= MENU_PUZZLE_OFFSET + PuzzleFactory.numPuzzles()) {
 			final int puzzle = id - MENU_PUZZLE_OFFSET;
@@ -216,7 +222,7 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onCreate(final Bundle savedState) {
 		super.onCreate(savedState);
-		Log.d(LOG_TAG, "==================onCreate()=======================");
+		Log.d(LOG_TAG, "=======================onCreate()=======================");
 		setContentView(R.layout.activity_connect64);
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
@@ -244,18 +250,18 @@ public class Connect64 extends Activity implements
 	protected final void onPause() {
 		super.onPause();
 		Log.d(LOG_TAG, "onPause()");
-
-		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-		final SharedPreferences.Editor editor = prefs.edit();
-		editor.putInt(CURRENT_INPUT, this.currentInput);
-		editor.putInt(CURRENT_RANGE, this.currentRange);
-		editor.putInt(CURRENT_PUZZLE, this.currentPuzzle);
-		editor.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
-		editor.putBoolean(TIMER_RUNNING, this.timerRunning);
+		final SharedPreferences statePrefs = getSharedPreferences(
+				GAME_STATE_PREFS, MODE_PRIVATE);
+		final SharedPreferences.Editor stateEditor = statePrefs.edit();
+		stateEditor.putInt(CURRENT_INPUT, this.currentInput);
+		stateEditor.putInt(CURRENT_PUZZLE, this.currentPuzzle);
+		stateEditor.putInt(CURRENT_RANGE, this.currentRange);
+		stateEditor.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
+		stateEditor.putBoolean(TIMER_RUNNING, this.timerRunning);
 		if (this.timerRunning) {
 			setElapsedTime();
 		}
-		editor.putLong(ELAPSED_TIME, this.elapsedTime);
+		stateEditor.putLong(ELAPSED_TIME, this.elapsedTime);
 
 		final SparseIntArray state = this.boardState;
 		final int size = state.size();
@@ -265,26 +271,21 @@ public class Connect64 extends Activity implements
 			positions[i] = state.keyAt(i);
 			values[i] = state.valueAt(i);
 		}
-		editor.putString(STATE_POSITIONS, serializeIntArray(positions));
-		editor.putString(STATE_VALUES, serializeIntArray(values));
-		editor.apply();
+		stateEditor.putString(STATE_POSITIONS, serializeIntArray(positions));
+		stateEditor.putString(STATE_VALUES, serializeIntArray(values));
+		stateEditor.apply();
 	}
 
 	@Override
 	protected final void onRestoreInstanceState(final Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
-		Log.d(LOG_TAG,
-				"onRestoreInstanceState(); local elapsed: " + this.elapsedTime
-						+ " bundle elapsed: "
-						+ savedState.getLong(ELAPSED_TIME));
-
+		Log.d(LOG_TAG, "onRestoreInstanceState()");
 		this.currentInput = savedState.getInt(CURRENT_INPUT, BAD_VALUE);
-		this.currentRange = savedState.getInt(CURRENT_RANGE, 0);
 		this.currentPuzzle = savedState.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
+		this.currentRange = savedState.getInt(CURRENT_RANGE, 0);
 		this.maxPuzzleAttempted = savedState.getInt(MAX_PUZZLE_ATTEMPTED,
 				STARTING_PUZZLE);
 		loadPuzzle(this.currentPuzzle, false);
-
 		this.rangeSpinner.setSelection(this.currentRange);
 		this.elapsedTime = savedState.getLong(ELAPSED_TIME, 0L);
 		this.timerRunning = savedState.getBoolean(TIMER_RUNNING, true);
@@ -303,21 +304,20 @@ public class Connect64 extends Activity implements
 	protected final void onResume() {
 		super.onResume();
 		Log.d(LOG_TAG, "onResume()");
-		final SharedPreferences prefs = getPreferences(MODE_PRIVATE);
-		this.currentInput = prefs.getInt(CURRENT_INPUT, BAD_VALUE);
-		this.currentRange = prefs.getInt(CURRENT_RANGE, 0);
-		this.currentPuzzle = prefs.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
-		this.maxPuzzleAttempted = prefs.getInt(MAX_PUZZLE_ATTEMPTED,
+		final SharedPreferences statePrefs = getSharedPreferences(
+				GAME_STATE_PREFS, MODE_PRIVATE);
+		this.currentInput = statePrefs.getInt(CURRENT_INPUT, BAD_VALUE);
+		this.currentPuzzle = statePrefs.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
+		this.currentRange = statePrefs.getInt(CURRENT_RANGE, 0);
+		this.maxPuzzleAttempted = statePrefs.getInt(MAX_PUZZLE_ATTEMPTED,
 				STARTING_PUZZLE);
 		loadPuzzle(this.currentPuzzle, false);
-
 		this.rangeSpinner.setSelection(this.currentRange);
-		this.elapsedTime = prefs.getLong(ELAPSED_TIME, 0L);
-		this.timerRunning = prefs.getBoolean(TIMER_RUNNING, true);
+		this.elapsedTime = statePrefs.getLong(ELAPSED_TIME, 0L);
+		this.timerRunning = statePrefs.getBoolean(TIMER_RUNNING, true);
 
-		final String posString = prefs.getString(STATE_POSITIONS, null);
-		final String valString = prefs.getString(STATE_VALUES, null);
-
+		final String posString = statePrefs.getString(STATE_POSITIONS, null);
+		final String valString = statePrefs.getString(STATE_VALUES, null);
 		if (posString != null && valString != null) {
 			final int[] positions = deserializeIntArray(posString);
 			final int[] values = deserializeIntArray(valString);
@@ -335,12 +335,10 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
-		Log.d(LOG_TAG, "onSaveInstanceState(). elapsedTime: "
-				+ this.elapsedTime);
-
+		Log.d(LOG_TAG, "onSaveInstanceState()");
 		outState.putInt(CURRENT_INPUT, this.currentInput);
-		outState.putInt(CURRENT_RANGE, this.currentRange);
 		outState.putInt(CURRENT_PUZZLE, this.currentPuzzle);
+		outState.putInt(CURRENT_RANGE, this.currentRange);
 		outState.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
 		outState.putBoolean(TIMER_RUNNING, this.timerRunning);
 		if (this.timerRunning) {
