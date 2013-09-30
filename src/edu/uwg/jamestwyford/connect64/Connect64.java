@@ -6,6 +6,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Locale;
 
+import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -56,6 +57,7 @@ public class Connect64 extends Activity implements
 	private static final String STATE_POSITIONS = "statePositions";
 	private static final String STATE_VALUES = "stateValues";
 	private static final String TIMER_RUNNING = "timerRunning";
+	private static final String PLAYER_NAME = "Player";
 
 	// views
 	private TableLayout gameBoard;
@@ -73,6 +75,9 @@ public class Connect64 extends Activity implements
 	private long elapsedTime;
 	private int maxPuzzleAttempted;
 	private boolean timerRunning;
+	
+	//db
+	private ScoresDBAdapter dbAdapter;
 
 	/**
 	 * Input handler for the clear button. Resets the game board to the initial
@@ -244,6 +249,9 @@ public class Connect64 extends Activity implements
 		}
 		this.inputButtons = buttons;
 		// load puzzle/state in onResume/onRestoreInstanceState()
+		
+		dbAdapter = new ScoresDBAdapter(this);
+		dbAdapter.open();
 	}
 
 	@Override
@@ -372,9 +380,12 @@ public class Connect64 extends Activity implements
 			toast = Toast.makeText(this, R.string.all_puzzles_complete,
 					Toast.LENGTH_SHORT);
 			this.timerRunning = false;
+			setElapsedTime();
 			this.timer.stop();
+			addScoretoTable();
 		} else if (boardCorrect && !onLastPuzzle) {
 			setElapsedTime();
+			addScoretoTable();
 			final String outString = String.format(Locale.US, getResources()
 					.getString(R.string.you_won_in_s),
 					formatTime(this.elapsedTime));
@@ -390,6 +401,10 @@ public class Connect64 extends Activity implements
 		}
 	}
 
+	private void addScoretoTable() {
+		dbAdapter.insertScore(PLAYER_NAME, currentPuzzle, elapsedTime);
+	}
+	
 	private int[] deserializeIntArray(final String string) {
 		try {
 			final byte[] bytes = Base64.decode(string, Base64.DEFAULT);

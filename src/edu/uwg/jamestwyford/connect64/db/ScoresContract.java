@@ -6,7 +6,7 @@ public final class ScoresContract {
 	private ScoresContract() {
 	}
 	
-	static class Scores implements BaseColumns {
+	public static class Scores implements BaseColumns {
 		public static final String SCORES_TABLE_NAME = "scores";
 		public static final String ID = "_id";
 		public static final String PLAYER = "player";

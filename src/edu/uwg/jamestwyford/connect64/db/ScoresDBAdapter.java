@@ -39,31 +39,24 @@ public class ScoresDBAdapter {
 		return theDB.insert(Scores.SCORES_TABLE_NAME, null, initialValues);
 	}
 
-	public boolean deleteStudent(long id) {
+	public boolean deleteScore(long id) {
 		String[] ids = { "" + id };
-		int retVal = theDB.delete(Scores.SCORES_TABLE_NAME, Scores.ID
-				+ " = ?", ids);
-		if (retVal > 0) {
-			return true;
-		} else {
-			return false;
-		}
+		int retVal = theDB.delete(Scores.SCORES_TABLE_NAME, Scores.ID + " = ?",
+				ids);
+		return (retVal > 0);
 	}
 
-	public boolean deleteAllStudents() {
-		String[] where = { "" };
-		int retVal = theDB.delete(Scores.SCORES_TABLE_NAME, "1", where);
-		if (retVal > 0) {
-			return true;
-		} else {
-			return false;
-		}
+	public boolean deleteAllScores() {
+		int retVal = theDB.delete(Scores.SCORES_TABLE_NAME, "1", null);
+		return (retVal > 0);
 	}
 
 	public Cursor fetchAllScores() {
-		String[] columns = new String[] { Scores.PLAYER, Scores.PUZZLE, Scores.COMPLETION_TIME };
-		return this.theDB.query(Scores.SCORES_TABLE_NAME, columns, null,
-				null, null, null, null);
+		String[] columns = new String[] { Scores.ID, Scores.PLAYER,
+				Scores.PUZZLE, Scores.COMPLETION_TIME };
+		String order = Scores.COMPLETION_TIME;
+		return this.theDB.query(Scores.SCORES_TABLE_NAME, columns, null, null,
+				null, null, order);
 	}
 
 }

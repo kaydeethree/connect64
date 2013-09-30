@@ -1,10 +1,15 @@
 package edu.uwg.jamestwyford.connect64;
 
-import android.app.Activity;
+import android.app.ListActivity;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
+import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
 
 /**
  * Top scores activity.
@@ -12,7 +17,9 @@ import android.view.MenuItem;
  * @author jtwyford
  * @version assignment3
  */
-public class TopScores extends Activity {
+public class TopScores extends ListActivity {
+	ListView listView;
+	ScoresDBAdapter dbAdapter;
 
 	@Override
 	public boolean onCreateOptionsMenu(final Menu menu) {
@@ -37,6 +44,16 @@ public class TopScores extends Activity {
 		setContentView(R.layout.activity_top_scores);
 		// Show the Up button in the action bar.
 		setupActionBar();
+		listView = (ListView) findViewById(android.R.id.list);
+		dbAdapter = new ScoresDBAdapter(this);
+		dbAdapter.open();
+		Cursor cursor = dbAdapter.fetchAllScores();
+		String[] fields = { Scores.PLAYER, Scores.PUZZLE,
+				Scores.COMPLETION_TIME };
+		int[] columns = { R.id.row_player, R.id.row_puzzle, R.id.row_time };
+		SimpleCursorAdapter cursorAdapter = new SimpleCursorAdapter(this,
+				R.layout.score_row, cursor, fields, columns);
+		setListAdapter(cursorAdapter);
 	}
 
 	/**
