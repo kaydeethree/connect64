@@ -1,4 +1,5 @@
 /**
+ * Database package for Connect 64.
  * @author jtwyford
  *
  */

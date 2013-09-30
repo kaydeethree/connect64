@@ -3,26 +3,46 @@ package edu.uwg.jamestwyford.connect64.db;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
 
+/**
+ * Database adapter for the Scores database/table.
+ * 
+ * @author jtwyford
+ * @version assignment3
+ * 
+ */
 public class ScoresDBAdapter {
 	private ScoresDBHelper databaseHelper = null;
 	private SQLiteDatabase theDB = null;
 	private Context context = null;
 
-	public ScoresDBAdapter(Context context) {
-		this.context = context;
+	/**
+	 * Constructs the adapter using the given Activy Context.
+	 * 
+	 * @param newContext
+	 *            the Context of the Activity.
+	 */
+	public ScoresDBAdapter(final Context newContext) {
+		this.context = newContext;
 	}
 
-	public ScoresDBAdapter open() throws SQLException {
+	/**
+	 * Opens the table for write access.
+	 * 
+	 * @return this class with the table open for write access.
+	 */
+	public final ScoresDBAdapter open() {
 		this.databaseHelper = new ScoresDBHelper(this.context);
 		this.theDB = this.databaseHelper.getWritableDatabase();
 		return this;
 	}
 
-	public void close() {
+	/**
+	 * Closes the table if necessary.
+	 */
+	public final void close() {
 		if (this.databaseHelper != null) {
 			this.databaseHelper.close();
 		}
@@ -31,27 +51,56 @@ public class ScoresDBAdapter {
 		}
 	}
 
-	public long insertScore(String player, int puzzle, String time) {
+	/**
+	 * Inserts a score with the specified values into the table.
+	 * 
+	 * @param player
+	 *            the player who completed the puzzle
+	 * @param puzzle
+	 *            the puzzle completed by the player
+	 * @param time
+	 *            the time taken to complete the puzzle
+	 * @return the ID of the row just entered or -1
+	 */
+	public final long insertScore(final String player, final int puzzle,
+			final String time) {
 		ContentValues initialValues = new ContentValues();
 		initialValues.put(Scores.PLAYER, player);
 		initialValues.put(Scores.PUZZLE, puzzle);
 		initialValues.put(Scores.COMPLETION_TIME, time);
-		return theDB.insert(Scores.SCORES_TABLE_NAME, null, initialValues);
+		return this.theDB.insert(Scores.SCORES_TABLE_NAME, null, initialValues);
 	}
 
-	public boolean deleteScore(long id) {
+	/**
+	 * Given a score id, deletes the score with that id.
+	 * 
+	 * @param id
+	 *            the score to delete
+	 * @return true if the row was deleted
+	 */
+	public final boolean deleteScore(final long id) {
 		String[] ids = { "" + id };
-		int retVal = theDB.delete(Scores.SCORES_TABLE_NAME, Scores.ID + " = ?",
-				ids);
+		int retVal = this.theDB.delete(Scores.SCORES_TABLE_NAME, Scores.ID
+				+ " = ?", ids);
 		return (retVal > 0);
 	}
 
-	public boolean deleteAllScores() {
-		int retVal = theDB.delete(Scores.SCORES_TABLE_NAME, "1", null);
+	/**
+	 * Clear the table.
+	 * 
+	 * @return true if the table was cleared
+	 */
+	public final boolean deleteAllScores() {
+		int retVal = this.theDB.delete(Scores.SCORES_TABLE_NAME, "1", null);
 		return (retVal > 0);
 	}
 
-	public Cursor fetchAllScores() {
+	/**
+	 * Gets a Cursor over the whole table.
+	 * 
+	 * @return a Cursor over the whole table
+	 */
+	public final Cursor fetchAllScores() {
 		String[] columns = new String[] { Scores.ID, Scores.PLAYER,
 				Scores.PUZZLE, Scores.COMPLETION_TIME };
 		String order = Scores.COMPLETION_TIME;

@@ -75,8 +75,8 @@ public class Connect64 extends Activity implements
 	private long elapsedTime;
 	private int maxPuzzleAttempted;
 	private boolean timerRunning;
-	
-	//db
+
+	// db
 	private ScoresDBAdapter dbAdapter;
 
 	/**
@@ -163,7 +163,8 @@ public class Connect64 extends Activity implements
 		} else if (id == R.id.clearScores) {
 			clearScoresTable();
 		} else if (id == R.id.action_settings) {
-			final Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+			final Intent intent = new Intent(getApplicationContext(),
+					SettingsActivity.class);
 			startActivityForResult(intent, SETTINGS);
 		} else if (id >= MENU_PUZZLE_OFFSET
 				&& id <= MENU_PUZZLE_OFFSET + PuzzleFactory.numPuzzles()) {
@@ -229,7 +230,8 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onCreate(final Bundle savedState) {
 		super.onCreate(savedState);
-		Log.d(LOG_TAG, "=======================onCreate()=======================");
+		Log.d(LOG_TAG,
+				"=======================onCreate()=======================");
 		setContentView(R.layout.activity_connect64);
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
@@ -251,9 +253,9 @@ public class Connect64 extends Activity implements
 		}
 		this.inputButtons = buttons;
 		// load puzzle/state in onResume/onRestoreInstanceState()
-		
-		dbAdapter = new ScoresDBAdapter(this);
-		dbAdapter.open();
+
+		this.dbAdapter = new ScoresDBAdapter(this);
+
 	}
 
 	@Override
@@ -284,6 +286,7 @@ public class Connect64 extends Activity implements
 		stateEditor.putString(STATE_POSITIONS, serializeIntArray(positions));
 		stateEditor.putString(STATE_VALUES, serializeIntArray(values));
 		stateEditor.apply();
+		this.dbAdapter.close();
 	}
 
 	@Override
@@ -340,6 +343,7 @@ public class Connect64 extends Activity implements
 		} else {
 			loadPuzzle(this.currentPuzzle, true);
 		}
+		this.dbAdapter.open();
 	}
 
 	@Override
@@ -404,13 +408,14 @@ public class Connect64 extends Activity implements
 	}
 
 	private void addScoretoTable() {
-		dbAdapter.insertScore(PLAYER_NAME, currentPuzzle, formatTime(elapsedTime));
+		this.dbAdapter.insertScore(PLAYER_NAME, this.currentPuzzle,
+				formatTime(this.elapsedTime));
 	}
-	
+
 	private void clearScoresTable() {
-		dbAdapter.deleteAllScores();
+		this.dbAdapter.deleteAllScores();
 	}
-	
+
 	private int[] deserializeIntArray(final String string) {
 		try {
 			final byte[] bytes = Base64.decode(string, Base64.DEFAULT);
