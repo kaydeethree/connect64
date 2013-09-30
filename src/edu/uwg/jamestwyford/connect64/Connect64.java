@@ -6,7 +6,6 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Locale;
 
-import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -28,6 +27,7 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
 
 /**
  * Game logic and GUI handling for the 8x8 board.
@@ -372,6 +372,11 @@ public class Connect64 extends Activity implements
 		outState.putIntArray(STATE_VALUES, values);
 	}
 
+	private void addScoretoTable() {
+		this.dbAdapter.insertScore(PLAYER_NAME, this.currentPuzzle,
+				formatTime(this.elapsedTime));
+	}
+
 	/**
 	 * Overall board win condition check. Board must be full and all positions
 	 * must have a valid higher and lower neighbor to fulfill the win condition.
@@ -405,11 +410,6 @@ public class Connect64 extends Activity implements
 		if (toast != null) {
 			toast.show();
 		}
-	}
-
-	private void addScoretoTable() {
-		this.dbAdapter.insertScore(PLAYER_NAME, this.currentPuzzle,
-				formatTime(this.elapsedTime));
 	}
 
 	private void clearScoresTable() {

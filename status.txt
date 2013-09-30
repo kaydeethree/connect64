@@ -3,16 +3,17 @@ Android Assignment 3: Connect64
 Checkstyle issues:
 * Something something array initialization and switch indents.
 * this.localField is ok, but the Source Cleanup tool removes "this" on method
-  calls defined elsewhere in the Class. Checkstyle doesn't seem to care about
-  methods defined in parent Classes or straight calls to methods (that is, not
-  calls as part of an assignment operation), though...
+  calls defined elsewhere in the Class, including those calls as part of an
+  assignment operation. Checkstyle doesn't seem to care about methods defined
+  in parent Classes or straight calls to class-defined methods though...
+* It's also complaining about the 5 values I'm checking against in
+  hasValidNeighbors(), (hasNext = 64 || up || down || left || right) but I
+  don't want to break it up just to satisfy checkstyle as it's obvious what's
+  going on.
+* Some Eclipse-generated code in the Preferences activty is using the tertiary
+  operator, so I'm ignoring the warning. 
 
 Implementation notes:
-* The solution I came up with storing puzzles is meh. 2-dimensional arrays are
-  not efficient, but at least they only get accessed _once_ on puzzle
-  initialization. I'd store them as HashMaps (or SparseIntArrays on Android)
-  if there was a better way to initialize them without having to iterate
-  through the array to load them up anyway.
 * Serialization/Parcelization is painful. I'm really curious to see how the
   rest of the class saves state in onPause().
 * onPause/Resume() and onSave/RestoreInstanceState() do nearly the same thing.
