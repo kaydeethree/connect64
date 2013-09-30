@@ -7,7 +7,8 @@
             android:entries="@array/pref_feedback_list_titles"
             android:entryValues="@array/pref_feedback_list_values"
             android:key="pref_feedback"
-            android:title="@string/pref_choose_feedback" />
+            android:title="@string/pref_choose_feedback"
+            android:summary="" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/pref_colors_title"
         android:key="color_feedback_category" >
@@ -15,12 +16,14 @@
             android:key="pref_cell_color"
             android:maxLines="1"
             android:singleLine="true"
-            android:title="@string/pref_cell_color_title" />
+            android:title="@string/pref_cell_color_title"
+            android:summary="" />
         <EditTextPreference
             android:key="pref_number_color"
             android:maxLines="1"
             android:singleLine="true"
-            android:title="@string/pref_number_color_title" />
+            android:title="@string/pref_number_color_title"
+            android:summary="" />
     </PreferenceCategory>
 
 </PreferenceScreen>
