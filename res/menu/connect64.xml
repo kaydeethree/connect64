@@ -3,7 +3,7 @@
     <item
         android:id="@+id/topScores"
         android:showAsAction="ifRoom"
-        android:title="@string/top_scores"
+        android:title="@string/title_activity_top_scores"
         android:icon="@android:drawable/ic_menu_sort_by_size"/>
     <item
         android:id="@+id/loadPuzzle"
@@ -16,11 +16,6 @@
         android:id="@+id/clearScores"
         android:showAsAction="never"
         android:title="@string/clear_scores"
-        android:icon="@android:drawable/ic_menu_delete"/>
-    <item
-        android:id="@+id/clearPrefs"
-        android:showAsAction="never"
-        android:title="@string/clear_state"
         android:icon="@android:drawable/ic_menu_delete"/>
     <item
         android:id="@+id/action_settings"

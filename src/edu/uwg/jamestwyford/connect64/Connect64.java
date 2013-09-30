@@ -150,13 +150,7 @@ public class Connect64 extends Activity implements
 	public final boolean onOptionsItemSelected(final MenuItem item) {
 		final boolean retVal = true;
 		final int id = item.getItemId();
-		if (id == R.id.clearPrefs) {
-			final SharedPreferences statePrefs = getSharedPreferences(
-					GAME_STATE_PREFS, MODE_PRIVATE);
-			final SharedPreferences.Editor stateEditor = statePrefs.edit();
-			stateEditor.clear();
-			stateEditor.apply();
-		} else if (id == R.id.topScores) {
+		if (id == R.id.topScores) {
 			final Intent intent = new Intent(getApplicationContext(),
 					TopScores.class);
 			startActivityForResult(intent, TOP_SCORES);
