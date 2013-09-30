@@ -31,7 +31,7 @@
         android:text="@string/puzzle_s"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
+    <ImageButton
         android:id="@+id/clear"
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
@@ -39,6 +39,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
         android:onClick="clearButtonClick"
-        android:text="@string/clear" />
+        android:contentDescription="@string/clear"
+        android:src="@android:drawable/ic_menu_revert" />
 
 </RelativeLayout>

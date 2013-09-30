@@ -12,7 +12,7 @@
     <PreferenceCategory android:title="@string/pref_colors_title"
         android:key="color_feedback_category" >
         <EditTextPreference
-            android:key="pref_number_color"
+            android:key="pref_cell_color"
             android:maxLines="1"
             android:singleLine="true"
             android:title="@string/pref_cell_color_title" />

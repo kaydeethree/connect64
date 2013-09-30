@@ -13,7 +13,7 @@
 
     <string name="all_puzzles_complete">All puzzles complete!</string>
     <string name="clear">Clear</string>
-    <string name="clear_prefs">Clear preferences</string>
+    <string name="clear_state">Clear state</string>
     <string name="load_puzzle">Load puzzle</string>
     <string name="loading_puzzle_s">Loading puzzle %s</string>
     <string name="pause">Pause</string>
