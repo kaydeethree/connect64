@@ -42,6 +42,8 @@ public class TopScores extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
+
+
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -50,6 +52,12 @@ public class TopScores extends ListActivity {
 		this.dbAdapter = new ScoresDBAdapter(this);
 		this.dbAdapter.open();
 		fillListView();
+	}
+	
+	@Override
+	protected final void onPause() {
+		super.onPause();
+		this.dbAdapter.close();
 	}
 	
 	@SuppressWarnings("deprecation")
