@@ -75,36 +75,30 @@ public class Connect64 extends Activity implements
 	private boolean timerRunning;
 
 	// db
-	private ScoresDBAdapter dbAdapter;
+	private ScoresDBAdapter database;
 
 	/**
-	 * Input handler for the clear button. Resets the game board to the initial
-	 * state and resets the timer.
+	 * Input handler for the clear button. Reloads the current puzzle and resets
+	 * the timer.
 	 * 
 	 * @param view
 	 *            ignored
 	 */
 	public final void clearButtonClick(final View view) {
-		this.elapsedTime = 0;
-		resumeTimer();
-		resetAndInitialize();
+		loadPuzzle(this.currentPuzzle, true);
 	}
 
 	/**
 	 * Input handler for the 64 game board Buttons. If the current input is
 	 * valid, sets the clicked Button to that value. Clears the Button
-	 * otherwise. Updates the input Buttons to dis/enable them as appropriate.
-	 * If the board is full, checks if the player has won and moves to the next
-	 * puzzle if so.
+	 * otherwise. If the board is full, checks if the player has won and moves
+	 * to the next puzzle if so.
 	 * 
 	 * @param view
 	 *            the Button clicked
 	 */
 	public final void gameButtonClick(final View view) {
 		setGameButtonText((Button) view);
-		Log.d(LOG_TAG, "calling setupInputButtons() from gameButtonClick()");
-		setupInputButtons();
-
 		if (this.boardState.size() == BOARD_MAX) {
 			checkWinCondition();
 		}
@@ -134,7 +128,7 @@ public class Connect64 extends Activity implements
 			final View view, final int pos, final long id) {
 		if (parent.getId() == R.id.rangeSpinner) {
 			this.currentRange = pos;
-			Log.d(LOG_TAG, "calling setupInputButtons from onItemSelected");
+			Log.d(LOG_TAG, "calling setupInputButtons() from onItemSelected()");
 			setupInputButtons();
 		}
 	}
@@ -153,7 +147,7 @@ public class Connect64 extends Activity implements
 					TopScores.class);
 			startActivity(intent);
 		} else if (id == R.id.clearScores) {
-			this.dbAdapter.deleteAllScores();
+			this.database.deleteAllScores();
 		} else if (id == R.id.action_settings) {
 			final Intent intent = new Intent(getApplicationContext(),
 					SettingsActivity.class);
@@ -222,8 +216,7 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onCreate(final Bundle savedState) {
 		super.onCreate(savedState);
-		Log.d(LOG_TAG,
-				"=======================onCreate()=======================");
+		Log.d(LOG_TAG, "====================onCreate()====================");
 		setContentView(R.layout.activity_connect64);
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
@@ -244,8 +237,7 @@ public class Connect64 extends Activity implements
 			buttons[i] = (Button) inputs.findViewWithTag("in" + (i + 1));
 		}
 		this.inputButtons = buttons;
-		this.dbAdapter = new ScoresDBAdapter(this); // open in onResume()
-		// load puzzle/state in onResume/onRestoreInstanceState()
+		this.database = new ScoresDBAdapter(this); // open in onResume()
 	}
 
 	@Override
@@ -276,13 +268,15 @@ public class Connect64 extends Activity implements
 		stateEditor.putString(STATE_POSITIONS, serializeIntArray(positions));
 		stateEditor.putString(STATE_VALUES, serializeIntArray(values));
 		stateEditor.apply();
-		this.dbAdapter.close();
+		this.database.close();
 	}
 
 	@Override
 	protected final void onRestoreInstanceState(final Bundle savedState) {
 		super.onRestoreInstanceState(savedState);
-		Log.d(LOG_TAG, "onRestoreInstanceState()");
+		Log.d(LOG_TAG, "onRestoreInstanceState() no-op");
+		// @formatter:off
+		/*
 		this.currentInput = savedState.getInt(CURRENT_INPUT, BAD_VALUE);
 		this.currentPuzzle = savedState.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
 		this.currentRange = savedState.getInt(CURRENT_RANGE, 0);
@@ -301,6 +295,8 @@ public class Connect64 extends Activity implements
 			getButton(String.valueOf(positions[i])).setText(
 					String.valueOf(values[i]));
 		}
+		*/
+		// @formatter:on
 	}
 
 	@Override
@@ -333,13 +329,15 @@ public class Connect64 extends Activity implements
 		} else {
 			loadPuzzle(this.currentPuzzle, true);
 		}
-		this.dbAdapter.open();
+		this.database.open();
 	}
 
 	@Override
 	protected final void onSaveInstanceState(final Bundle outState) {
 		super.onSaveInstanceState(outState);
-		Log.d(LOG_TAG, "onSaveInstanceState()");
+		Log.d(LOG_TAG, "onSaveInstanceState() no-op");
+		// @formatter:off
+		/*
 		outState.putInt(CURRENT_INPUT, this.currentInput);
 		outState.putInt(CURRENT_PUZZLE, this.currentPuzzle);
 		outState.putInt(CURRENT_RANGE, this.currentRange);
@@ -360,10 +358,12 @@ public class Connect64 extends Activity implements
 		}
 		outState.putIntArray(STATE_POSITIONS, positions);
 		outState.putIntArray(STATE_VALUES, values);
+		*/
+		// @formatter:on
 	}
 
 	private void addScoretoTable() {
-		this.dbAdapter.insertScore(PLAYER_NAME, this.currentPuzzle,
+		this.database.insertScore(PLAYER_NAME, this.currentPuzzle,
 				formatTime(this.elapsedTime));
 	}
 
@@ -395,7 +395,7 @@ public class Connect64 extends Activity implements
 			toast = Toast.makeText(this, outString, Toast.LENGTH_SHORT);
 			final int nextPuzzle = this.currentPuzzle + 1;
 			loadPuzzle(nextPuzzle, true);
-			
+
 		} else if (!boardCorrect && onLastPuzzle) {
 			toast = Toast
 					.makeText(this, R.string.try_again, Toast.LENGTH_SHORT);
@@ -503,7 +503,7 @@ public class Connect64 extends Activity implements
 	 *            whether or not to restart the timer
 	 */
 	private void loadPuzzle(final int newPuzzle, final boolean restartTimer) {
-		Log.d(LOG_TAG, "loadPuzzle(" + newPuzzle + ")");
+		Log.d(LOG_TAG, "loadPuzzle(" + newPuzzle + ", " + restartTimer + ")");
 		this.currentPuzzle = newPuzzle;
 		this.puzzleLabel.setText(String.format(Locale.US, getResources()
 				.getString(R.string.puzzle_s), this.currentPuzzle));
@@ -516,6 +516,9 @@ public class Connect64 extends Activity implements
 			this.elapsedTime = 0;
 			resumeTimer();
 		}
+		if (!this.timerRunning) {
+			pauseTimer();
+		}
 	}
 
 	private void pauseTimer() {
@@ -525,7 +528,7 @@ public class Connect64 extends Activity implements
 		this.timer.stop();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
 		this.gameBoard.setVisibility(View.INVISIBLE);
-		Log.d(LOG_TAG, "calling setupInputButtons() from pauseTimer");
+		Log.d(LOG_TAG, "calling setupInputButtons() from pauseTimer()");
 		setupInputButtons();
 	}
 
@@ -553,7 +556,7 @@ public class Connect64 extends Activity implements
 			this.boardState.put(pos[i], vals[i]);
 		}
 
-		Log.d(LOG_TAG, "calling setupInputButtons from resetAndInitialize");
+		Log.d(LOG_TAG, "calling setupInputButtons() from resetAndInitialize()");
 		setupInputButtons();
 	}
 
@@ -564,7 +567,7 @@ public class Connect64 extends Activity implements
 		this.timer.start();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_pause);
 		this.gameBoard.setVisibility(View.VISIBLE);
-		Log.d(LOG_TAG, "calling setupInputButtons from resumeTimer()");
+		Log.d(LOG_TAG, "calling setupInputButtons() from resumeTimer()");
 		setupInputButtons();
 	}
 
@@ -606,6 +609,8 @@ public class Connect64 extends Activity implements
 			this.boardState.put(pos, this.currentInput);
 		}
 		this.currentInput = oldValue;
+		Log.d(LOG_TAG, "calling setupInputButtons() from setGameButtonText()");
+		setupInputButtons();
 	}
 
 	/**
