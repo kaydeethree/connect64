@@ -21,7 +21,7 @@
     <string name="top_scores">Top scores</string>
     <string name="try_again">Try again</string>
     <string name="you_won_in_s">You won in %s!</string>
-    <string name="title_activity_top_scores">TopScores</string>
+    <string name="title_activity_top_scores">Top Scores</string>
     <string name="clear_scores">Clear scores</string>
 
 </resources>
