@@ -11,7 +11,7 @@ public class ScoresDBHelper extends SQLiteOpenHelper {
 	
 	private static final String	COMMA_SEP =	", ";
 	private static final String	TEXT_TYPE = " TEXT";
-	private static final String INTEGER_TYPE = " INTEGER";
+	private static final String INTEGER_TYPE = " INT";
 	private static final String	SQL_CREATE_DATABASE	= "CREATE TABLE "
 	+ Scores.SCORES_TABLE_NAME + " (" + Scores.ID
 	+ " INTEGER PRIMARY KEY AUTOINCREMENT" + COMMA_SEP
