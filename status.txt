@@ -10,8 +10,6 @@ Checkstyle issues:
   hasValidNeighbors(), (hasNext = 64 || up || down || left || right) but I
   don't want to break it up just to satisfy checkstyle as it's obvious what's
   going on.
-* Some Eclipse-generated code in the Preferences activty is using the tertiary
-  operator, so I'm ignoring the warning. 
 
 Implementation notes:
 * Serialization/Parcelization is painful. I'm really curious to see how the
