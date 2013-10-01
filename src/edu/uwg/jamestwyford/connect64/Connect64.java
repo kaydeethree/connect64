@@ -7,10 +7,13 @@ import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.os.Vibrator;
+import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.SparseIntArray;
@@ -76,6 +79,9 @@ public class Connect64 extends Activity implements
 
 	// db
 	private ScoresDBAdapter database;
+
+	// prefs
+	SharedPreferences preferences;
 
 	/**
 	 * Input handler for the clear button. Reloads the current puzzle and resets
@@ -143,21 +149,18 @@ public class Connect64 extends Activity implements
 		final boolean retVal = true;
 		final int id = item.getItemId();
 		if (id == R.id.topScores) {
-			final Intent intent = new Intent(getApplicationContext(),
-					TopScores.class);
+			final Intent intent = new Intent(this, TopScores.class);
 			startActivity(intent);
 		} else if (id == R.id.clearScores) {
 			this.database.deleteAllScores();
 		} else if (id == R.id.action_settings) {
-			final Intent intent = new Intent(getApplicationContext(),
-					SettingsActivity.class);
+			final Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 		} else if (id >= MENU_PUZZLE_OFFSET
 				&& id <= MENU_PUZZLE_OFFSET + PuzzleFactory.numPuzzles()) {
 			final int puzzle = id - MENU_PUZZLE_OFFSET;
 			final String outString = String.format(Locale.US, getResources()
 					.getString(R.string.loading_puzzle_s), puzzle);
-			Log.d(LOG_TAG, "Loading old puzzle " + puzzle);
 			final Toast toast = Toast.makeText(this, outString,
 					Toast.LENGTH_SHORT);
 			toast.show();
@@ -218,6 +221,16 @@ public class Connect64 extends Activity implements
 		super.onCreate(savedState);
 		Log.d(LOG_TAG, "====================onCreate()====================");
 		setContentView(R.layout.activity_connect64);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
+		final int feedback = Integer.valueOf(this.preferences.getString(
+				SettingsActivity.KEY_PREF_FEEDBACK, "0"));
+		final String textColor = this.preferences.getString(
+				SettingsActivity.KEY_PREF_NUMBER_COLOR, "#000000");
+		final String cellColor = this.preferences.getString(
+				SettingsActivity.KEY_PREF_CELL_COLOR, "#FFFFFF");
+		Log.d(LOG_TAG, "preferences: feedback(" + feedback + ") textColor("
+				+ textColor + ") cellColor(" + cellColor + ")");
+
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
 		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
@@ -238,6 +251,7 @@ public class Connect64 extends Activity implements
 		}
 		this.inputButtons = buttons;
 		this.database = new ScoresDBAdapter(this); // open in onResume()
+
 	}
 
 	@Override
@@ -279,17 +293,18 @@ public class Connect64 extends Activity implements
 				GAME_STATE_PREFS, MODE_PRIVATE);
 		this.currentInput = statePrefs.getInt(CURRENT_INPUT, BAD_VALUE);
 		this.currentPuzzle = statePrefs.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
-		this.currentRange = statePrefs.getInt(CURRENT_RANGE, 0);
 		this.maxPuzzleAttempted = statePrefs.getInt(MAX_PUZZLE_ATTEMPTED,
 				STARTING_PUZZLE);
-		loadPuzzle(this.currentPuzzle, false);
-		this.rangeSpinner.setSelection(this.currentRange);
 		this.elapsedTime = statePrefs.getLong(ELAPSED_TIME, 0L);
 		this.timerRunning = statePrefs.getBoolean(TIMER_RUNNING, true);
+		loadPuzzle(this.currentPuzzle, false); // disable initial buttons
+		this.currentRange = statePrefs.getInt(CURRENT_RANGE, 0);
+		this.rangeSpinner.setSelection(this.currentRange);
 
 		final String posString = statePrefs.getString(STATE_POSITIONS, null);
 		final String valString = statePrefs.getString(STATE_VALUES, null);
 		if (posString != null && valString != null) {
+			Log.d(LOG_TAG, "loading saved puzzle state");
 			final int[] positions = deserializeIntArray(posString);
 			final int[] values = deserializeIntArray(valString);
 			final SparseIntArray state = this.boardState;
@@ -299,7 +314,8 @@ public class Connect64 extends Activity implements
 						String.valueOf(values[i]));
 			}
 		} else {
-			loadPuzzle(this.currentPuzzle, true);
+			Log.d(LOG_TAG, "starting from scratch, starting timer.");
+			resumeTimer();
 		}
 		this.database.open();
 	}
@@ -341,10 +357,11 @@ public class Connect64 extends Activity implements
 		} else if (!boardCorrect && onLastPuzzle) {
 			toast = Toast
 					.makeText(this, R.string.try_again, Toast.LENGTH_SHORT);
+		} else {
+			return;
 		}
-		if (toast != null) {
-			toast.show();
-		}
+		toast.show();
+		performFeedback(boardCorrect);
 	}
 
 	private int[] deserializeIntArray(final String string) {
@@ -470,6 +487,42 @@ public class Connect64 extends Activity implements
 		setupInputButtons();
 	}
 
+	private void performFeedback(final boolean hasWon) {
+		Log.d(LOG_TAG, "performFeedback(" + hasWon + ")");
+		final int feedbackMode = Integer.valueOf(this.preferences.getString(
+				SettingsActivity.KEY_PREF_FEEDBACK, ""
+						+ SettingsActivity.FEEDBACK_NONE));
+
+		switch (feedbackMode) {
+		case SettingsActivity.FEEDBACK_AURAL:
+			Log.d(LOG_TAG, "music play goes here");
+			// @formatter:off
+			/*
+			MediaPlayer mp;
+			if (hasWon) {
+				mp = MediaPlayer.create(this, R.raw.foo);
+			} else {
+				mp = MediaPlayer.create(this, R.raw.bar);
+			}
+			mp.start();
+			*/
+			// @formatter:on
+			break;
+		case SettingsActivity.FEEDBACK_HAPTIC:
+			Log.d(LOG_TAG, "BZZZTT!!1!");
+			Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+			if (hasWon) {
+				vibe.vibrate(500);
+			} else {
+				vibe.vibrate(250);
+			}
+			break;
+		case SettingsActivity.FEEDBACK_NONE:
+		default:
+			break;
+		}
+	}
+
 	private void resetAndInitialize() {
 		Log.d(LOG_TAG, "resetAndInitialize()");
 		for (int i = 1; i <= COL_SIZE; i++) {
@@ -567,7 +620,8 @@ public class Connect64 extends Activity implements
 			final int value = NUM_INPUT_BUTTONS * range + i + 1;
 			final Button inputButton = inputButtons[i];
 			inputButton.setText(String.valueOf(value));
-			inputButton.setEnabled(timerRunning && state.indexOfValue(value) < 0);
+			inputButton.setEnabled(timerRunning
+					&& state.indexOfValue(value) < 0);
 		}
 	}
 }

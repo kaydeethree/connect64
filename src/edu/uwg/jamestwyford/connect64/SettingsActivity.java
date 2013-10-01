@@ -28,6 +28,20 @@ import android.view.MenuItem;
  * @version assignment3
  */
 public class SettingsActivity extends PreferenceActivity {
+	/** key for the "cell color" preference. */
+	public static final String KEY_PREF_CELL_COLOR = "pref_cell_color";
+	/** key for the "text color" preference. */
+	public static final String KEY_PREF_NUMBER_COLOR = "pref_number_color";
+	/** key for the "feedback" (aural or haptic) preference. */
+	public static final String KEY_PREF_FEEDBACK = "pref_feedback";
+
+	/** value for Feedback: "None" */
+	public static final int FEEDBACK_NONE = 0;
+	/** value for Feedback: "Aural" */
+	public static final int FEEDBACK_AURAL = 1;
+	/** value for Feedback: "Haptic" */
+	public static final int FEEDBACK_HAPTIC = 2;
+
 	/**
 	 * This fragment shows general preferences only. It is used when the
 	 * activity is showing a two-pane settings UI.
@@ -43,9 +57,9 @@ public class SettingsActivity extends PreferenceActivity {
 			// to their values. When their values change, their summaries are
 			// updated to reflect the new value, per the Android Design
 			// guidelines.
-			bindPreferenceSummaryToValue(findPreference("pref_cell_color"));
-			bindPreferenceSummaryToValue(findPreference("pref_text_color"));
-			bindPreferenceSummaryToValue(findPreference("pref_feedback"));
+			bindPreferenceSummaryToValue(findPreference(KEY_PREF_CELL_COLOR));
+			bindPreferenceSummaryToValue(findPreference(KEY_PREF_NUMBER_COLOR));
+			bindPreferenceSummaryToValue(findPreference(KEY_PREF_FEEDBACK));
 		}
 	}
 

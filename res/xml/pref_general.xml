@@ -1,29 +1,33 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceCategory android:title="@string/pref_feedback_title"
-        android:key="pref_feedback_category" >
+    <PreferenceCategory
+        android:key="pref_feedback_category"
+        android:title="@string/pref_feedback_title" >
         <ListPreference
             android:defaultValue="None"
             android:entries="@array/pref_feedback_list_titles"
             android:entryValues="@array/pref_feedback_list_values"
             android:key="pref_feedback"
-            android:title="@string/pref_choose_feedback"
-            android:summary="" />
+            android:summary=""
+            android:title="@string/pref_choose_feedback" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/pref_colors_title"
-        android:key="color_feedback_category" >
+    <PreferenceCategory
+        android:key="color_feedback_category"
+        android:title="@string/pref_colors_title" >
         <EditTextPreference
+            android:defaultValue="#FFFFFF"
             android:key="pref_cell_color"
             android:maxLines="1"
             android:singleLine="true"
-            android:title="@string/pref_cell_color_title"
-            android:summary="" />
+            android:summary=""
+            android:title="@string/pref_cell_color_title" />
         <EditTextPreference
+            android:defaultValue="#000000"
             android:key="pref_number_color"
             android:maxLines="1"
             android:singleLine="true"
-            android:title="@string/pref_number_color_title"
-            android:summary="" />
+            android:summary=""
+            android:title="@string/pref_number_color_title" />
     </PreferenceCategory>
 
 </PreferenceScreen>
