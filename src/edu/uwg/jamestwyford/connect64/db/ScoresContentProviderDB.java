@@ -12,11 +12,18 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
+/**
+ * Content provider for the Scores DB.
+ * 
+ * @author jtwyfor1
+ * @version assignment3
+ */
 public class ScoresContentProviderDB extends ContentProvider {
 	private static final int ALL_SCORES = 1;
 	private static final int SCORE_ID = 2;
 	private static final String AUTHORITY = "edu.uwg.jamestwyford.connect64.scoresdbprovider";
 	private static final String BASE_PATH = "scores";
+	/** content URI used to access this provider. */
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
 			+ "/" + BASE_PATH);
 	private static final UriMatcher sURIMatcher = new UriMatcher(
@@ -27,19 +34,35 @@ public class ScoresContentProviderDB extends ContentProvider {
 	}
 	private ScoresDBHelper dbHelper;
 
+	private void checkColumns(final String[] projection) {
+		final String[] available = { ScoresContract.Scores.ID,
+				ScoresContract.Scores.PLAYER, ScoresContract.Scores.PUZZLE,
+				ScoresContract.Scores.COMPLETION_TIME };
+		if (projection != null) {
+			final HashSet<String> requestedColumns = new HashSet<String>(
+					Arrays.asList(projection));
+			final HashSet<String> availableColumns = new HashSet<String>(
+					Arrays.asList(available));
+			if (!availableColumns.containsAll(requestedColumns)) {
+				throw new IllegalArgumentException(
+						"Unknown columns in projection");
+			}
+		}
+	}
+
 	@Override
-	public int delete(Uri uri, String selection, String[] selectionArgs) {
-		int uriType = sURIMatcher.match(uri);
-		SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
+	public final int delete(final Uri uri, final String selection,
+			final String[] selectionArgs) {
+		final int uriType = sURIMatcher.match(uri);
+		final SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		int rowsDeleted = 0;
 		switch (uriType) {
 		case ALL_SCORES:
-			rowsDeleted = sqlDB.delete(
-					ScoresContract.Scores.SCORES_TABLE_NAME, selection,
-					selectionArgs);
+			rowsDeleted = sqlDB.delete(ScoresContract.Scores.SCORES_TABLE_NAME,
+					selection, selectionArgs);
 			break;
 		case SCORE_ID:
-			String id = uri.getLastPathSegment();
+			final String id = uri.getLastPathSegment();
 			if (TextUtils.isEmpty(selection)) {
 				rowsDeleted = sqlDB.delete(
 						ScoresContract.Scores.SCORES_TABLE_NAME,
@@ -60,19 +83,19 @@ public class ScoresContentProviderDB extends ContentProvider {
 	}
 
 	@Override
-	public String getType(Uri uri) {
+	public final String getType(final Uri uri) {
 		return null;
 	}
 
 	@Override
-	public Uri insert(Uri uri, ContentValues values) {
-		int uriType = sURIMatcher.match(uri);
-		SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
+	public final Uri insert(final Uri uri, final ContentValues values) {
+		final int uriType = sURIMatcher.match(uri);
+		final SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		long id = 0;
 		switch (uriType) {
 		case ALL_SCORES:
-			id = sqlDB.insert(ScoresContract.Scores.SCORES_TABLE_NAME,
-					null, values);
+			id = sqlDB.insert(ScoresContract.Scores.SCORES_TABLE_NAME, null,
+					values);
 			break;
 		default:
 			throw new IllegalArgumentException("Unknown URI: " + uri);
@@ -83,18 +106,19 @@ public class ScoresContentProviderDB extends ContentProvider {
 	}
 
 	@Override
-	public boolean onCreate() {
+	public final boolean onCreate() {
 		this.dbHelper = new ScoresDBHelper(getContext());
 		return true;
 	}
 
 	@Override
-	public Cursor query(Uri uri, String[] projection, String selection,
-			String[] selectionArgs, String sortOrder) {
-		SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
-		checkColumns(projection);
+	public final Cursor query(final Uri uri, final String[] projection,
+			final String selection, final String[] selectionArgs,
+			final String sortOrder) {
+		final SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
+		this.checkColumns(projection);
 		queryBuilder.setTables(ScoresContract.Scores.SCORES_TABLE_NAME);
-		int uriType = sURIMatcher.match(uri);
+		final int uriType = sURIMatcher.match(uri);
 		switch (uriType) {
 		case ALL_SCORES:
 			break;
@@ -105,8 +129,8 @@ public class ScoresContentProviderDB extends ContentProvider {
 		default:
 			throw new IllegalArgumentException("Unknown URI: " + uri);
 		}
-		SQLiteDatabase db = this.dbHelper.getReadableDatabase();
-		Cursor cursor = queryBuilder.query(db, projection, selection,
+		final SQLiteDatabase db = this.dbHelper.getReadableDatabase();
+		final Cursor cursor = queryBuilder.query(db, projection, selection,
 				selectionArgs, null, null, sortOrder);
 		// Notify potential listeners
 		cursor.setNotificationUri(getContext().getContentResolver(), uri);
@@ -114,19 +138,18 @@ public class ScoresContentProviderDB extends ContentProvider {
 	}
 
 	@Override
-	public int update(Uri uri, ContentValues values, String selection,
-			String[] selectionArgs) {
-		int uriType = sURIMatcher.match(uri);
-		SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
+	public final int update(final Uri uri, final ContentValues values,
+			final String selection, final String[] selectionArgs) {
+		final int uriType = sURIMatcher.match(uri);
+		final SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		int rowsUpdated = 0;
 		switch (uriType) {
 		case ALL_SCORES:
-			rowsUpdated = sqlDB.update(
-					ScoresContract.Scores.SCORES_TABLE_NAME, values,
-					selection, selectionArgs);
+			rowsUpdated = sqlDB.update(ScoresContract.Scores.SCORES_TABLE_NAME,
+					values, selection, selectionArgs);
 			break;
 		case SCORE_ID:
-			String id = uri.getLastPathSegment();
+			final String id = uri.getLastPathSegment();
 			if (TextUtils.isEmpty(selection)) {
 				rowsUpdated = sqlDB.update(
 						ScoresContract.Scores.SCORES_TABLE_NAME, values,
@@ -144,22 +167,5 @@ public class ScoresContentProviderDB extends ContentProvider {
 		// Notify potential listeners
 		getContext().getContentResolver().notifyChange(uri, null);
 		return rowsUpdated;
-	}
-
-	private void checkColumns(String[] projection) {
-		String[] available = { ScoresContract.Scores.ID,
-				ScoresContract.Scores.PLAYER,
-				ScoresContract.Scores.PUZZLE,
-				ScoresContract.Scores.COMPLETION_TIME};
-		if (projection != null) {
-			HashSet<String> requestedColumns = new HashSet<String>(
-					Arrays.asList(projection));
-			HashSet<String> availableColumns = new HashSet<String>(
-					Arrays.asList(available));
-			if (!availableColumns.containsAll(requestedColumns)) {
-				throw new IllegalArgumentException(
-						"Unknown columns in projection");
-			}
-		}
 	}
 }

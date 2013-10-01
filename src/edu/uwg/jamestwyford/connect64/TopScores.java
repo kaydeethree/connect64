@@ -36,10 +36,10 @@ public class TopScores extends ListActivity implements
 	}
 
 	@Override
-	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+	public final Loader<Cursor> onCreateLoader(final int id, final Bundle args) {
 		return new CursorLoader(TopScores.this,
 				ScoresContentProviderDB.CONTENT_URI, SCORES_PROJECTION, null,
-				null, null);
+				null, Scores.COMPLETION_TIME);
 	}
 
 	@Override
@@ -49,13 +49,13 @@ public class TopScores extends ListActivity implements
 	}
 
 	@Override
-	public void onLoaderReset(Loader<Cursor> loader) {
+	public final void onLoaderReset(final Loader<Cursor> loader) {
 		this.adapter.swapCursor(null);
 	}
 
-
 	@Override
-	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+	public final void onLoadFinished(final Loader<Cursor> loader,
+			final Cursor cursor) {
 		this.adapter.swapCursor(cursor);
 	}
 
@@ -80,12 +80,12 @@ public class TopScores extends ListActivity implements
 	}
 
 	private void setupListAdapter() {
-		String[] dataColumns = new String[] { Scores.PLAYER, Scores.PUZZLE,
-				Scores.COMPLETION_TIME };
+		final String[] dataColumns = new String[] { Scores.PLAYER,
+				Scores.PUZZLE, Scores.COMPLETION_TIME };
 		getLoaderManager().initLoader(0, null, this);
 		this.adapter = new SimpleCursorAdapter(this, R.layout.score_row, null,
 				dataColumns, COLUMNS, 0);
-		setListAdapter(adapter);
+		setListAdapter(this.adapter);
 	}
 
 }

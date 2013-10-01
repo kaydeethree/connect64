@@ -10,6 +10,8 @@ Checkstyle issues:
   hasValidNeighbors(), (hasNext = 64 || up || down || left || right) but I
   don't want to break it up just to satisfy checkstyle as it's obvious what's
   going on.
+* Interface-defined methods with >4 parameters aren't liked either, but there's
+  nothing I can do about that.
 
 Implementation notes:
 * Serialization/Parcelization is painful. I'm really curious to see how the
