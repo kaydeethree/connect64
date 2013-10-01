@@ -34,7 +34,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 import edu.uwg.jamestwyford.connect64.db.ScoresContentProviderDB;
 import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
-import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
 
 /**
  * Game logic and GUI handling for the 8x8 board.
@@ -81,9 +80,6 @@ public class Connect64 extends Activity implements
 	private long elapsedTime;
 	private int maxPuzzleAttempted;
 	private boolean timerRunning;
-
-	// db
-	private ScoresDBAdapter database;
 
 	// prefs
 	private int prefFeedback;
@@ -160,7 +156,8 @@ public class Connect64 extends Activity implements
 			final Intent intent = new Intent(this, TopScores.class);
 			startActivity(intent);
 		} else if (id == R.id.clearScores) {
-			this.database.deleteAllScores();
+			getContentResolver().delete(ScoresContentProviderDB.CONTENT_URI,
+					null, null);
 		} else if (id == R.id.action_settings) {
 			final Intent intent = new Intent(this, SettingsActivity.class);
 			startActivityForResult(intent, ACTIVITY_SETTINGS);
