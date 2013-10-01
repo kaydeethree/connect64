@@ -13,8 +13,8 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 public class ScoresContentProviderDB extends ContentProvider {
-	private static final int ALL_STUDENTS = 1;
-	private static final int STUDENT_ID = 2;
+	private static final int ALL_SCORES = 1;
+	private static final int SCORE_ID = 2;
 	private static final String AUTHORITY = "edu.uwg.jamestwyford.connect64.scoresdbprovider";
 	private static final String BASE_PATH = "scores";
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
@@ -22,8 +22,8 @@ public class ScoresContentProviderDB extends ContentProvider {
 	private static final UriMatcher sURIMatcher = new UriMatcher(
 			UriMatcher.NO_MATCH);
 	static {
-		sURIMatcher.addURI(AUTHORITY, BASE_PATH, ALL_STUDENTS);
-		sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", STUDENT_ID);
+		sURIMatcher.addURI(AUTHORITY, BASE_PATH, ALL_SCORES);
+		sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", SCORE_ID);
 	}
 	private ScoresDBHelper dbHelper;
 
@@ -33,12 +33,12 @@ public class ScoresContentProviderDB extends ContentProvider {
 		SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		int rowsDeleted = 0;
 		switch (uriType) {
-		case ALL_STUDENTS:
+		case ALL_SCORES:
 			rowsDeleted = sqlDB.delete(
 					ScoresContract.Scores.SCORES_TABLE_NAME, selection,
 					selectionArgs);
 			break;
-		case STUDENT_ID:
+		case SCORE_ID:
 			String id = uri.getLastPathSegment();
 			if (TextUtils.isEmpty(selection)) {
 				rowsDeleted = sqlDB.delete(
@@ -70,7 +70,7 @@ public class ScoresContentProviderDB extends ContentProvider {
 		SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		long id = 0;
 		switch (uriType) {
-		case ALL_STUDENTS:
+		case ALL_SCORES:
 			id = sqlDB.insert(ScoresContract.Scores.SCORES_TABLE_NAME,
 					null, values);
 			break;
@@ -96,9 +96,9 @@ public class ScoresContentProviderDB extends ContentProvider {
 		queryBuilder.setTables(ScoresContract.Scores.SCORES_TABLE_NAME);
 		int uriType = sURIMatcher.match(uri);
 		switch (uriType) {
-		case ALL_STUDENTS:
+		case ALL_SCORES:
 			break;
-		case STUDENT_ID:
+		case SCORE_ID:
 			queryBuilder.appendWhere(ScoresContract.Scores.ID + "="
 					+ uri.getLastPathSegment());
 			break;
@@ -120,12 +120,12 @@ public class ScoresContentProviderDB extends ContentProvider {
 		SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		int rowsUpdated = 0;
 		switch (uriType) {
-		case ALL_STUDENTS:
+		case ALL_SCORES:
 			rowsUpdated = sqlDB.update(
 					ScoresContract.Scores.SCORES_TABLE_NAME, values,
 					selection, selectionArgs);
 			break;
-		case STUDENT_ID:
+		case SCORE_ID:
 			String id = uri.getLastPathSegment();
 			if (TextUtils.isEmpty(selection)) {
 				rowsUpdated = sqlDB.update(
