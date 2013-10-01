@@ -26,10 +26,17 @@
         <item name="android:onClick">gameButtonClick</item>
     </style>
 
-    <style name="InputButton" parent="@android:Widget.Holo.Button.Small">
+    <style name="InputButtonPort" parent="@android:Widget.Holo.Button.Small">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:onClick">inputButtonClick</item>
+        <item name="android:layout_weight">0.166</item>
+    </style>
+    <style name="InputButtonLand" parent="@android:Widget.Holo.Button.Small">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:onClick">inputButtonClick</item>
+        <item name="android:layout_weight">.25</item>
     </style>
 
 </resources>

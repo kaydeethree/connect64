@@ -1,10 +1,9 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:id="@+id/inputButtons" >
+    android:id="@+id/inputButtons"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
 
     <TableRow
-        android:id="@+id/inputRow1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
@@ -12,98 +11,81 @@
             android:id="@+id/rangeSpinner"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_span="2" />
+            android:layout_span="2"
+            android:layout_weight="0.166" />
 
         <Button
-            android:id="@+id/input1"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in1" />
 
         <Button
-            android:id="@+id/input2"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in2" />
 
         <Button
-            android:id="@+id/input3"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in3" />
 
         <Button
-            android:id="@+id/input4"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in4" />
     </TableRow>
 
     <TableRow
-        android:id="@+id/inputRow2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/input5"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in5" />
 
         <Button
-            android:id="@+id/input6"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in6" />
 
         <Button
-            android:id="@+id/input7"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in7" />
 
         <Button
-            android:id="@+id/input8"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in8" />
 
         <Button
-            android:id="@+id/input9"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in9" />
 
         <Button
-            android:id="@+id/input10"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in10" />
     </TableRow>
 
     <TableRow
-        android:id="@+id/inputRow3"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/input11"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in11" />
 
         <Button
-            android:id="@+id/input12"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in12" />
 
         <Button
-            android:id="@+id/input13"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in13" />
 
         <Button
-            android:id="@+id/input14"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in14" />
 
         <Button
-            android:id="@+id/input15"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in15" />
 
         <Button
-            android:id="@+id/input16"
-            style="@style/InputButton"
+            style="@style/InputButtonPort"
             android:tag="in16" />
     </TableRow>
 

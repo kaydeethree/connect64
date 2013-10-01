@@ -15,8 +15,7 @@
     <include
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        layout="@layout/game_grid"
-        android:background="#FFFFFF" />
+        layout="@layout/game_grid" />
 
     <include
         android:layout_width="fill_parent"

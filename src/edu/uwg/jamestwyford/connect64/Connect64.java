@@ -44,7 +44,6 @@ import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
 public class Connect64 extends Activity implements
 		AdapterView.OnItemSelectedListener, OnSharedPreferenceChangeListener {
 
-	private static final int ACTIVITY_SETTINGS = 1;
 	private static final int BAD_VALUE = -1;
 	private static final int BOARD_MAX = 64;
 	private static final int COL_SIZE = 8;
@@ -102,7 +101,7 @@ public class Connect64 extends Activity implements
 	 * Input handler for the 64 game board Buttons. If the current input is
 	 * valid, sets the clicked Button to that value. Clears the Button
 	 * otherwise. If the board is full, checks if the player has won and moves
-	 * to the next puzzle if so.
+	 * to the next Puzzle if so.
 	 * 
 	 * @param view
 	 *            the Button clicked
@@ -160,7 +159,7 @@ public class Connect64 extends Activity implements
 					null, null);
 		} else if (id == R.id.action_settings) {
 			final Intent intent = new Intent(this, SettingsActivity.class);
-			startActivityForResult(intent, ACTIVITY_SETTINGS);
+			startActivity(intent);
 		} else if (id >= MENU_PUZZLE_OFFSET
 				&& id <= MENU_PUZZLE_OFFSET + PuzzleFactory.numPuzzles()) {
 			final int puzzle = id - MENU_PUZZLE_OFFSET;
@@ -306,7 +305,7 @@ public class Connect64 extends Activity implements
 			final SparseIntArray state = this.boardState;
 			for (int i = 0; i < positions.length; i++) {
 				state.put(positions[i], values[i]);
-				getButton(String.valueOf(positions[i])).setText(
+				getGameButton(String.valueOf(positions[i])).setText(
 						String.valueOf(values[i]));
 			}
 		} else {
@@ -316,11 +315,12 @@ public class Connect64 extends Activity implements
 	}
 
 	private void addScoretoTable() {
-		ContentValues values = new ContentValues();
-		values.put(Scores.PLAYER, PLAYER_NAME);
-		values.put(Scores.PUZZLE, this.currentPuzzle);
-		values.put(Scores.COMPLETION_TIME, formatTime(this.elapsedTime));
-		getContentResolver().insert(ScoresContentProviderDB.CONTENT_URI, values);
+		ContentValues newScore = new ContentValues(3);
+		newScore.put(Scores.PLAYER, PLAYER_NAME);
+		newScore.put(Scores.PUZZLE, this.currentPuzzle);
+		newScore.put(Scores.COMPLETION_TIME, formatTime(this.elapsedTime));
+		getContentResolver().insert(ScoresContentProviderDB.CONTENT_URI,
+				newScore);
 	}
 
 	/**
@@ -382,7 +382,7 @@ public class Connect64 extends Activity implements
 				elapsed % secToMin);
 	}
 
-	private Button getButton(final String tag) {
+	private Button getGameButton(final String tag) {
 		final Button button = (Button) this.gameBoard.findViewWithTag(tag);
 		if (button == null) {
 			Log.e(LOG_TAG, "invalid tag passed: " + tag);
@@ -391,8 +391,9 @@ public class Connect64 extends Activity implements
 	}
 
 	/**
-	 * Win-condition checking at the position level. Looks for a neighbor with
-	 * value+1 and a neighbor with value-1.
+	 * Win-condition checking at the position level. Looks for a neighbor whose
+	 * value is 1 higher than this position's value, and another neighbor whose
+	 * value is 1 lower.
 	 * 
 	 * @param pos
 	 *            the position to check against
@@ -464,7 +465,7 @@ public class Connect64 extends Activity implements
 			this.maxPuzzleAttempted = newPuzzle;
 			invalidateOptionsMenu(); // to add the new puzzle to the menu
 		}
-		resetAndInitialize();
+		resetAndInitializeBoard();
 		if (restartTimer) {
 			this.elapsedTime = 0;
 			resumeTimer();
@@ -510,15 +511,14 @@ public class Connect64 extends Activity implements
 			} else {
 				vibe.vibrate(longLength);
 			}
-
 		}
 	}
 
-	private void resetAndInitialize() {
-		Log.d(LOG_TAG, "resetAndInitialize()");
+	private void resetAndInitializeBoard() {
+		Log.d(LOG_TAG, "resetAndInitializeBoard()");
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				final Button button = this.getButton("" + i + j);
+				final Button button = this.getGameButton("" + i + j);
 				button.setText("");
 				button.setEnabled(true);
 			}
@@ -532,25 +532,25 @@ public class Connect64 extends Activity implements
 		final int[] vals = puzzle.getValues();
 
 		for (int i = 0; i < pos.length; i++) {
-			final Button button = this.getButton(String.valueOf(pos[i]));
+			final Button button = this.getGameButton(String.valueOf(pos[i]));
 			button.setText(String.valueOf(vals[i]));
 			button.setEnabled(false);
 			this.boardState.put(pos[i], vals[i]);
 		}
 
-		Log.d(LOG_TAG, "calling setupInputButtons() from resetAndInitialize()");
+		Log.d(LOG_TAG, "calling setupInputButtons() from resetAndInitializeBoard()");
 		setupInputButtons();
 	}
 
 	private void resumeTimer() {
 		Log.d(LOG_TAG, "resumeTimer(); elapsed: " + this.elapsedTime);
 		this.timerRunning = true;
-		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
-		this.timer.start();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_pause);
 		this.gameBoard.setVisibility(View.VISIBLE);
 		Log.d(LOG_TAG, "calling setupInputButtons() from resumeTimer()");
 		setupInputButtons();
+		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
+		this.timer.start();
 	}
 
 	private String serializeIntArray(final int[] array) {
@@ -620,20 +620,9 @@ public class Connect64 extends Activity implements
 		final SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(this);
-		String feedbackPref = preferences.getString(
+		this.prefFeedback = Integer.valueOf(preferences.getString(
 				SettingsActivity.KEY_PREF_FEEDBACK,
-				SettingsActivity.PREF_FEEDBACK_DEFAULT);
-		if (feedbackPref.equals("None")) {
-			Log.d(LOG_TAG, "fixing invalid pref");
-			SharedPreferences.Editor editor = preferences.edit();
-			editor.putString(SettingsActivity.KEY_PREF_FEEDBACK, "0");
-			editor.apply();
-			this.prefFeedback = 0;
-		} else {
-			this.prefFeedback = Integer.valueOf(preferences.getString(
-					SettingsActivity.KEY_PREF_FEEDBACK,
-					SettingsActivity.PREF_FEEDBACK_DEFAULT));
-		}
+				SettingsActivity.PREF_FEEDBACK_DEFAULT));
 		this.prefCellColor = preferences.getString(
 				SettingsActivity.KEY_PREF_CELL_COLOR,
 				SettingsActivity.PREF_CELL_COLOR_DEFAULT);
