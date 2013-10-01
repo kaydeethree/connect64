@@ -28,20 +28,6 @@ import android.view.MenuItem;
  * @version assignment3
  */
 public class SettingsActivity extends PreferenceActivity {
-	/** key for the "cell color" preference. */
-	public static final String KEY_PREF_CELL_COLOR = "pref_cell_color";
-	/** key for the "text color" preference. */
-	public static final String KEY_PREF_NUMBER_COLOR = "pref_number_color";
-	/** key for the "feedback" (aural or haptic) preference. */
-	public static final String KEY_PREF_FEEDBACK = "pref_feedback";
-
-	/** value for Feedback: "None" */
-	public static final int FEEDBACK_NONE = 0;
-	/** value for Feedback: "Aural" */
-	public static final int FEEDBACK_AURAL = 1;
-	/** value for Feedback: "Haptic" */
-	public static final int FEEDBACK_HAPTIC = 2;
-
 	/**
 	 * This fragment shows general preferences only. It is used when the
 	 * activity is showing a two-pane settings UI.
@@ -53,15 +39,31 @@ public class SettingsActivity extends PreferenceActivity {
 			super.onCreate(savedInstanceState);
 			addPreferencesFromResource(R.xml.pref_general);
 
-			// Bind the summaries of EditText/List/Dialog/Ringtone preferences
-			// to their values. When their values change, their summaries are
-			// updated to reflect the new value, per the Android Design
-			// guidelines.
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_CELL_COLOR));
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_NUMBER_COLOR));
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_FEEDBACK));
 		}
 	}
+
+	/** key for the "cell color" preference. */
+	public static final String KEY_PREF_CELL_COLOR = "pref_cell_color";
+	/** default value for the "cell color" preference. */
+	public static final String PREF_CELL_COLOR_DEFAULT = "#FFFFFF";
+	/** key for the "text color" preference. */
+	public static final String KEY_PREF_NUMBER_COLOR = "pref_number_color";
+	/** default value for the "text color" preference. */
+	public static final String PREF_NUMBER_COLOR_DEFAULT = "#000000";
+	/** key for the "feedback" (aural or haptic) preference. */
+	public static final String KEY_PREF_FEEDBACK = "pref_feedback";
+	/** default value for the "feedback" (aural or haptic) preference. */
+	public static final String PREF_FEEDBACK_DEFAULT = "0";
+
+	/** value for Feedback: "None". */
+	public static final int FEEDBACK_NONE = 0;
+	/** value for Feedback: "Aural". */
+	public static final int FEEDBACK_AURAL = 1;
+	/** value for Feedback: "Haptic". */
+	public static final int FEEDBACK_HAPTIC = 2;
 
 	/**
 	 * Determines whether to always show the simplified settings UI, where
@@ -84,9 +86,7 @@ public class SettingsActivity extends PreferenceActivity {
 			if (preference instanceof ListPreference) {
 				final ListPreference listPreference = (ListPreference) preference;
 				final int index = listPreference.findIndexOfValue(stringValue);
-				preference
-						.setSummary(index >= 0 ? listPreference.getEntries()[index]
-								: null);
+				preference.setSummary(listPreference.getEntries()[index]);
 			} else {
 				preference.setSummary(stringValue);
 			}

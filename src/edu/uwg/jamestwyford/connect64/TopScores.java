@@ -19,7 +19,8 @@ import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
 public class TopScores extends ListActivity {
 	private static final String[] FIELDS = { Scores.PLAYER, Scores.PUZZLE,
 			Scores.COMPLETION_TIME };
-	private static final int[] COLUMNS = { R.id.row_player, R.id.row_puzzle, R.id.row_time };
+	private static final int[] COLUMNS = { R.id.row_player, R.id.row_puzzle,
+			R.id.row_time };
 	private ScoresDBAdapter dbAdapter;
 	private SimpleCursorAdapter cursorAdapter;
 
@@ -42,8 +43,6 @@ public class TopScores extends ListActivity {
 		return super.onOptionsItemSelected(item);
 	}
 
-
-
 	@Override
 	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,18 +52,18 @@ public class TopScores extends ListActivity {
 		this.dbAdapter.open();
 		fillListView();
 	}
-	
+
 	@Override
 	protected final void onPause() {
 		super.onPause();
 		this.dbAdapter.close();
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	private void fillListView() {
 		Cursor cursor = this.dbAdapter.fetchAllScores();
-		this.cursorAdapter = new SimpleCursorAdapter(this,
-				R.layout.score_row, cursor, FIELDS, COLUMNS);
+		this.cursorAdapter = new SimpleCursorAdapter(this, R.layout.score_row,
+				cursor, FIELDS, COLUMNS);
 		setListAdapter(this.cursorAdapter);
 	}
 

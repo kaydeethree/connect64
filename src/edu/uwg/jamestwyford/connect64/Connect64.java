@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.os.Vibrator;
@@ -39,8 +40,9 @@ import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
  * @version assignment3
  */
 public class Connect64 extends Activity implements
-		AdapterView.OnItemSelectedListener {
+		AdapterView.OnItemSelectedListener, OnSharedPreferenceChangeListener {
 
+	private static final int ACTIVITY_SETTINGS = 1;
 	private static final int BAD_VALUE = -1;
 	private static final int BOARD_MAX = 64;
 	private static final int COL_SIZE = 8;
@@ -81,7 +83,9 @@ public class Connect64 extends Activity implements
 	private ScoresDBAdapter database;
 
 	// prefs
-	SharedPreferences preferences;
+	private int prefFeedback;
+	private String prefCellColor;
+	private String prefNumberColor;
 
 	/**
 	 * Input handler for the clear button. Reloads the current puzzle and resets
@@ -155,7 +159,7 @@ public class Connect64 extends Activity implements
 			this.database.deleteAllScores();
 		} else if (id == R.id.action_settings) {
 			final Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
+			startActivityForResult(intent, ACTIVITY_SETTINGS);
 		} else if (id >= MENU_PUZZLE_OFFSET
 				&& id <= MENU_PUZZLE_OFFSET + PuzzleFactory.numPuzzles()) {
 			final int puzzle = id - MENU_PUZZLE_OFFSET;
@@ -185,6 +189,27 @@ public class Connect64 extends Activity implements
 							getResources().getString(R.string.puzzle_s), i));
 		}
 		return super.onPrepareOptionsMenu(menu);
+	}
+
+	@Override
+	public final void onSharedPreferenceChanged(
+			final SharedPreferences sharedPreferences, final String key) {
+		// TODO Auto-generated method stub
+		Log.d(LOG_TAG, "pref changed--key: '" + key + "' new value: "
+				+ sharedPreferences.getString(key, null));
+		if (key.equals(SettingsActivity.KEY_PREF_FEEDBACK)) {
+			this.prefFeedback = Integer.valueOf(sharedPreferences.getString(
+					SettingsActivity.KEY_PREF_FEEDBACK,
+					SettingsActivity.PREF_FEEDBACK_DEFAULT));
+		} else if (key.equals(SettingsActivity.KEY_PREF_CELL_COLOR)) {
+			this.prefCellColor = sharedPreferences.getString(
+					SettingsActivity.KEY_PREF_CELL_COLOR,
+					SettingsActivity.PREF_CELL_COLOR_DEFAULT);
+		} else if (key.equals(SettingsActivity.KEY_PREF_NUMBER_COLOR)) {
+			this.prefNumberColor = sharedPreferences.getString(
+					SettingsActivity.KEY_PREF_NUMBER_COLOR,
+					SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
+		}
 	}
 
 	@Override
@@ -221,37 +246,9 @@ public class Connect64 extends Activity implements
 		super.onCreate(savedState);
 		Log.d(LOG_TAG, "====================onCreate()====================");
 		setContentView(R.layout.activity_connect64);
-		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		final int feedback = Integer.valueOf(this.preferences.getString(
-				SettingsActivity.KEY_PREF_FEEDBACK, "0"));
-		final String textColor = this.preferences.getString(
-				SettingsActivity.KEY_PREF_NUMBER_COLOR, "#000000");
-		final String cellColor = this.preferences.getString(
-				SettingsActivity.KEY_PREF_CELL_COLOR, "#FFFFFF");
-		Log.d(LOG_TAG, "preferences: feedback(" + feedback + ") textColor("
-				+ textColor + ") cellColor(" + cellColor + ")");
-
-		this.boardState = new SparseIntArray(BOARD_MAX);
-		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
-		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
-		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
-		this.pauseResume = (ImageButton) findViewById(R.id.pauseResumeButton);
-		this.timer = (Chronometer) findViewById(R.id.chronometer);
-		final ArrayAdapter<CharSequence> adapter = ArrayAdapter
-				.createFromResource(this, R.array.ranges,
-						android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		this.rangeSpinner.setAdapter(adapter);
-		this.rangeSpinner.setOnItemSelectedListener(this);
-
-		final TableLayout inputs = (TableLayout) findViewById(R.id.inputButtons);
-		final Button[] buttons = new Button[NUM_INPUT_BUTTONS];
-		for (int i = 0; i < NUM_INPUT_BUTTONS; i++) {
-			buttons[i] = (Button) inputs.findViewWithTag("in" + (i + 1));
-		}
-		this.inputButtons = buttons;
+		setupPreferences();
+		setupViews();
 		this.database = new ScoresDBAdapter(this); // open in onResume()
-
 	}
 
 	@Override
@@ -489,12 +486,7 @@ public class Connect64 extends Activity implements
 
 	private void performFeedback(final boolean hasWon) {
 		Log.d(LOG_TAG, "performFeedback(" + hasWon + ")");
-		final int feedbackMode = Integer.valueOf(this.preferences.getString(
-				SettingsActivity.KEY_PREF_FEEDBACK, ""
-						+ SettingsActivity.FEEDBACK_NONE));
-
-		switch (feedbackMode) {
-		case SettingsActivity.FEEDBACK_AURAL:
+		if (this.prefFeedback == SettingsActivity.FEEDBACK_AURAL) {
 			Log.d(LOG_TAG, "music play goes here");
 			// @formatter:off
 			/*
@@ -507,19 +499,17 @@ public class Connect64 extends Activity implements
 			mp.start();
 			*/
 			// @formatter:on
-			break;
-		case SettingsActivity.FEEDBACK_HAPTIC:
+		} else if (this.prefFeedback == SettingsActivity.FEEDBACK_HAPTIC) {
 			Log.d(LOG_TAG, "BZZZTT!!1!");
-			Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+			final int shortLength = 500;
+			final int longLength = 1000;
+			final Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 			if (hasWon) {
-				vibe.vibrate(500);
+				vibe.vibrate(shortLength);
 			} else {
-				vibe.vibrate(250);
+				vibe.vibrate(longLength);
 			}
-			break;
-		case SettingsActivity.FEEDBACK_NONE:
-		default:
-			break;
+
 		}
 	}
 
@@ -612,16 +602,53 @@ public class Connect64 extends Activity implements
 	private void setupInputButtons() {
 		Log.d(LOG_TAG, "setupInputButtons()");
 		final int range = this.currentRange;
-		final Button[] inputButtons = this.inputButtons;
+		final Button[] inputs = this.inputButtons;
 		final SparseIntArray state = this.boardState;
-		final boolean timerRunning = this.timerRunning;
+		final boolean timerActive = this.timerRunning;
 
 		for (int i = 0; i < NUM_INPUT_BUTTONS; i++) {
 			final int value = NUM_INPUT_BUTTONS * range + i + 1;
-			final Button inputButton = inputButtons[i];
+			final Button inputButton = inputs[i];
 			inputButton.setText(String.valueOf(value));
-			inputButton.setEnabled(timerRunning
-					&& state.indexOfValue(value) < 0);
+			inputButton
+					.setEnabled(timerActive && state.indexOfValue(value) < 0);
 		}
+	}
+
+	private void setupPreferences() {
+		final SharedPreferences preferences = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		preferences.registerOnSharedPreferenceChangeListener(this);
+		this.prefFeedback = Integer.valueOf(preferences.getString(
+				SettingsActivity.KEY_PREF_FEEDBACK,
+				SettingsActivity.PREF_FEEDBACK_DEFAULT));
+		this.prefCellColor = preferences.getString(
+				SettingsActivity.KEY_PREF_CELL_COLOR,
+				SettingsActivity.PREF_CELL_COLOR_DEFAULT);
+		this.prefNumberColor = preferences.getString(
+				SettingsActivity.KEY_PREF_NUMBER_COLOR,
+				SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
+	}
+
+	private void setupViews() {
+		this.boardState = new SparseIntArray(BOARD_MAX);
+		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
+		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
+		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
+		this.pauseResume = (ImageButton) findViewById(R.id.pauseResumeButton);
+		this.timer = (Chronometer) findViewById(R.id.chronometer);
+		final ArrayAdapter<CharSequence> adapter = ArrayAdapter
+				.createFromResource(this, R.array.ranges,
+						android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		this.rangeSpinner.setAdapter(adapter);
+		this.rangeSpinner.setOnItemSelectedListener(this);
+
+		final TableLayout inputs = (TableLayout) findViewById(R.id.inputButtons);
+		final Button[] buttons = new Button[NUM_INPUT_BUTTONS];
+		for (int i = 0; i < NUM_INPUT_BUTTONS; i++) {
+			buttons[i] = (Button) inputs.findViewWithTag("in" + (i + 1));
+		}
+		this.inputButtons = buttons;
 	}
 }
