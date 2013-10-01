@@ -4,7 +4,7 @@
         android:key="pref_feedback_category"
         android:title="@string/pref_feedback_title" >
         <ListPreference
-            android:defaultValue="None"
+            android:defaultValue="0"
             android:entries="@array/pref_feedback_list_titles"
             android:entryValues="@array/pref_feedback_list_values"
             android:key="pref_feedback"

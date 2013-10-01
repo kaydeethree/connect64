@@ -619,9 +619,16 @@ public class Connect64 extends Activity implements
 		final SharedPreferences preferences = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(this);
-		this.prefFeedback = Integer.valueOf(preferences.getString(
+		String feedbackPref = preferences.getString(
 				SettingsActivity.KEY_PREF_FEEDBACK,
-				SettingsActivity.PREF_FEEDBACK_DEFAULT));
+				SettingsActivity.PREF_FEEDBACK_DEFAULT);
+		if (feedbackPref.equals("None")) {
+			this.prefFeedback = 0;
+		} else {
+			this.prefFeedback = Integer.valueOf(preferences.getString(
+					SettingsActivity.KEY_PREF_FEEDBACK,
+					SettingsActivity.PREF_FEEDBACK_DEFAULT));
+		}
 		this.prefCellColor = preferences.getString(
 				SettingsActivity.KEY_PREF_CELL_COLOR,
 				SettingsActivity.PREF_CELL_COLOR_DEFAULT);
