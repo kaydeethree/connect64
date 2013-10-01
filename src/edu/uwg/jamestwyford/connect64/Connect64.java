@@ -7,6 +7,7 @@ import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -31,6 +32,8 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.uwg.jamestwyford.connect64.db.ScoresContentProviderDB;
+import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
 import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
 
 /**
@@ -95,6 +98,7 @@ public class Connect64 extends Activity implements
 	 *            ignored
 	 */
 	public final void clearButtonClick(final View view) {
+		Log.d(LOG_TAG, "clearButtonClick()");
 		loadPuzzle(this.currentPuzzle, true);
 	}
 
@@ -194,7 +198,6 @@ public class Connect64 extends Activity implements
 	@Override
 	public final void onSharedPreferenceChanged(
 			final SharedPreferences sharedPreferences, final String key) {
-		// TODO Auto-generated method stub
 		Log.d(LOG_TAG, "pref changed--key: '" + key + "' new value: "
 				+ sharedPreferences.getString(key, null));
 		if (key.equals(SettingsActivity.KEY_PREF_FEEDBACK)) {
@@ -234,6 +237,7 @@ public class Connect64 extends Activity implements
 	 *            ignored
 	 */
 	public final void pauseResumeClick(final View view) {
+		Log.d(LOG_TAG, "pauseResumeClick()");
 		if (this.timerRunning) {
 			pauseTimer();
 		} else {
@@ -248,7 +252,6 @@ public class Connect64 extends Activity implements
 		setContentView(R.layout.activity_connect64);
 		setupPreferences();
 		setupViews();
-		this.database = new ScoresDBAdapter(this); // open in onResume()
 	}
 
 	@Override
@@ -279,7 +282,6 @@ public class Connect64 extends Activity implements
 		stateEditor.putString(STATE_POSITIONS, serializeIntArray(positions));
 		stateEditor.putString(STATE_VALUES, serializeIntArray(values));
 		stateEditor.apply();
-		this.database.close();
 	}
 
 	@Override
@@ -314,12 +316,14 @@ public class Connect64 extends Activity implements
 			Log.d(LOG_TAG, "starting from scratch, starting timer.");
 			resumeTimer();
 		}
-		this.database.open();
 	}
 
 	private void addScoretoTable() {
-		this.database.insertScore(PLAYER_NAME, this.currentPuzzle,
-				formatTime(this.elapsedTime));
+		ContentValues values = new ContentValues();
+		values.put(Scores.PLAYER, PLAYER_NAME);
+		values.put(Scores.PUZZLE, this.currentPuzzle);
+		values.put(Scores.COMPLETION_TIME, formatTime(this.elapsedTime));
+		getContentResolver().insert(ScoresContentProviderDB.CONTENT_URI, values);
 	}
 
 	/**
@@ -351,7 +355,7 @@ public class Connect64 extends Activity implements
 			final int nextPuzzle = this.currentPuzzle + 1;
 			loadPuzzle(nextPuzzle, true);
 
-		} else if (!boardCorrect && onLastPuzzle) {
+		} else if (!boardCorrect) {
 			toast = Toast
 					.makeText(this, R.string.try_again, Toast.LENGTH_SHORT);
 		} else {

@@ -1,11 +1,11 @@
 <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="match_parent"
+    android:layout_height="fill_parent"
     android:id="@+id/inputButtons" >
 
     <TableRow
         android:id="@+id/inputRow1"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <Spinner
@@ -37,7 +37,7 @@
 
     <TableRow
         android:id="@+id/inputRow2"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <Button
@@ -73,7 +73,7 @@
 
     <TableRow
         android:id="@+id/inputRow3"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
 
         <Button

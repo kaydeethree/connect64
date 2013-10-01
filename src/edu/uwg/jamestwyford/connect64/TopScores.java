@@ -1,14 +1,17 @@
 package edu.uwg.jamestwyford.connect64;
 
 import android.app.ListActivity;
+import android.app.LoaderManager;
+import android.content.CursorLoader;
+import android.content.Loader;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SimpleCursorAdapter;
+import edu.uwg.jamestwyford.connect64.db.ScoresContentProviderDB;
 import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
-import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
 
 /**
  * Top scores activity.
@@ -16,18 +19,44 @@ import edu.uwg.jamestwyford.connect64.db.ScoresDBAdapter;
  * @author jtwyford
  * @version assignment3
  */
-public class TopScores extends ListActivity {
-	private static final String[] FIELDS = { Scores.PLAYER, Scores.PUZZLE,
-			Scores.COMPLETION_TIME };
+public class TopScores extends ListActivity implements
+		LoaderManager.LoaderCallbacks<Cursor> {
+	private static final String[] SCORES_PROJECTION = { Scores.ID,
+			Scores.PLAYER, Scores.PUZZLE, Scores.COMPLETION_TIME };
 	private static final int[] COLUMNS = { R.id.row_player, R.id.row_puzzle,
 			R.id.row_time };
-	private ScoresDBAdapter dbAdapter;
-	private SimpleCursorAdapter cursorAdapter;
+	private SimpleCursorAdapter adapter;
+
+	@Override
+	protected final void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_top_scores);
+		setupActionBar();
+		setupListAdapter();
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int id, Bundle args) {
+		return new CursorLoader(TopScores.this,
+				ScoresContentProviderDB.CONTENT_URI, SCORES_PROJECTION, null,
+				null, null);
+	}
 
 	@Override
 	public final boolean onCreateOptionsMenu(final Menu menu) {
 		getMenuInflater().inflate(R.menu.top_scores, menu);
 		return true;
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> loader) {
+		this.adapter.swapCursor(null);
+	}
+
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
+		this.adapter.swapCursor(cursor);
 	}
 
 	@Override
@@ -37,34 +66,10 @@ public class TopScores extends ListActivity {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
 		} else if (id == R.id.clearScores) {
-			this.dbAdapter.deleteAllScores();
-			fillListView();
+			getContentResolver().delete(ScoresContentProviderDB.CONTENT_URI,
+					null, null);
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	protected final void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_top_scores);
-		setupActionBar();
-		this.dbAdapter = new ScoresDBAdapter(this);
-		this.dbAdapter.open();
-		fillListView();
-	}
-
-	@Override
-	protected final void onPause() {
-		super.onPause();
-		this.dbAdapter.close();
-	}
-
-	@SuppressWarnings("deprecation")
-	private void fillListView() {
-		Cursor cursor = this.dbAdapter.fetchAllScores();
-		this.cursorAdapter = new SimpleCursorAdapter(this, R.layout.score_row,
-				cursor, FIELDS, COLUMNS);
-		setListAdapter(this.cursorAdapter);
 	}
 
 	/**
@@ -72,6 +77,15 @@ public class TopScores extends ListActivity {
 	 */
 	private void setupActionBar() {
 		getActionBar().setDisplayHomeAsUpEnabled(true);
+	}
+
+	private void setupListAdapter() {
+		String[] dataColumns = new String[] { Scores.PLAYER, Scores.PUZZLE,
+				Scores.COMPLETION_TIME };
+		getLoaderManager().initLoader(0, null, this);
+		this.adapter = new SimpleCursorAdapter(this, R.layout.score_row, null,
+				dataColumns, COLUMNS, 0);
+		setListAdapter(adapter);
 	}
 
 }

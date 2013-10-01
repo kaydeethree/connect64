@@ -7,7 +7,8 @@
     <uses-sdk
         android:minSdkVersion="13"
         android:targetSdkVersion="18" />
-    <uses-permission android:name="android.permission.VIBRATE"/>
+
+    <uses-permission android:name="android.permission.VIBRATE" />
 
     <application
         android:allowBackup="true"
@@ -39,6 +40,11 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.uwg.jamestwyford.connect64.Connect64" />
         </activity>
+
+        <provider
+            android:name="edu.uwg.jamestwyford.connect64.db.ScoresContentProviderDB"
+            android:authorities="edu.uwg.jamestwyford.connect64.scoresdbprovider" >
+        </provider>
     </application>
 
 </manifest>

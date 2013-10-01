@@ -19,7 +19,7 @@ public class ScoresDBAdapter {
 	private Context context = null;
 
 	/**
-	 * Constructs the adapter using the given Activy Context.
+	 * Constructs the adapter using the given Activity Context.
 	 * 
 	 * @param newContext
 	 *            the Context of the Activity.
@@ -31,7 +31,7 @@ public class ScoresDBAdapter {
 	/**
 	 * Opens the table for write access.
 	 * 
-	 * @return this class with the table open for write access.
+	 * @return this instance with the table open for write access.
 	 */
 	public final ScoresDBAdapter open() {
 		this.databaseHelper = new ScoresDBHelper(this.context);
