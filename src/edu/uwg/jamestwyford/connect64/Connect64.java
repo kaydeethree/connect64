@@ -314,7 +314,7 @@ public class Connect64 extends Activity implements
 		}
 	}
 
-	private void addScoretoTable() {
+	private void addScoretoDB() {
 		ContentValues newScore = new ContentValues(3);
 		newScore.put(Scores.PLAYER, PLAYER_NAME);
 		newScore.put(Scores.PUZZLE, this.currentPuzzle);
@@ -333,18 +333,17 @@ public class Connect64 extends Activity implements
 		final boolean boardCorrect = isBoardCorrect();
 		final boolean onLastPuzzle = this.currentPuzzle == PuzzleFactory
 				.numPuzzles();
-
+		if (boardCorrect) {
+			setElapsedTime();
+			this.addScoretoDB();
+		}
 		if (boardCorrect && onLastPuzzle) {
-			setElapsedTime(); // checkstyle doesn't complain about this...
-			this.addScoretoTable(); // but does for this line?
 			toast = Toast.makeText(this, R.string.all_puzzles_complete,
 					Toast.LENGTH_SHORT);
 			this.timerRunning = false;
 			this.timer.stop();
 
 		} else if (boardCorrect && !onLastPuzzle) {
-			setElapsedTime();
-			this.addScoretoTable();
 			final String outString = String.format(Locale.US, getResources()
 					.getString(R.string.you_won_in_s),
 					formatTime(this.elapsedTime));
