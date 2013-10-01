@@ -334,8 +334,8 @@ public class Connect64 extends Activity implements
 				.numPuzzles();
 
 		if (boardCorrect && onLastPuzzle) {
-			setElapsedTime();
-			addScoretoTable();
+			setElapsedTime(); // checkstyle doesn't complain about this...
+			this.addScoretoTable(); // but does for this line?
 			toast = Toast.makeText(this, R.string.all_puzzles_complete,
 					Toast.LENGTH_SHORT);
 			this.timerRunning = false;
@@ -343,7 +343,7 @@ public class Connect64 extends Activity implements
 
 		} else if (boardCorrect && !onLastPuzzle) {
 			setElapsedTime();
-			addScoretoTable();
+			this.addScoretoTable();
 			final String outString = String.format(Locale.US, getResources()
 					.getString(R.string.you_won_in_s),
 					formatTime(this.elapsedTime));
@@ -430,7 +430,7 @@ public class Connect64 extends Activity implements
 		final int rowOffset = 10;
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				if (!hasValidNeighbors(i * rowOffset + j)) {
+				if (!this.hasValidNeighbors(i * rowOffset + j)) {
 					return false;
 				}
 			}
@@ -517,7 +517,7 @@ public class Connect64 extends Activity implements
 		Log.d(LOG_TAG, "resetAndInitialize()");
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				final Button button = getButton("" + i + j);
+				final Button button = this.getButton("" + i + j);
 				button.setText("");
 				button.setEnabled(true);
 			}
@@ -531,7 +531,7 @@ public class Connect64 extends Activity implements
 		final int[] vals = puzzle.getValues();
 
 		for (int i = 0; i < pos.length; i++) {
-			final Button button = getButton(String.valueOf(pos[i]));
+			final Button button = this.getButton(String.valueOf(pos[i]));
 			button.setText(String.valueOf(vals[i]));
 			button.setEnabled(false);
 			this.boardState.put(pos[i], vals[i]);
@@ -623,6 +623,10 @@ public class Connect64 extends Activity implements
 				SettingsActivity.KEY_PREF_FEEDBACK,
 				SettingsActivity.PREF_FEEDBACK_DEFAULT);
 		if (feedbackPref.equals("None")) {
+			Log.d(LOG_TAG, "fixing invalid pref");
+			SharedPreferences.Editor editor = preferences.edit();
+			editor.putString(SettingsActivity.KEY_PREF_FEEDBACK, "0");
+			editor.apply();
 			this.prefFeedback = 0;
 		} else {
 			this.prefFeedback = Integer.valueOf(preferences.getString(

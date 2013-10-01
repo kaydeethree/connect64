@@ -10,6 +10,9 @@ import android.provider.BaseColumns;
  * 
  */
 public final class ScoresContract {
+	private ScoresContract() {
+	}
+
 	/**
 	 * Contract of the Scores table.
 	 * 
@@ -27,9 +30,6 @@ public final class ScoresContract {
 		public static final String PUZZLE = "puzzle";
 		/** Scores table completion time column. */
 		public static final String COMPLETION_TIME = "completiontime";
-	}
-
-	private ScoresContract() {
 	}
 
 }

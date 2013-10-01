@@ -28,22 +28,7 @@ import android.view.MenuItem;
  * @version assignment3
  */
 public class SettingsActivity extends PreferenceActivity {
-	/**
-	 * This fragment shows general preferences only. It is used when the
-	 * activity is showing a two-pane settings UI.
-	 */
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
-	public static class GeneralPreferenceFragment extends PreferenceFragment {
-		@Override
-		public final void onCreate(final Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-			addPreferencesFromResource(R.xml.pref_general);
 
-			bindPreferenceSummaryToValue(findPreference(KEY_PREF_CELL_COLOR));
-			bindPreferenceSummaryToValue(findPreference(KEY_PREF_NUMBER_COLOR));
-			bindPreferenceSummaryToValue(findPreference(KEY_PREF_FEEDBACK));
-		}
-	}
 
 	/** key for the "cell color" preference. */
 	public static final String KEY_PREF_CELL_COLOR = "pref_cell_color";
@@ -93,6 +78,8 @@ public class SettingsActivity extends PreferenceActivity {
 			return true;
 		}
 	};
+	
+
 
 	/**
 	 * Binds a preference's summary to its value. More specifically, when the
@@ -200,5 +187,20 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 		addPreferencesFromResource(R.xml.pref_general);
 	}
+	/**
+	 * This fragment shows general preferences only. It is used when the
+	 * activity is showing a two-pane settings UI.
+	 */
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static class GeneralPreferenceFragment extends PreferenceFragment {
+		@Override
+		public final void onCreate(final Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+			addPreferencesFromResource(R.xml.pref_general);
 
+			bindPreferenceSummaryToValue(findPreference(KEY_PREF_CELL_COLOR));
+			bindPreferenceSummaryToValue(findPreference(KEY_PREF_NUMBER_COLOR));
+			bindPreferenceSummaryToValue(findPreference(KEY_PREF_FEEDBACK));
+		}
+	}
 }
