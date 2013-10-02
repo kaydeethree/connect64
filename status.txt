@@ -31,3 +31,5 @@ Other implementation notes:
   the game state's all localized into the seven fields (and leave the GUI
   handling where it is...) but I'm worried about the performance hit of calling
   across classes all the time.
+* Tablet-mode views are workable, but meh. Struggling to get the buttons to
+  actually take up vertical space, not just increase the padding between them.

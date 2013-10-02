@@ -26,11 +26,11 @@ public class ScoresContentProviderDB extends ContentProvider {
 	/** content URI used to access this provider. */
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY
 			+ "/" + BASE_PATH);
-	private static final UriMatcher sURIMatcher = new UriMatcher(
+	private static final UriMatcher S_URI_MATCHER = new UriMatcher(
 			UriMatcher.NO_MATCH);
 	static {
-		sURIMatcher.addURI(AUTHORITY, BASE_PATH, ALL_SCORES);
-		sURIMatcher.addURI(AUTHORITY, BASE_PATH + "/#", SCORE_ID);
+		S_URI_MATCHER.addURI(AUTHORITY, BASE_PATH, ALL_SCORES);
+		S_URI_MATCHER.addURI(AUTHORITY, BASE_PATH + "/#", SCORE_ID);
 	}
 	private ScoresDBHelper dbHelper;
 
@@ -53,7 +53,7 @@ public class ScoresContentProviderDB extends ContentProvider {
 	@Override
 	public final int delete(final Uri uri, final String selection,
 			final String[] selectionArgs) {
-		final int uriType = sURIMatcher.match(uri);
+		final int uriType = S_URI_MATCHER.match(uri);
 		final SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		int rowsDeleted = 0;
 		switch (uriType) {
@@ -89,7 +89,7 @@ public class ScoresContentProviderDB extends ContentProvider {
 
 	@Override
 	public final Uri insert(final Uri uri, final ContentValues values) {
-		final int uriType = sURIMatcher.match(uri);
+		final int uriType = S_URI_MATCHER.match(uri);
 		final SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		long id = 0;
 		switch (uriType) {
@@ -118,7 +118,7 @@ public class ScoresContentProviderDB extends ContentProvider {
 		final SQLiteQueryBuilder queryBuilder = new SQLiteQueryBuilder();
 		this.checkColumns(projection);
 		queryBuilder.setTables(ScoresContract.Scores.SCORES_TABLE_NAME);
-		final int uriType = sURIMatcher.match(uri);
+		final int uriType = S_URI_MATCHER.match(uri);
 		switch (uriType) {
 		case ALL_SCORES:
 			break;
@@ -140,7 +140,7 @@ public class ScoresContentProviderDB extends ContentProvider {
 	@Override
 	public final int update(final Uri uri, final ContentValues values,
 			final String selection, final String[] selectionArgs) {
-		final int uriType = sURIMatcher.match(uri);
+		final int uriType = S_URI_MATCHER.match(uri);
 		final SQLiteDatabase sqlDB = this.dbHelper.getWritableDatabase();
 		int rowsUpdated = 0;
 		switch (uriType) {

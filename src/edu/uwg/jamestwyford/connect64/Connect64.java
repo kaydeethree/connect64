@@ -438,7 +438,7 @@ public class Connect64 extends Activity implements
 		final int rowOffset = 10;
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				if (!hasValidNeighbors(i * rowOffset + j)) {
+				if (!this.hasValidNeighbors(i * rowOffset + j)) {
 					return false;
 				}
 			}
@@ -532,7 +532,7 @@ public class Connect64 extends Activity implements
 		Log.d(LOG_TAG, "resetAndInitializeBoard()");
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				final Button button = getGameButton("" + i + j);
+				final Button button = this.getGameButton("" + i + j);
 				button.setText("");
 				button.setEnabled(true);
 			}
@@ -546,7 +546,7 @@ public class Connect64 extends Activity implements
 		final int[] vals = puzzle.getValues();
 
 		for (int i = 0; i < pos.length; i++) {
-			final Button button = getGameButton(String.valueOf(pos[i]));
+			final Button button = this.getGameButton(String.valueOf(pos[i]));
 			button.setText(String.valueOf(vals[i]));
 			button.setEnabled(false);
 			this.boardState.put(pos[i], vals[i]);
@@ -640,7 +640,7 @@ public class Connect64 extends Activity implements
 		this.prefNumberColor = this.preferences.getInt(
 				SettingsActivity.KEY_PREF_NUMBER_COLOR,
 				SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
-		changeButtonTextColor();
+		this.changeButtonTextColor();
 	}
 
 	private void setupViews() {
