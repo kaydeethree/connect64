@@ -1,0 +1,81 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/inputButtons"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" >
+
+    <TableRow
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" >
+
+        <Spinner
+            android:id="@+id/rangeSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0.25" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in1" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in2" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in3" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in4" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in5" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in6" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in7" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in8" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in9" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in10" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in11" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in12" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in13" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in14" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in15" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in16" />
+    </TableRow>
+
+</TableLayout>
