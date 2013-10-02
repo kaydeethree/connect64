@@ -14,19 +14,13 @@
     <PreferenceCategory
         android:key="color_feedback_category"
         android:title="@string/pref_colors_title" >
-        <EditTextPreference
-            android:defaultValue="#FFFFFF"
+        <afzkl.development.colorpickerview.preference.ColorPickerPreference
+            android:defaultValue="0xFFFFFFFF"
             android:key="pref_cell_color"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:summary=""
             android:title="@string/pref_cell_color_title" />
-        <EditTextPreference
-            android:defaultValue="#000000"
+        <afzkl.development.colorpickerview.preference.ColorPickerPreference
+            android:defaultValue="0xFF000000"
             android:key="pref_number_color"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:summary=""
             android:title="@string/pref_number_color_title" />
     </PreferenceCategory>
 

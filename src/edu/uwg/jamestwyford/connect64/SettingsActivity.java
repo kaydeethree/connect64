@@ -33,11 +33,11 @@ public class SettingsActivity extends PreferenceActivity {
 	/** key for the "cell color" preference. */
 	public static final String KEY_PREF_CELL_COLOR = "pref_cell_color";
 	/** default value for the "cell color" preference. */
-	public static final String PREF_CELL_COLOR_DEFAULT = "#FFFFFF";
+	public static final int PREF_CELL_COLOR_DEFAULT = 0xFFFFFFFF;
 	/** key for the "text color" preference. */
 	public static final String KEY_PREF_NUMBER_COLOR = "pref_number_color";
 	/** default value for the "text color" preference. */
-	public static final String PREF_NUMBER_COLOR_DEFAULT = "#000000";
+	public static final int PREF_NUMBER_COLOR_DEFAULT = 0xFF000000;
 	/** key for the "feedback" (aural or haptic) preference. */
 	public static final String KEY_PREF_FEEDBACK = "pref_feedback";
 	/** default value for the "feedback" (aural or haptic) preference. */

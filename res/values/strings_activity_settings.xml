@@ -14,7 +14,6 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-
     <string name="pref_colors_title">Colors</string>
     <string name="pref_cell_color_title">Cell color</string>
     <string name="pref_number_color_title">Number color</string>

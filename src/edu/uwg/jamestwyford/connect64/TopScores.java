@@ -31,7 +31,7 @@ public class TopScores extends ListActivity implements
 	protected final void onCreate(final Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_top_scores);
-		setupActionBar();
+		getActionBar().setDisplayHomeAsUpEnabled(true);
 		setupListAdapter();
 	}
 
@@ -70,13 +70,6 @@ public class TopScores extends ListActivity implements
 					null, null);
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-	 * Set up the {@link android.app.ActionBar}.
-	 */
-	private void setupActionBar() {
-		getActionBar().setDisplayHomeAsUpEnabled(true);
 	}
 
 	private void setupListAdapter() {

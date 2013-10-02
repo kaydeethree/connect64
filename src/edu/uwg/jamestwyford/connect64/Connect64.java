@@ -81,9 +81,8 @@ public class Connect64 extends Activity implements
 	private boolean timerRunning;
 
 	// prefs
-	private int prefFeedback;
-	private String prefCellColor;
-	private String prefNumberColor;
+	private int prefNumberColor;
+	private SharedPreferences preferences;
 
 	/**
 	 * Input handler for the clear button. Reloads the current puzzle and resets
@@ -194,20 +193,16 @@ public class Connect64 extends Activity implements
 	@Override
 	public final void onSharedPreferenceChanged(
 			final SharedPreferences sharedPreferences, final String key) {
-		Log.d(LOG_TAG, "pref changed--key: '" + key + "' new value: "
-				+ sharedPreferences.getString(key, null));
-		if (key.equals(SettingsActivity.KEY_PREF_FEEDBACK)) {
-			this.prefFeedback = Integer.valueOf(sharedPreferences.getString(
-					SettingsActivity.KEY_PREF_FEEDBACK,
-					SettingsActivity.PREF_FEEDBACK_DEFAULT));
-		} else if (key.equals(SettingsActivity.KEY_PREF_CELL_COLOR)) {
-			this.prefCellColor = sharedPreferences.getString(
-					SettingsActivity.KEY_PREF_CELL_COLOR,
-					SettingsActivity.PREF_CELL_COLOR_DEFAULT);
-		} else if (key.equals(SettingsActivity.KEY_PREF_NUMBER_COLOR)) {
-			this.prefNumberColor = sharedPreferences.getString(
+		// Log.d(LOG_TAG, "pref changed--key: '" + key + "' new value: "
+		// + sharedPreferences.getString(key, null));
+		if (key.equals(SettingsActivity.KEY_PREF_NUMBER_COLOR)) {
+			this.prefNumberColor = sharedPreferences.getInt(
 					SettingsActivity.KEY_PREF_NUMBER_COLOR,
 					SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
+		} else if (key.equals(SettingsActivity.KEY_PREF_CELL_COLOR)) {
+			this.gameBoard.setBackgroundColor(sharedPreferences.getInt(
+					SettingsActivity.KEY_PREF_CELL_COLOR,
+					SettingsActivity.PREF_CELL_COLOR_DEFAULT));
 		}
 	}
 
@@ -246,8 +241,8 @@ public class Connect64 extends Activity implements
 		super.onCreate(savedState);
 		Log.d(LOG_TAG, "====================onCreate()====================");
 		setContentView(R.layout.activity_connect64);
-		setupPreferences();
 		setupViews();
+		setupPreferences();
 	}
 
 	@Override
@@ -257,15 +252,17 @@ public class Connect64 extends Activity implements
 		final SharedPreferences statePrefs = getSharedPreferences(
 				GAME_STATE_PREFS, MODE_PRIVATE);
 		final SharedPreferences.Editor stateEditor = statePrefs.edit();
+		stateEditor.putBoolean(TIMER_RUNNING, this.timerRunning);
+		if (this.timerRunning) {
+			setElapsedTime();
+			this.timerRunning = false;
+		}
+		Log.d(LOG_TAG, "pausing. elapsed time: " + this.elapsedTime);
+		stateEditor.putLong(ELAPSED_TIME, this.elapsedTime);
 		stateEditor.putInt(CURRENT_INPUT, this.currentInput);
 		stateEditor.putInt(CURRENT_PUZZLE, this.currentPuzzle);
 		stateEditor.putInt(CURRENT_RANGE, this.currentRange);
 		stateEditor.putInt(MAX_PUZZLE_ATTEMPTED, this.maxPuzzleAttempted);
-		stateEditor.putBoolean(TIMER_RUNNING, this.timerRunning);
-		if (this.timerRunning) {
-			setElapsedTime();
-		}
-		stateEditor.putLong(ELAPSED_TIME, this.elapsedTime);
 
 		final SparseIntArray state = this.boardState;
 		final int size = state.size();
@@ -290,7 +287,7 @@ public class Connect64 extends Activity implements
 		this.currentPuzzle = statePrefs.getInt(CURRENT_PUZZLE, STARTING_PUZZLE);
 		this.maxPuzzleAttempted = statePrefs.getInt(MAX_PUZZLE_ATTEMPTED,
 				STARTING_PUZZLE);
-		this.elapsedTime = statePrefs.getLong(ELAPSED_TIME, 0L);
+
 		this.timerRunning = statePrefs.getBoolean(TIMER_RUNNING, true);
 		loadPuzzle(this.currentPuzzle, false); // disable initial buttons
 		this.currentRange = statePrefs.getInt(CURRENT_RANGE, 0);
@@ -298,6 +295,9 @@ public class Connect64 extends Activity implements
 
 		final String posString = statePrefs.getString(STATE_POSITIONS, null);
 		final String valString = statePrefs.getString(STATE_VALUES, null);
+
+		this.elapsedTime = statePrefs.getLong(ELAPSED_TIME, 0L);
+		Log.d(LOG_TAG, "resuming elapsed time: " + this.elapsedTime);
 		if (posString != null && valString != null) {
 			Log.d(LOG_TAG, "loading saved puzzle state");
 			final int[] positions = deserializeIntArray(posString);
@@ -342,7 +342,6 @@ public class Connect64 extends Activity implements
 					Toast.LENGTH_SHORT);
 			this.timerRunning = false;
 			this.timer.stop();
-
 		} else if (boardCorrect && !onLastPuzzle) {
 			final String outString = String.format(Locale.US, getResources()
 					.getString(R.string.you_won_in_s),
@@ -350,7 +349,6 @@ public class Connect64 extends Activity implements
 			toast = Toast.makeText(this, outString, Toast.LENGTH_SHORT);
 			final int nextPuzzle = this.currentPuzzle + 1;
 			loadPuzzle(nextPuzzle, true);
-
 		} else if (!boardCorrect) {
 			toast = Toast
 					.makeText(this, R.string.try_again, Toast.LENGTH_SHORT);
@@ -475,7 +473,9 @@ public class Connect64 extends Activity implements
 	}
 
 	private void pauseTimer() {
-		setElapsedTime();
+		if (this.timerRunning) {
+			setElapsedTime();
+		}
 		this.timerRunning = false;
 		Log.d(LOG_TAG, "pauseTimer(). elapsed: " + this.elapsedTime);
 		this.timer.stop();
@@ -487,7 +487,10 @@ public class Connect64 extends Activity implements
 
 	private void performFeedback(final boolean hasWon) {
 		Log.d(LOG_TAG, "performFeedback(" + hasWon + ")");
-		if (this.prefFeedback == SettingsActivity.FEEDBACK_AURAL) {
+		int prefFeedback = Integer.valueOf(preferences.getString(
+				SettingsActivity.KEY_PREF_FEEDBACK, "0"));
+		switch (prefFeedback) {
+		case SettingsActivity.FEEDBACK_AURAL:
 			Log.d(LOG_TAG, "music play goes here");
 			// @formatter:off
 			/*
@@ -500,16 +503,19 @@ public class Connect64 extends Activity implements
 			mp.start();
 			*/
 			// @formatter:on
-		} else if (this.prefFeedback == SettingsActivity.FEEDBACK_HAPTIC) {
+			break;
+		case SettingsActivity.FEEDBACK_HAPTIC:
 			Log.d(LOG_TAG, "BZZZTT!!1!");
-			final int shortLength = 500;
-			final int longLength = 1000;
+			final int shortLength = 1000;
+			final int longLength = 2000;
 			final Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 			if (hasWon) {
 				vibe.vibrate(shortLength);
 			} else {
 				vibe.vibrate(longLength);
 			}
+			break;
+		default:
 		}
 	}
 
@@ -537,19 +543,20 @@ public class Connect64 extends Activity implements
 			this.boardState.put(pos[i], vals[i]);
 		}
 
-		Log.d(LOG_TAG, "calling setupInputButtons() from resetAndInitializeBoard()");
+		Log.d(LOG_TAG,
+				"calling setupInputButtons() from resetAndInitializeBoard()");
 		setupInputButtons();
 	}
 
 	private void resumeTimer() {
 		Log.d(LOG_TAG, "resumeTimer(); elapsed: " + this.elapsedTime);
+		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
+		this.timer.start();
 		this.timerRunning = true;
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_pause);
 		this.gameBoard.setVisibility(View.VISIBLE);
 		Log.d(LOG_TAG, "calling setupInputButtons() from resumeTimer()");
 		setupInputButtons();
-		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
-		this.timer.start();
 	}
 
 	private String serializeIntArray(final int[] array) {
@@ -616,18 +623,11 @@ public class Connect64 extends Activity implements
 	}
 
 	private void setupPreferences() {
-		final SharedPreferences preferences = PreferenceManager
-				.getDefaultSharedPreferences(this);
+		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		preferences.registerOnSharedPreferenceChangeListener(this);
-		this.prefFeedback = Integer.valueOf(preferences.getString(
-				SettingsActivity.KEY_PREF_FEEDBACK,
-				SettingsActivity.PREF_FEEDBACK_DEFAULT));
-		this.prefCellColor = preferences.getString(
+		this.gameBoard.setBackgroundColor(preferences.getInt(
 				SettingsActivity.KEY_PREF_CELL_COLOR,
-				SettingsActivity.PREF_CELL_COLOR_DEFAULT);
-		this.prefNumberColor = preferences.getString(
-				SettingsActivity.KEY_PREF_NUMBER_COLOR,
-				SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
+				SettingsActivity.PREF_CELL_COLOR_DEFAULT));
 	}
 
 	private void setupViews() {

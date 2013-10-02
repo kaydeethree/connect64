@@ -14,6 +14,8 @@ Checkstyle issues:
   nothing I can do about that.
 
 Implementation notes:
+* I am using a library project for the color picker. It *should* be in the zip,
+  but if not, it can be found at http://code.google.com/p/android-color-picker/
 * Serialization/Parcelization is painful. I'm really curious to see how the
   rest of the class saves state in onPause().
 * I've got a boatload of member fields this time around, most of which are
