@@ -22,16 +22,6 @@
         android:layout_below="@+id/pauseResumeButton"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
-    <Button
-        android:id="@+id/clearButton"
-        style="?android:attr/buttonStyleSmall"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
-        android:onClick="clearButtonClick"
-        android:text="@string/clear" />
-
     <TextView
         android:id="@+id/puzzleLabel"
         android:layout_width="wrap_content"
@@ -40,5 +30,16 @@
         android:layout_alignParentRight="true"
         android:text="@string/puzzle_s"
         android:textAppearance="?android:attr/textAppearanceLarge" />
+
+    <ImageButton
+        android:id="@+id/clearButton"
+        style="?android:attr/buttonStyleSmall"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        android:contentDescription="@string/clear"
+        android:onClick="clearButtonClick"
+        android:src="@android:drawable/ic_menu_revert" />
 
 </RelativeLayout>
