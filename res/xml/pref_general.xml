@@ -8,7 +8,6 @@
             android:entries="@array/pref_feedback_list_titles"
             android:entryValues="@array/pref_feedback_list_values"
             android:key="pref_feedback"
-            android:summary=""
             android:title="@string/pref_choose_feedback" />
     </PreferenceCategory>
     <PreferenceCategory

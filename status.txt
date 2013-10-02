@@ -13,9 +13,16 @@ Checkstyle issues:
 * Interface-defined methods with >4 parameters aren't liked either, but there's
   nothing I can do about that.
 
-Implementation notes:
-* I am using a library project for the color picker. It *should* be in the zip,
-  but if not, it can be found at http://code.google.com/p/android-color-picker/
+
+
+BIG BIG IMPLEMENTATION NOTE: (this is my wow factor)
+
+
+* I am using a library for the color picker. If it's not in the zip, it can be
+  found at <http://code.google.com/p/android-color-picker/>. More info on at 
+  https://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject
+  
+Other implementation notes:
 * Serialization/Parcelization is painful. I'm really curious to see how the
   rest of the class saves state in onPause().
 * I've got a boatload of member fields this time around, most of which are

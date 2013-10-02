@@ -193,12 +193,12 @@ public class Connect64 extends Activity implements
 	@Override
 	public final void onSharedPreferenceChanged(
 			final SharedPreferences sharedPreferences, final String key) {
-		// Log.d(LOG_TAG, "pref changed--key: '" + key + "' new value: "
-		// + sharedPreferences.getString(key, null));
 		if (key.equals(SettingsActivity.KEY_PREF_NUMBER_COLOR)) {
 			this.prefNumberColor = sharedPreferences.getInt(
 					SettingsActivity.KEY_PREF_NUMBER_COLOR,
 					SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
+			changeButtonTextColor();
+			Log.d(LOG_TAG, "new number color: " + this.prefNumberColor);
 		} else if (key.equals(SettingsActivity.KEY_PREF_CELL_COLOR)) {
 			this.gameBoard.setBackgroundColor(sharedPreferences.getInt(
 					SettingsActivity.KEY_PREF_CELL_COLOR,
@@ -315,12 +315,21 @@ public class Connect64 extends Activity implements
 	}
 
 	private void addScoretoDB() {
-		ContentValues newScore = new ContentValues(3);
+		final ContentValues newScore = new ContentValues(3);
 		newScore.put(Scores.PLAYER, PLAYER_NAME);
 		newScore.put(Scores.PUZZLE, this.currentPuzzle);
 		newScore.put(Scores.COMPLETION_TIME, formatTime(this.elapsedTime));
 		getContentResolver().insert(ScoresContentProviderDB.CONTENT_URI,
 				newScore);
+	}
+
+	private void changeButtonTextColor() {
+		final int color = this.prefNumberColor;
+		for (int i = 1; i <= ROW_SIZE; i++) {
+			for (int j = 1; j <= COL_SIZE; j++) {
+				getGameButton("" + i + j).setTextColor(color);
+			}
+		}
 	}
 
 	/**
@@ -334,8 +343,8 @@ public class Connect64 extends Activity implements
 		final boolean onLastPuzzle = this.currentPuzzle == PuzzleFactory
 				.numPuzzles();
 		if (boardCorrect) {
-			setElapsedTime();
-			this.addScoretoDB();
+			setElapsedTime(); // so checkstyle is ok with no "this." here...
+			this.addScoretoDB(); // but it wants one here?
 		}
 		if (boardCorrect && onLastPuzzle) {
 			toast = Toast.makeText(this, R.string.all_puzzles_complete,
@@ -429,7 +438,7 @@ public class Connect64 extends Activity implements
 		final int rowOffset = 10;
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				if (!this.hasValidNeighbors(i * rowOffset + j)) {
+				if (!hasValidNeighbors(i * rowOffset + j)) {
 					return false;
 				}
 			}
@@ -475,19 +484,19 @@ public class Connect64 extends Activity implements
 	private void pauseTimer() {
 		if (this.timerRunning) {
 			setElapsedTime();
+			this.gameBoard.setVisibility(View.INVISIBLE);
 		}
 		this.timerRunning = false;
 		Log.d(LOG_TAG, "pauseTimer(). elapsed: " + this.elapsedTime);
 		this.timer.stop();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
-		this.gameBoard.setVisibility(View.INVISIBLE);
 		Log.d(LOG_TAG, "calling setupInputButtons() from pauseTimer()");
 		setupInputButtons();
 	}
 
 	private void performFeedback(final boolean hasWon) {
 		Log.d(LOG_TAG, "performFeedback(" + hasWon + ")");
-		int prefFeedback = Integer.valueOf(preferences.getString(
+		final int prefFeedback = Integer.valueOf(this.preferences.getString(
 				SettingsActivity.KEY_PREF_FEEDBACK, "0"));
 		switch (prefFeedback) {
 		case SettingsActivity.FEEDBACK_AURAL:
@@ -523,7 +532,7 @@ public class Connect64 extends Activity implements
 		Log.d(LOG_TAG, "resetAndInitializeBoard()");
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				final Button button = this.getGameButton("" + i + j);
+				final Button button = getGameButton("" + i + j);
 				button.setText("");
 				button.setEnabled(true);
 			}
@@ -537,7 +546,7 @@ public class Connect64 extends Activity implements
 		final int[] vals = puzzle.getValues();
 
 		for (int i = 0; i < pos.length; i++) {
-			final Button button = this.getGameButton(String.valueOf(pos[i]));
+			final Button button = getGameButton(String.valueOf(pos[i]));
 			button.setText(String.valueOf(vals[i]));
 			button.setEnabled(false);
 			this.boardState.put(pos[i], vals[i]);
@@ -624,10 +633,14 @@ public class Connect64 extends Activity implements
 
 	private void setupPreferences() {
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
-		preferences.registerOnSharedPreferenceChangeListener(this);
-		this.gameBoard.setBackgroundColor(preferences.getInt(
+		this.preferences.registerOnSharedPreferenceChangeListener(this);
+		this.gameBoard.setBackgroundColor(this.preferences.getInt(
 				SettingsActivity.KEY_PREF_CELL_COLOR,
 				SettingsActivity.PREF_CELL_COLOR_DEFAULT));
+		this.prefNumberColor = this.preferences.getInt(
+				SettingsActivity.KEY_PREF_NUMBER_COLOR,
+				SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
+		changeButtonTextColor();
 	}
 
 	private void setupViews() {
