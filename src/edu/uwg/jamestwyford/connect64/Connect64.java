@@ -120,7 +120,7 @@ public class Connect64 extends Activity implements
 	 *            the Button clicked
 	 */
 	public final void inputButtonClick(final View view) {
-		this.currentInput = Integer.valueOf(((Button) view).getText()
+		this.currentInput = Integer.parseInt(((Button) view).getText()
 				.toString());
 	}
 
@@ -289,7 +289,7 @@ public class Connect64 extends Activity implements
 				STARTING_PUZZLE);
 
 		this.timerRunning = statePrefs.getBoolean(TIMER_RUNNING, true);
-		loadPuzzle(this.currentPuzzle, false); // disable initial buttons
+		loadPuzzle(this.currentPuzzle, false); // to disable initial buttons
 		this.currentRange = statePrefs.getInt(CURRENT_RANGE, 0);
 		this.rangeSpinner.setSelection(this.currentRange);
 
@@ -430,9 +430,9 @@ public class Connect64 extends Activity implements
 
 	/**
 	 * Win-condition checking at the board level. Iterates through each position
-	 * to check that it isn't empty and that it has valid neighbors.
+	 * to check that it has valid neighbors.
 	 * 
-	 * @return true if no position is empty or has all invalid neighbors.
+	 * @return true if no position has all invalid neighbors.
 	 */
 	private boolean isBoardCorrect() {
 		final int rowOffset = 10;
@@ -466,7 +466,7 @@ public class Connect64 extends Activity implements
 		Log.d(LOG_TAG, "loadPuzzle(" + newPuzzle + ", " + restartTimer + ")");
 		this.currentPuzzle = newPuzzle;
 		this.puzzleLabel.setText(String.format(Locale.US, getResources()
-				.getString(R.string.puzzle_s), this.currentPuzzle));
+				.getString(R.string.puzzle_s), newPuzzle));
 		if (newPuzzle > this.maxPuzzleAttempted) {
 			this.maxPuzzleAttempted = newPuzzle;
 			invalidateOptionsMenu(); // to add the new puzzle to the menu
@@ -486,7 +486,7 @@ public class Connect64 extends Activity implements
 			setElapsedTime();
 		}
 		if (!this.isBoardCorrect()) {
-			//don't hide the puzzle if we're done
+			//hide the board only if we're not done with it
 			this.gameBoard.setVisibility(View.INVISIBLE);
 		}
 		this.timerRunning = false;
@@ -499,7 +499,7 @@ public class Connect64 extends Activity implements
 
 	private void performFeedback(final boolean hasWon) {
 		Log.d(LOG_TAG, "performFeedback(" + hasWon + ")");
-		final int prefFeedback = Integer.valueOf(this.preferences.getString(
+		final int prefFeedback = Integer.parseInt(this.preferences.getString(
 				SettingsActivity.KEY_PREF_FEEDBACK, "0"));
 		switch (prefFeedback) {
 		case SettingsActivity.FEEDBACK_AURAL:
@@ -598,7 +598,7 @@ public class Connect64 extends Activity implements
 	 */
 	private void setGameButtonText(final Button button) {
 		Log.d(LOG_TAG, "setGameButtonText(): " + this.currentInput);
-		final int pos = Integer.valueOf(button.getTag().toString());
+		final int pos = Integer.parseInt(button.getTag().toString());
 		final int oldValue = this.boardState.get(pos, BAD_VALUE);
 
 		if (this.currentInput == BAD_VALUE) {
