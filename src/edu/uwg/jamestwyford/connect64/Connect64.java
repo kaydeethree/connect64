@@ -484,6 +484,9 @@ public class Connect64 extends Activity implements
 	private void pauseTimer() {
 		if (this.timerRunning) {
 			setElapsedTime();
+		}
+		if (!this.isBoardCorrect()) {
+			//don't hide the puzzle if we're done
 			this.gameBoard.setVisibility(View.INVISIBLE);
 		}
 		this.timerRunning = false;

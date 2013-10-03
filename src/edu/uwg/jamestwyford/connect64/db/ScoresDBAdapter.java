@@ -39,9 +39,7 @@ public class ScoresDBAdapter {
 		return this;
 	}
 
-	/**
-	 * Closes the table if necessary.
-	 */
+	/** Closes the table if necessary. */
 	public final void close() {
 		if (this.databaseHelper != null) {
 			this.databaseHelper.close();
