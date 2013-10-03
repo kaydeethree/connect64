@@ -2,6 +2,7 @@ package edu.uwg.jamestwyford.connect64;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
+import android.view.Menu;
 import android.view.MenuItem;
 
 /**
@@ -29,7 +31,6 @@ import android.view.MenuItem;
  */
 public class SettingsActivity extends PreferenceActivity {
 
-
 	/** key for the "cell color" preference. */
 	public static final String KEY_PREF_CELL_COLOR = "pref_cell_color";
 	/** default value for the "cell color" preference. */
@@ -40,13 +41,14 @@ public class SettingsActivity extends PreferenceActivity {
 	public static final int PREF_NUMBER_COLOR_DEFAULT = 0xFF000000;
 	/** key for the "feedback" (aural or haptic) preference. */
 	public static final String KEY_PREF_FEEDBACK = "pref_feedback";
+
 	/** default value for the "feedback" (aural or haptic) preference. */
 	public static final String PREF_FEEDBACK_DEFAULT = "0";
-
 	/** value for Feedback: "None". */
 	public static final int FEEDBACK_NONE = 0;
 	/** value for Feedback: "Aural". */
 	public static final int FEEDBACK_AURAL = 1;
+
 	/** value for Feedback: "Haptic". */
 	public static final int FEEDBACK_HAPTIC = 2;
 
@@ -78,8 +80,6 @@ public class SettingsActivity extends PreferenceActivity {
 			return true;
 		}
 	};
-	
-
 
 	/**
 	 * Binds a preference's summary to its value. More specifically, when the
@@ -137,6 +137,18 @@ public class SettingsActivity extends PreferenceActivity {
 	}
 
 	@Override
+	protected final void onCreate(final Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setupActionBar();
+	}
+
+	@Override
+	public final boolean onCreateOptionsMenu(final Menu menu) {
+		getMenuInflater().inflate(R.menu.settings, menu);
+		return true;
+	}
+
+	@Override
 	public final boolean onIsMultiPane() {
 		return isXLargeTablet(this) && !isSimplePreferences(this);
 	}
@@ -147,14 +159,11 @@ public class SettingsActivity extends PreferenceActivity {
 		if (id == android.R.id.home) {
 			NavUtils.navigateUpFromSameTask(this);
 			return true;
+		} else if (id == R.id.defaults) {
+			setDefaults();
+			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	@Override
-	protected final void onCreate(final Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setupActionBar();
 	}
 
 	@Override
@@ -162,6 +171,16 @@ public class SettingsActivity extends PreferenceActivity {
 		super.onPostCreate(savedInstanceState);
 
 		setupSimplePreferencesScreen();
+	}
+
+	private void setDefaults() {
+		final SharedPreferences prefs = PreferenceManager
+				.getDefaultSharedPreferences(this);
+		final SharedPreferences.Editor editor = prefs.edit();
+		editor.putInt(KEY_PREF_CELL_COLOR, PREF_CELL_COLOR_DEFAULT);
+		editor.putInt(KEY_PREF_NUMBER_COLOR, PREF_NUMBER_COLOR_DEFAULT);
+		editor.putString(KEY_PREF_FEEDBACK, PREF_FEEDBACK_DEFAULT);
+		editor.apply();
 	}
 
 	/**
