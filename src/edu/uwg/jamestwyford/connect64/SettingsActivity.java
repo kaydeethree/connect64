@@ -14,6 +14,7 @@ import android.preference.PreferenceManager;
 import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 /**
  * A {@link PreferenceActivity} that presents a set of application settings. On
@@ -181,6 +182,8 @@ public class SettingsActivity extends PreferenceActivity {
 		editor.putInt(KEY_PREF_NUMBER_COLOR, PREF_NUMBER_COLOR_DEFAULT);
 		editor.putString(KEY_PREF_FEEDBACK, PREF_FEEDBACK_DEFAULT);
 		editor.apply();
+		Toast toast = Toast.makeText(this.getBaseContext(),R.string.prefs_reset,Toast.LENGTH_SHORT);
+		toast.show();
 	}
 
 	/**
