@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Arrays;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -46,9 +47,11 @@ public class Connect64 extends Activity implements
 
 	private static final int BAD_VALUE = -1;
 	private static final int BOARD_MAX = 64;
+	private static final int COLUMN_DELTA = 1;
 	private static final int COL_SIZE = 8;
 	private static final int NUM_INPUT_BUTTONS = 16;
 	private static final int MENU_PUZZLE_OFFSET = 100;
+	private static final int ROW_DELTA = 10;
 	private static final int ROW_SIZE = 8;
 	private static final int STARTING_PUZZLE = 0;
 	private static final String CURRENT_INPUT = "currentInput";
@@ -409,54 +412,34 @@ public class Connect64 extends Activity implements
 		return button;
 	}
 
-	private int[] getValidOptions(final int loc) {
-		final int xDelta = 1;
-		final int yDelta = 10;
+	/**
+	 * Given a position on the board, calculate all valid values that can go in
+	 * that position.
+	 * 
+	 * @param position
+	 *            the position to check against
+	 * @return an array with valid unique values. May be empty.
+	 */
+	private int[] getValidOptions(final int position) {
 		final int maxOptions = 8;
-		final int left = getValue(loc - xDelta);
-		final int right = getValue(loc + xDelta);
-		final int up = getValue(loc - yDelta);
-		final int down = getValue(loc + yDelta);
-		int[] out = new int[maxOptions];
+		final int[] values = { getValue(position - COLUMN_DELTA),
+				getValue(position + COLUMN_DELTA),
+				getValue(position - ROW_DELTA), getValue(position + ROW_DELTA) };
+		final int[] out = new int[maxOptions];
 		int count = 0;
 
-		if (left > 1 && !isValueOnBoard(left - 1)) {
-			out[count++] = left - 1;
-		}
-		if (left > 0 && left < BOARD_MAX && !isValueOnBoard(left + 1)
-				&& !inIntArray(left + 1, out)) {
-			out[count++] = left + 1;
-		}
-		if (right > 1 && !isValueOnBoard(right - 1)
-				&& !inIntArray(right - 1, out)) {
-			out[count++] = right - 1;
-		}
-		if (right > 0 && right < BOARD_MAX && !isValueOnBoard(right + 1)
-				&& !inIntArray(right + 1, out)) {
-			out[count++] = right + 1;
-		}
-		if (up > 1 && !isValueOnBoard(up - 1) && !inIntArray(up - 1, out)) {
-			out[count++] = up - 1;
-		}
-		if (up > 0 && up < BOARD_MAX && !isValueOnBoard(up + 1)
-				&& !inIntArray(up + 1, out)) {
-			out[count++] = up + 1;
-		}
-		if (down > 1 && !isValueOnBoard(down - 1) && !inIntArray(down - 1, out)) {
-			out[count++] = down - 1;
-		}
-		if (down > 0 && down < BOARD_MAX && !isValueOnBoard(down + 1)
-				&& !inIntArray(down + 1, out)) {
-			out[count++] = down + 1;
-		}
-
-		int[] out2 = new int[count];
-		count = 0;
-		for (final int i : out) {
-			if (i > 0) {
-				out2[count++] = i;
+		for (final int value : values) {
+			if (value > 1 && !onBoard(value - 1) && !inArray(value - 1, out)) {
+				out[count++] = value - 1;
+			}
+			if (value > 0 && value < BOARD_MAX && !onBoard(value + 1)
+					&& !inArray(value + 1, out)) {
+				out[count++] = value + 1;
 			}
 		}
+		//trim the array before sorting it so we don't sort the 0s
+		int[] out2 = Arrays.copyOf(out, count);
+		Arrays.sort(out2);
 		return out2;
 	}
 
@@ -478,13 +461,11 @@ public class Connect64 extends Activity implements
 		if (value == BAD_VALUE) {
 			return false;
 		}
-		final int xDelta = 1;
-		final int yDelta = 10;
 
-		final int left = this.getValue(pos - xDelta);
-		final int right = this.getValue(pos + xDelta);
-		final int up = this.getValue(pos - yDelta);
-		final int down = this.getValue(pos + yDelta);
+		final int left = this.getValue(pos - COLUMN_DELTA);
+		final int right = this.getValue(pos + COLUMN_DELTA);
+		final int up = this.getValue(pos - ROW_DELTA);
+		final int down = this.getValue(pos + ROW_DELTA);
 
 		final boolean hasNext = (value == BOARD_MAX) || isNext(value, left)
 				|| isNext(value, right) || isNext(value, up)
@@ -496,7 +477,7 @@ public class Connect64 extends Activity implements
 		return hasNext && hasPrev;
 	}
 
-	private boolean inIntArray(final int needle, final int[] haystack) {
+	private boolean inArray(final int needle, final int[] haystack) {
 		for (final int i : haystack) {
 			if (needle == i) {
 				return true;
@@ -512,10 +493,9 @@ public class Connect64 extends Activity implements
 	 * @return true if no position has all invalid neighbors.
 	 */
 	private boolean isBoardCorrect() {
-		final int rowOffset = 10;
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
-				if (!this.hasValidNeighbors(i * rowOffset + j)) {
+				if (!this.hasValidNeighbors(i * ROW_DELTA + j)) {
 					return false;
 				}
 			}
@@ -531,7 +511,7 @@ public class Connect64 extends Activity implements
 		return thisValue == otherValue + 1;
 	}
 
-	private boolean isValueOnBoard(final int value) {
+	private boolean onBoard(final int value) {
 		return this.boardState.indexOfValue(value) >= 0;
 	}
 
@@ -721,7 +701,7 @@ public class Connect64 extends Activity implements
 			final int value = NUM_INPUT_BUTTONS * range + i + 1;
 			final Button inputButton = inputs[i];
 			inputButton.setText(String.valueOf(value));
-			inputButton.setEnabled(timerActive && !this.isValueOnBoard(value));
+			inputButton.setEnabled(timerActive && !this.onBoard(value));
 		}
 	}
 
