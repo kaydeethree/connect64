@@ -188,7 +188,8 @@ public class SettingsActivity extends PreferenceActivity {
 		editor.putString(KEY_PREF_FEEDBACK, PREF_FEEDBACK_DEFAULT);
 		editor.putBoolean(KEY_PREF_AUTO_FILLIN, PREF_AUTO_FILLIN_DEFAULT);
 		editor.apply();
-		Toast toast = Toast.makeText(this.getBaseContext(),R.string.prefs_reset,Toast.LENGTH_SHORT);
+		Toast toast = Toast.makeText(this.getBaseContext(),
+				R.string.prefs_reset, Toast.LENGTH_SHORT);
 		toast.show();
 	}
 
@@ -215,6 +216,7 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 		addPreferencesFromResource(R.xml.pref_general);
 	}
+
 	/**
 	 * This fragment shows general preferences only. It is used when the
 	 * activity is showing a two-pane settings UI.

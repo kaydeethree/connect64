@@ -328,6 +328,14 @@ public class Connect64 extends Activity implements
 				newScore);
 	}
 
+	private String arrayToString(final int[] array) {
+		String out = "[";
+		for (final int i : array) {
+			out += " " + i;
+		}
+		return out + " ]";
+	}
+
 	private void changeButtonTextColor() {
 		final int color = this.prefNumberColor;
 		for (int i = 1; i <= ROW_SIZE; i++) {
@@ -404,17 +412,18 @@ public class Connect64 extends Activity implements
 	private int[] getValidOptions(final int loc) {
 		final int xDelta = 1;
 		final int yDelta = 10;
+		final int maxOptions = 8;
 		final int left = getValue(loc - xDelta);
 		final int right = getValue(loc + xDelta);
 		final int up = getValue(loc - yDelta);
 		final int down = getValue(loc + yDelta);
-		int[] out = new int[8];
+		int[] out = new int[maxOptions];
 		int count = 0;
 
 		if (left > 1 && !isValueOnBoard(left - 1)) {
 			out[count++] = left - 1;
 		}
-		if (left > 0 && left < 64 && !isValueOnBoard(left + 1)
+		if (left > 0 && left < BOARD_MAX && !isValueOnBoard(left + 1)
 				&& !inIntArray(left + 1, out)) {
 			out[count++] = left + 1;
 		}
@@ -422,21 +431,21 @@ public class Connect64 extends Activity implements
 				&& !inIntArray(right - 1, out)) {
 			out[count++] = right - 1;
 		}
-		if (right > 0 && right < 64 && !isValueOnBoard(right + 1)
+		if (right > 0 && right < BOARD_MAX && !isValueOnBoard(right + 1)
 				&& !inIntArray(right + 1, out)) {
 			out[count++] = right + 1;
 		}
 		if (up > 1 && !isValueOnBoard(up - 1) && !inIntArray(up - 1, out)) {
 			out[count++] = up - 1;
 		}
-		if (up > 0 && up < 64 && !isValueOnBoard(up + 1)
+		if (up > 0 && up < BOARD_MAX && !isValueOnBoard(up + 1)
 				&& !inIntArray(up + 1, out)) {
 			out[count++] = up + 1;
 		}
 		if (down > 1 && !isValueOnBoard(down - 1) && !inIntArray(down - 1, out)) {
 			out[count++] = down - 1;
 		}
-		if (down > 0 && down < 64 && !isValueOnBoard(down + 1)
+		if (down > 0 && down < BOARD_MAX && !isValueOnBoard(down + 1)
 				&& !inIntArray(down + 1, out)) {
 			out[count++] = down + 1;
 		}
@@ -451,16 +460,7 @@ public class Connect64 extends Activity implements
 		return out2;
 	}
 
-	private boolean inIntArray(int needle, int[] haystack) {
-		for (final int i : haystack) {
-			if (needle == i) {
-				return true;
-			}
-		}
-		return false;
-	}
-
-	private int getValue(int position) {
+	private int getValue(final int position) {
 		return this.boardState.get(position, BAD_VALUE);
 	}
 
@@ -474,17 +474,17 @@ public class Connect64 extends Activity implements
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
 	private boolean hasValidNeighbors(final int pos) {
-		final int value = getValue(pos);
+		final int value = this.getValue(pos);
 		if (value == BAD_VALUE) {
 			return false;
 		}
 		final int xDelta = 1;
 		final int yDelta = 10;
 
-		final int left = getValue(pos - xDelta);
-		final int right = getValue(pos + xDelta);
-		final int up = getValue(pos - yDelta);
-		final int down = getValue(pos + yDelta);
+		final int left = this.getValue(pos - xDelta);
+		final int right = this.getValue(pos + xDelta);
+		final int up = this.getValue(pos - yDelta);
+		final int down = this.getValue(pos + yDelta);
 
 		final boolean hasNext = (value == BOARD_MAX) || isNext(value, left)
 				|| isNext(value, right) || isNext(value, up)
@@ -494,6 +494,15 @@ public class Connect64 extends Activity implements
 				|| isPrev(value, down);
 
 		return hasNext && hasPrev;
+	}
+
+	private boolean inIntArray(final int needle, final int[] haystack) {
+		for (final int i : haystack) {
+			if (needle == i) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -520,6 +529,10 @@ public class Connect64 extends Activity implements
 
 	private boolean isPrev(final int thisValue, final int otherValue) {
 		return thisValue == otherValue + 1;
+	}
+
+	private boolean isValueOnBoard(final int value) {
+		return this.boardState.indexOfValue(value) >= 0;
 	}
 
 	/**
@@ -667,16 +680,17 @@ public class Connect64 extends Activity implements
 	private void setGameButtonText(final Button button) {
 		Log.d(LOG_TAG, "setGameButtonText(): " + this.currentInput);
 		final int pos = Integer.parseInt(button.getTag().toString());
-		final int oldValue = getValue(pos);
+		final int oldValue = this.getValue(pos);
 
-		if (autoFillIn && this.currentInput == BAD_VALUE && oldValue == BAD_VALUE) {
-			int[] options = getValidOptions(pos);
+		if (this.autoFillIn && this.currentInput == BAD_VALUE
+				&& oldValue == BAD_VALUE) {
+			int[] options = this.getValidOptions(pos);
 			if (options.length == 1) {
 				this.currentInput = options[0];
 			} else if (options.length > 1) {
-				Toast t = Toast.makeText(this, arrayToString(options),
+				Toast toast = Toast.makeText(this, this.arrayToString(options),
 						Toast.LENGTH_SHORT);
-				t.show();
+				toast.show();
 			}
 		}
 
@@ -690,14 +704,6 @@ public class Connect64 extends Activity implements
 		this.currentInput = oldValue;
 		Log.d(LOG_TAG, "calling setupInputButtons() from setGameButtonText()");
 		setupInputButtons();
-	}
-
-	private String arrayToString(int[] array) {
-		String out = "[";
-		for (final int i : array) {
-			out += " " + i;
-		}
-		return out + " ]";
 	}
 
 	/**
@@ -715,12 +721,8 @@ public class Connect64 extends Activity implements
 			final int value = NUM_INPUT_BUTTONS * range + i + 1;
 			final Button inputButton = inputs[i];
 			inputButton.setText(String.valueOf(value));
-			inputButton.setEnabled(timerActive && !isValueOnBoard(value));
+			inputButton.setEnabled(timerActive && !this.isValueOnBoard(value));
 		}
-	}
-
-	private boolean isValueOnBoard(final int value) {
-		return this.boardState.indexOfValue(value) >= 0;
 	}
 
 	private void setupPreferences() {
