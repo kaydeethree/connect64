@@ -396,6 +396,69 @@ public class Connect64 extends Activity implements
 		return button;
 	}
 
+	private int[] getValidOptions(final int loc) {
+		final int xDelta = 1;
+		final int yDelta = 10;
+		final int left = getValue(loc - xDelta);
+		final int right = getValue(loc + xDelta);
+		final int up = getValue(loc - yDelta);
+		final int down = getValue(loc + yDelta);
+		int[] out = new int[8];
+		int count = 0;
+
+		if (left > 1 && !isValueOnBoard(left - 1)) {
+			out[count++] = left - 1;
+		}
+		if (left > 0 && left < 64 && !isValueOnBoard(left + 1)
+				&& !inIntArray(left + 1, out)) {
+			out[count++] = left + 1;
+		}
+		if (right > 1 && !isValueOnBoard(right - 1)
+				&& !inIntArray(right - 1, out)) {
+			out[count++] = right - 1;
+		}
+		if (right > 0 && right < 64 && !isValueOnBoard(right + 1)
+				&& !inIntArray(right + 1, out)) {
+			out[count++] = right + 1;
+		}
+		if (up > 1 && !isValueOnBoard(up - 1) && !inIntArray(up - 1, out)) {
+			out[count++] = up - 1;
+		}
+		if (up > 0 && up < 64 && !isValueOnBoard(up + 1)
+				&& !inIntArray(up + 1, out)) {
+			out[count++] = up + 1;
+		}
+		if (down > 1 && !isValueOnBoard(down - 1) && !inIntArray(down - 1, out)) {
+			out[count++] = down - 1;
+		}
+		if (down > 0 && down < 64 && !isValueOnBoard(down + 1)
+				&& !inIntArray(down + 1, out)) {
+			out[count++] = down + 1;
+		}
+
+		int[] out2 = new int[count];
+		count = 0;
+		for (final int i : out) {
+			if (i > 0) {
+				out2[count++] = i;
+			}
+		}
+		return out2;
+	}
+
+	private boolean inIntArray(int needle, int[] haystack) {
+		for (final int i : haystack) {
+			if (needle == i) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private int getValue(int position) {
+		return this.boardState.get(position, BAD_VALUE);
+	}
+
 	/**
 	 * Win-condition checking at the position level. Looks for a neighbor whose
 	 * value is 1 higher than this position's value, and another neighbor whose
@@ -406,17 +469,17 @@ public class Connect64 extends Activity implements
 	 * @return true if one neighbor has value+1 AND another neighbor has value-1
 	 */
 	private boolean hasValidNeighbors(final int pos) {
-		final int value = this.boardState.get(pos, BAD_VALUE);
+		final int value = getValue(pos);
 		if (value == BAD_VALUE) {
 			return false;
 		}
 		final int xDelta = 1;
 		final int yDelta = 10;
 
-		final int left = this.boardState.get(pos - xDelta, BAD_VALUE);
-		final int right = this.boardState.get(pos + xDelta, BAD_VALUE);
-		final int up = this.boardState.get(pos - yDelta, BAD_VALUE);
-		final int down = this.boardState.get(pos + yDelta, BAD_VALUE);
+		final int left = getValue(pos - xDelta);
+		final int right = getValue(pos + xDelta);
+		final int up = getValue(pos - yDelta);
+		final int down = getValue(pos + yDelta);
 
 		final boolean hasNext = (value == BOARD_MAX) || isNext(value, left)
 				|| isNext(value, right) || isNext(value, up)
@@ -486,7 +549,7 @@ public class Connect64 extends Activity implements
 			setElapsedTime();
 		}
 		if (!this.isBoardCorrect()) {
-			//hide the board only if we're not done with it
+			// hide the board only if we're not done with it
 			this.gameBoard.setVisibility(View.INVISIBLE);
 		}
 		this.timerRunning = false;
@@ -599,7 +662,18 @@ public class Connect64 extends Activity implements
 	private void setGameButtonText(final Button button) {
 		Log.d(LOG_TAG, "setGameButtonText(): " + this.currentInput);
 		final int pos = Integer.parseInt(button.getTag().toString());
-		final int oldValue = this.boardState.get(pos, BAD_VALUE);
+		final int oldValue = getValue(pos);
+
+		if (this.currentInput == BAD_VALUE && oldValue == BAD_VALUE) {
+			int[] options = getValidOptions(pos);
+			if (options.length == 1) {
+				this.currentInput = options[0];
+			} else if (options.length > 1) {
+				Toast t = Toast.makeText(this, arrayToString(options),
+						Toast.LENGTH_SHORT);
+				t.show();
+			}
+		}
 
 		if (this.currentInput == BAD_VALUE) {
 			button.setText("");
@@ -613,6 +687,14 @@ public class Connect64 extends Activity implements
 		setupInputButtons();
 	}
 
+	private String arrayToString(int[] array) {
+		String out = "[";
+		for (final int i : array) {
+			out += " " + i;
+		}
+		return out + " ]";
+	}
+
 	/**
 	 * Sets the text on the input Buttons based on the current range. Buttons
 	 * whose freshly-set text appears on the game board will be disabled. If the
@@ -622,16 +704,18 @@ public class Connect64 extends Activity implements
 		Log.d(LOG_TAG, "setupInputButtons()");
 		final int range = this.currentRange;
 		final Button[] inputs = this.inputButtons;
-		final SparseIntArray state = this.boardState;
 		final boolean timerActive = this.timerRunning;
 
 		for (int i = 0; i < NUM_INPUT_BUTTONS; i++) {
 			final int value = NUM_INPUT_BUTTONS * range + i + 1;
 			final Button inputButton = inputs[i];
 			inputButton.setText(String.valueOf(value));
-			inputButton
-					.setEnabled(timerActive && state.indexOfValue(value) < 0);
+			inputButton.setEnabled(timerActive && !isValueOnBoard(value));
 		}
+	}
+
+	private boolean isValueOnBoard(final int value) {
+		return this.boardState.indexOfValue(value) >= 0;
 	}
 
 	private void setupPreferences() {
