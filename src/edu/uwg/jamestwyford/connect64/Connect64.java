@@ -20,6 +20,8 @@ import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 import android.util.SparseIntArray;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
@@ -126,6 +128,34 @@ public class Connect64 extends Activity implements
 	public final void inputButtonClick(final View view) {
 		this.currentInput = Integer.parseInt(((Button) view).getText()
 				.toString());
+	}
+
+	@Override
+	public final boolean onContextItemSelected(MenuItem item) {
+		if (this.autoFillIn) {
+			this.currentInput = Integer.valueOf(item.getTitle().toString());
+			Button button = getGameButton("" + item.getItemId());
+			setGameButtonText(button);
+			return true;
+		}
+		return super.onContextItemSelected(item);
+	}
+
+	@Override
+	public final void onCreateContextMenu(ContextMenu menu, View view,
+			ContextMenuInfo menuInfo) {
+		super.onCreateContextMenu(menu, view, menuInfo);
+		if (this.autoFillIn) {
+			Log.d(LOG_TAG, "context click on " + view.getTag().toString());
+
+			int[] options = this.getValidOptions(Integer.valueOf(view.getTag()
+					.toString()));
+			menu.clear();
+			for (int value : options) {
+				menu.add(0, Integer.valueOf(view.getTag().toString()), 0, ""
+						+ value);
+			}
+		}
 	}
 
 	@Override
@@ -331,14 +361,6 @@ public class Connect64 extends Activity implements
 				newScore);
 	}
 
-	private String arrayToString(final int[] array) {
-		String out = "[";
-		for (final int i : array) {
-			out += " " + i;
-		}
-		return out + " ]";
-	}
-
 	private void changeButtonTextColor() {
 		final int color = this.prefNumberColor;
 		for (int i = 1; i <= ROW_SIZE; i++) {
@@ -425,7 +447,7 @@ public class Connect64 extends Activity implements
 		final int[] values = { getValue(position - COLUMN_DELTA),
 				getValue(position + COLUMN_DELTA),
 				getValue(position - ROW_DELTA), getValue(position + ROW_DELTA) };
-		final int[] out = new int[maxOptions];
+		int[] out = new int[maxOptions];
 		int count = 0;
 
 		for (final int value : values) {
@@ -437,10 +459,10 @@ public class Connect64 extends Activity implements
 				out[count++] = value + 1;
 			}
 		}
-		//trim the array before sorting it so we don't sort the 0s
-		int[] out2 = Arrays.copyOf(out, count);
-		Arrays.sort(out2);
-		return out2;
+		// trim the array before sorting it so we don't sort the 0s
+		out = Arrays.copyOf(out, count);
+		Arrays.sort(out);
+		return out;
 	}
 
 	private int getValue(final int position) {
@@ -511,10 +533,6 @@ public class Connect64 extends Activity implements
 		return thisValue == otherValue + 1;
 	}
 
-	private boolean onBoard(final int value) {
-		return this.boardState.indexOfValue(value) >= 0;
-	}
-
 	/**
 	 * Loads the specified Puzzle. Will reset the timer if restartTimer is true
 	 * 
@@ -540,6 +558,10 @@ public class Connect64 extends Activity implements
 		if (!this.timerRunning) {
 			pauseTimer();
 		}
+	}
+
+	private boolean onBoard(final int value) {
+		return this.boardState.indexOfValue(value) >= 0;
 	}
 
 	private void pauseTimer() {
@@ -667,10 +689,6 @@ public class Connect64 extends Activity implements
 			int[] options = this.getValidOptions(pos);
 			if (options.length == 1) {
 				this.currentInput = options[0];
-			} else if (options.length > 1) {
-				Toast toast = Toast.makeText(this, this.arrayToString(options),
-						Toast.LENGTH_SHORT);
-				toast.show();
 			}
 		}
 
@@ -723,6 +741,7 @@ public class Connect64 extends Activity implements
 	private void setupViews() {
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
+		setupContextClicks();
 		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
 		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		this.pauseResume = (ImageButton) findViewById(R.id.pauseResumeButton);
@@ -740,5 +759,13 @@ public class Connect64 extends Activity implements
 			buttons[i] = (Button) inputs.findViewWithTag("in" + (i + 1));
 		}
 		this.inputButtons = buttons;
+	}
+
+	private void setupContextClicks() {
+		for (int i = 1; i <= COL_SIZE; i++) {
+			for (int j = 1; j <= ROW_SIZE; j++) {
+				registerForContextMenu(this.getGameButton("" + i + j));
+			}
+		}
 	}
 }
