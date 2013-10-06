@@ -32,6 +32,10 @@ import android.widget.Toast;
  */
 public class SettingsActivity extends PreferenceActivity {
 
+	/** key for the "auto fill-in" preference. */
+	public static final String KEY_PREF_AUTO_FILLIN = "pref_auto_fillin";
+	/** default value for the "auto fill-in" preference. */
+	public static final boolean PREF_AUTO_FILLIN_DEFAULT = true;
 	/** key for the "cell color" preference. */
 	public static final String KEY_PREF_CELL_COLOR = "pref_cell_color";
 	/** default value for the "cell color" preference. */
@@ -178,9 +182,11 @@ public class SettingsActivity extends PreferenceActivity {
 		final SharedPreferences prefs = PreferenceManager
 				.getDefaultSharedPreferences(this);
 		final SharedPreferences.Editor editor = prefs.edit();
+		editor.clear();
 		editor.putInt(KEY_PREF_CELL_COLOR, PREF_CELL_COLOR_DEFAULT);
 		editor.putInt(KEY_PREF_NUMBER_COLOR, PREF_NUMBER_COLOR_DEFAULT);
 		editor.putString(KEY_PREF_FEEDBACK, PREF_FEEDBACK_DEFAULT);
+		editor.putBoolean(KEY_PREF_AUTO_FILLIN, PREF_AUTO_FILLIN_DEFAULT);
 		editor.apply();
 		Toast toast = Toast.makeText(this.getBaseContext(),R.string.prefs_reset,Toast.LENGTH_SHORT);
 		toast.show();
@@ -223,6 +229,7 @@ public class SettingsActivity extends PreferenceActivity {
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_CELL_COLOR));
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_NUMBER_COLOR));
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_FEEDBACK));
+			bindPreferenceSummaryToValue(findPreference(KEY_PREF_AUTO_FILLIN));
 		}
 	}
 }

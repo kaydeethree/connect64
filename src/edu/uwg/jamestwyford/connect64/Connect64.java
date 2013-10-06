@@ -81,8 +81,9 @@ public class Connect64 extends Activity implements
 	private boolean timerRunning;
 
 	// prefs
-	private int prefNumberColor;
 	private SharedPreferences preferences;
+	private boolean autoFillIn;
+	private int prefNumberColor;
 
 	/**
 	 * Input handler for the clear button. Reloads the current puzzle and resets
@@ -203,6 +204,10 @@ public class Connect64 extends Activity implements
 			this.gameBoard.setBackgroundColor(sharedPreferences.getInt(
 					SettingsActivity.KEY_PREF_CELL_COLOR,
 					SettingsActivity.PREF_CELL_COLOR_DEFAULT));
+		} else if (key.equals(SettingsActivity.KEY_PREF_AUTO_FILLIN)) {
+			this.autoFillIn = sharedPreferences.getBoolean(
+					SettingsActivity.KEY_PREF_AUTO_FILLIN,
+					SettingsActivity.PREF_AUTO_FILLIN_DEFAULT);
 		}
 	}
 
@@ -664,7 +669,7 @@ public class Connect64 extends Activity implements
 		final int pos = Integer.parseInt(button.getTag().toString());
 		final int oldValue = getValue(pos);
 
-		if (this.currentInput == BAD_VALUE && oldValue == BAD_VALUE) {
+		if (autoFillIn && this.currentInput == BAD_VALUE && oldValue == BAD_VALUE) {
 			int[] options = getValidOptions(pos);
 			if (options.length == 1) {
 				this.currentInput = options[0];
@@ -728,6 +733,9 @@ public class Connect64 extends Activity implements
 				SettingsActivity.KEY_PREF_NUMBER_COLOR,
 				SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
 		this.changeButtonTextColor();
+		this.autoFillIn = this.preferences.getBoolean(
+				SettingsActivity.KEY_PREF_AUTO_FILLIN,
+				SettingsActivity.PREF_AUTO_FILLIN_DEFAULT);
 	}
 
 	private void setupViews() {

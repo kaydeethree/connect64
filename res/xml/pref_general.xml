@@ -1,8 +1,13 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
-    <PreferenceCategory
-        android:key="pref_feedback_category"
-        android:title="@string/pref_feedback_title" >
+    <PreferenceCategory android:title="@string/pref_gameplay_title" >
+        <CheckBoxPreference
+            android:defaultValue="true"
+            android:key="pref_auto_fillin"
+            android:title="@string/pref_auto_fillin"
+            android:summaryOn="@string/pref_auto_fillin_on"
+            android:summaryOff="@string/pref_auto_fillin_off" />
+
         <ListPreference
             android:defaultValue="0"
             android:entries="@array/pref_feedback_list_titles"
@@ -10,9 +15,7 @@
             android:key="pref_feedback"
             android:title="@string/pref_choose_feedback" />
     </PreferenceCategory>
-    <PreferenceCategory
-        android:key="color_feedback_category"
-        android:title="@string/pref_colors_title" >
+    <PreferenceCategory android:title="@string/pref_colors_title" >
         <afzkl.development.colorpickerview.preference.ColorPickerPreference
             android:defaultValue="0xFFFFFFFF"
             android:key="pref_cell_color"

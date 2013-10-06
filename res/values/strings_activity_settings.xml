@@ -1,7 +1,10 @@
 <resources>
 
     <string name="title_activity_settings">Settings</string>
-    <string name="pref_feedback_title">Feedback</string>
+    <string name="pref_gameplay_title">Gameplay</string>
+    <string name="pref_auto_fillin">Automatic fill in</string>
+    <string name="pref_auto_fillin_on">If only one option exists, automatically place it in the clicked game space.</string>
+    <string name="pref_auto_fillin_off">Do not automatically fill in values on clicked game spaces. Only use values from clicked input buttons.</string>
     <string name="pref_choose_feedback">Choose feedback</string>
 
     <string-array name="pref_feedback_list_titles">
@@ -14,6 +17,7 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+
     <string name="pref_colors_title">Colors</string>
     <string name="pref_cell_color_title">Cell color</string>
     <string name="pref_number_color_title">Number color</string>
