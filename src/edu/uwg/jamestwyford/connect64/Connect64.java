@@ -55,7 +55,7 @@ public class Connect64 extends Activity implements
 	private static final int MENU_PUZZLE_OFFSET = 100;
 	private static final int ROW_DELTA = 10;
 	private static final int ROW_SIZE = 8;
-	private static final int STARTING_PUZZLE = 0;
+	private static final int STARTING_PUZZLE = 1;
 	private static final String CURRENT_INPUT = "currentInput";
 	private static final String CURRENT_PUZZLE = "currentPuzzle";
 	private static final String CURRENT_RANGE = "currentRange";
@@ -130,10 +130,11 @@ public class Connect64 extends Activity implements
 	}
 
 	@Override
-	public final boolean onContextItemSelected(MenuItem item) {
+	public final boolean onContextItemSelected(final MenuItem item) {
 		if (this.autoFillIn) {
 			this.currentInput = Integer.parseInt(item.getTitle().toString());
-			Button button = getGameButton(String.valueOf(item.getItemId()));
+			final Button button = getGameButton(String
+					.valueOf(item.getItemId()));
 			setGameButtonText(button);
 			return true;
 		}
@@ -141,12 +142,12 @@ public class Connect64 extends Activity implements
 	}
 
 	@Override
-	public final void onCreateContextMenu(ContextMenu menu, View view,
-			ContextMenuInfo menuInfo) {
+	public final void onCreateContextMenu(final ContextMenu menu,
+			final View view, final ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, view, menuInfo);
 		if (this.autoFillIn) {
 			final int position = Integer.parseInt(view.getTag().toString());
-			final int[] options = this.getValidOptions(position);
+			final int[] options = getValidOptions(position);
 			menu.clear();
 			for (final int value : options) {
 				menu.add(Menu.NONE, position, Menu.NONE, String.valueOf(value));
@@ -165,7 +166,6 @@ public class Connect64 extends Activity implements
 			final View view, final int pos, final long id) {
 		if (parent.getId() == R.id.rangeSpinner) {
 			this.currentRange = pos;
-			Log.d(LOG_TAG, "calling setupInputButtons() from onItemSelected()");
 			setupInputButtons();
 		}
 	}
@@ -182,9 +182,6 @@ public class Connect64 extends Activity implements
 		if (id == R.id.topScores) {
 			final Intent intent = new Intent(this, TopScores.class);
 			startActivity(intent);
-		} else if (id == R.id.clearScores) {
-			getContentResolver().delete(ScoresContentProviderDB.CONTENT_URI,
-					null, null);
 		} else if (id == R.id.action_settings) {
 			final Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
@@ -203,8 +200,6 @@ public class Connect64 extends Activity implements
 
 	@Override
 	public final boolean onPrepareOptionsMenu(final Menu menu) {
-		Log.d(LOG_TAG, "onPrepareOptionsMenu(). maxPuzzle: "
-				+ this.maxPuzzleAttempted);
 		final SubMenu submenu = menu.findItem(R.id.loadPuzzle).getSubMenu();
 		submenu.clear();
 
@@ -241,8 +236,6 @@ public class Connect64 extends Activity implements
 	@Override
 	public final void onWindowFocusChanged(final boolean hasFocus) {
 		super.onWindowFocusChanged(hasFocus);
-		Log.d(LOG_TAG, "onWindowFocusedChanged(" + hasFocus + ") timer? "
-				+ this.timerRunning);
 		if (hasFocus && this.timerRunning) {
 			resumeTimer();
 		} else if (hasFocus && !this.timerRunning) {
@@ -270,7 +263,6 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onCreate(final Bundle savedState) {
 		super.onCreate(savedState);
-		Log.d(LOG_TAG, "====================onCreate()====================");
 		setContentView(R.layout.activity_connect64);
 		setupViews();
 		setupPreferences();
@@ -279,7 +271,6 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onPause() {
 		super.onPause();
-		Log.d(LOG_TAG, "onPause()");
 		final SharedPreferences statePrefs = getSharedPreferences(
 				GAME_STATE_PREFS, MODE_PRIVATE);
 		final SharedPreferences.Editor stateEditor = statePrefs.edit();
@@ -288,7 +279,6 @@ public class Connect64 extends Activity implements
 			setElapsedTime();
 			this.timerRunning = false;
 		}
-		Log.d(LOG_TAG, "pausing. elapsed time: " + this.elapsedTime);
 		stateEditor.putLong(ELAPSED_TIME, this.elapsedTime);
 		stateEditor.putInt(CURRENT_INPUT, this.currentInput);
 		stateEditor.putInt(CURRENT_PUZZLE, this.currentPuzzle);
@@ -311,7 +301,6 @@ public class Connect64 extends Activity implements
 	@Override
 	protected final void onResume() {
 		super.onResume();
-		Log.d(LOG_TAG, "onResume()");
 		final SharedPreferences statePrefs = getSharedPreferences(
 				GAME_STATE_PREFS, MODE_PRIVATE);
 		this.currentInput = statePrefs.getInt(CURRENT_INPUT, BAD_VALUE);
@@ -328,9 +317,7 @@ public class Connect64 extends Activity implements
 		final String valString = statePrefs.getString(STATE_VALUES, null);
 
 		this.elapsedTime = statePrefs.getLong(ELAPSED_TIME, 0L);
-		Log.d(LOG_TAG, "resuming elapsed time: " + this.elapsedTime);
 		if (posString != null && valString != null) {
-			Log.d(LOG_TAG, "loading saved puzzle state");
 			final int[] positions = deserializeIntArray(posString);
 			final int[] values = deserializeIntArray(valString);
 			final SparseIntArray state = this.boardState;
@@ -340,7 +327,6 @@ public class Connect64 extends Activity implements
 						String.valueOf(values[i]));
 			}
 		} else {
-			Log.d(LOG_TAG, "starting from scratch, starting timer.");
 			resumeTimer();
 		}
 	}
@@ -376,6 +362,7 @@ public class Connect64 extends Activity implements
 		if (boardCorrect) {
 			setElapsedTime(); // so checkstyle is ok with no "this." here...
 			this.addScoretoDB(); // but it wants one here?
+			performWinFeedback();
 		}
 		if (boardCorrect && onLastPuzzle) {
 			toast = Toast.makeText(this, R.string.all_puzzles_complete,
@@ -392,11 +379,11 @@ public class Connect64 extends Activity implements
 		} else if (!boardCorrect) {
 			toast = Toast
 					.makeText(this, R.string.try_again, Toast.LENGTH_SHORT);
+			performLoseFeedback();
 		} else {
 			return;
 		}
 		toast.show();
-		performFeedback(boardCorrect);
 	}
 
 	private int[] deserializeIntArray(final String string) {
@@ -444,11 +431,12 @@ public class Connect64 extends Activity implements
 		int count = 0;
 
 		for (final int value : values) {
-			if (value > 1 && !onBoard(value - 1) && !inArray(value - 1, out)) {
+			if (value > 1 && !isOnBoard(value - 1)
+					&& !isInArray(value - 1, out)) {
 				out[count++] = value - 1;
 			}
-			if (value > 0 && value < BOARD_MAX && !onBoard(value + 1)
-					&& !inArray(value + 1, out)) {
+			if (value > 0 && value < BOARD_MAX && !isOnBoard(value + 1)
+					&& !isInArray(value + 1, out)) {
 				out[count++] = value + 1;
 			}
 		}
@@ -492,15 +480,6 @@ public class Connect64 extends Activity implements
 		return hasNext && hasPrev;
 	}
 
-	private boolean inArray(final int needle, final int[] haystack) {
-		for (final int i : haystack) {
-			if (needle == i) {
-				return true;
-			}
-		}
-		return false;
-	}
-
 	/**
 	 * Win-condition checking at the board level. Iterates through each position
 	 * to check that it has valid neighbors.
@@ -518,8 +497,21 @@ public class Connect64 extends Activity implements
 		return true;
 	}
 
+	private boolean isInArray(final int needle, final int[] haystack) {
+		for (final int i : haystack) {
+			if (needle == i) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	private boolean isNext(final int thisValue, final int otherValue) {
 		return thisValue == otherValue - 1;
+	}
+
+	private boolean isOnBoard(final int value) {
+		return this.boardState.indexOfValue(value) >= 0;
 	}
 
 	private boolean isPrev(final int thisValue, final int otherValue) {
@@ -535,7 +527,6 @@ public class Connect64 extends Activity implements
 	 *            whether or not to restart the timer
 	 */
 	private void loadPuzzle(final int newPuzzle, final boolean restartTimer) {
-		Log.d(LOG_TAG, "loadPuzzle(" + newPuzzle + ", " + restartTimer + ")");
 		this.currentPuzzle = newPuzzle;
 		this.puzzleLabel.setText(String.format(Locale.US, getResources()
 				.getString(R.string.puzzle_s), newPuzzle));
@@ -553,10 +544,10 @@ public class Connect64 extends Activity implements
 		}
 	}
 
-	private boolean onBoard(final int value) {
-		return this.boardState.indexOfValue(value) >= 0;
-	}
-
+	/**
+	 * Stores the elapsed time if the timer is running, hides the game board,
+	 * and disables all the input buttons.
+	 */
 	private void pauseTimer() {
 		if (this.timerRunning) {
 			setElapsedTime();
@@ -566,49 +557,60 @@ public class Connect64 extends Activity implements
 			this.gameBoard.setVisibility(View.INVISIBLE);
 		}
 		this.timerRunning = false;
-		Log.d(LOG_TAG, "pauseTimer(). elapsed: " + this.elapsedTime);
 		this.timer.stop();
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_play);
-		Log.d(LOG_TAG, "calling setupInputButtons() from pauseTimer()");
 		setupInputButtons();
 	}
 
-	private void performFeedback(final boolean hasWon) {
-		Log.d(LOG_TAG, "performFeedback(" + hasWon + ")");
+	/** If feedback is on, play the chosen "lose" feedback, aural or haptic. */
+	private void performLoseFeedback() {
 		final int prefFeedback = Integer.parseInt(this.preferences.getString(
 				SettingsActivity.KEY_PREF_FEEDBACK, "0"));
 		switch (prefFeedback) {
 		case SettingsActivity.FEEDBACK_AURAL:
 			Log.d(LOG_TAG, "music play goes here");
-			// @formatter:off
-			/*
-			MediaPlayer mp;
-			if (hasWon) {
-				mp = MediaPlayer.create(this, R.raw.foo);
-			} else {
-				mp = MediaPlayer.create(this, R.raw.bar);
-			}
+			/*// @formatter:off
+			final MediaPlayer mp = MediaPlayer.create(this, R.raw.lose);
 			mp.start();
-			*/
-			// @formatter:on
+			*/// @formatter:on
 			break;
 		case SettingsActivity.FEEDBACK_HAPTIC:
 			Log.d(LOG_TAG, "BZZZTT!!1!");
-			final int shortLength = 1000;
 			final int longLength = 2000;
 			final Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-			if (hasWon) {
-				vibe.vibrate(shortLength);
-			} else {
-				vibe.vibrate(longLength);
-			}
+			vibe.vibrate(longLength);
 			break;
 		default:
 		}
 	}
 
+	/** If feedback is on, play the chosen "win" feedback, aural or haptic. */
+	private void performWinFeedback() {
+		final int prefFeedback = Integer.parseInt(this.preferences.getString(
+				SettingsActivity.KEY_PREF_FEEDBACK, "0"));
+		switch (prefFeedback) {
+		case SettingsActivity.FEEDBACK_AURAL:
+			Log.d(LOG_TAG, "music play goes here");
+			/*// @formatter:off
+			final MediaPlayer mp = MediaPlayer.create(this, R.raw.win);
+			mp.start();
+			*/// @formatter:on
+			break;
+		case SettingsActivity.FEEDBACK_HAPTIC:
+			Log.d(LOG_TAG, "BZZZTT!!1!");
+			final int shortLength = 1000;
+			final Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+			vibe.vibrate(shortLength);
+			break;
+		default:
+		}
+	}
+
+	/**
+	 * Clears/reenables all board buttons, loads in the current puzzle to the
+	 * board, and disables the buttons at the starting positions.
+	 */
 	private void resetAndInitializeBoard() {
-		Log.d(LOG_TAG, "resetAndInitializeBoard()");
 		for (int i = 1; i <= COL_SIZE; i++) {
 			for (int j = 1; j <= ROW_SIZE; j++) {
 				final Button button = this.getGameButton("" + i + j);
@@ -631,19 +633,16 @@ public class Connect64 extends Activity implements
 			this.boardState.put(pos[i], vals[i]);
 		}
 
-		Log.d(LOG_TAG,
-				"calling setupInputButtons() from resetAndInitializeBoard()");
 		setupInputButtons();
 	}
 
+	/** Rebases the timer, starts it, updates the input buttons. */
 	private void resumeTimer() {
-		Log.d(LOG_TAG, "resumeTimer(); elapsed: " + this.elapsedTime);
 		this.timer.setBase(SystemClock.elapsedRealtime() - this.elapsedTime);
 		this.timer.start();
 		this.timerRunning = true;
 		this.pauseResume.setImageResource(android.R.drawable.ic_media_pause);
 		this.gameBoard.setVisibility(View.VISIBLE);
-		Log.d(LOG_TAG, "calling setupInputButtons() from resumeTimer()");
 		setupInputButtons();
 	}
 
@@ -673,13 +672,13 @@ public class Connect64 extends Activity implements
 	 *            the Button to set the text for.
 	 */
 	private void setGameButtonText(final Button button) {
-		Log.d(LOG_TAG, "setGameButtonText(): " + this.currentInput);
 		final int position = Integer.parseInt(button.getTag().toString());
 		final int oldValue = this.getValue(position);
 
 		if (this.autoFillIn && this.currentInput == BAD_VALUE
 				&& oldValue == BAD_VALUE) {
-			int[] options = this.getValidOptions(position);
+			final int[] options = this.getValidOptions(position);
+			// how else do I do this? don't want to call gVO unnecessarily.
 			if (options.length == 1) {
 				this.currentInput = options[0];
 			}
@@ -693,7 +692,6 @@ public class Connect64 extends Activity implements
 			this.boardState.put(position, this.currentInput);
 		}
 		this.currentInput = oldValue;
-		Log.d(LOG_TAG, "calling setupInputButtons() from setGameButtonText()");
 		setupInputButtons();
 	}
 
@@ -711,7 +709,6 @@ public class Connect64 extends Activity implements
 	 * timer is paused, disables all Buttons.
 	 */
 	private void setupInputButtons() {
-		Log.d(LOG_TAG, "setupInputButtons()");
 		final int range = this.currentRange;
 		final Button[] inputs = this.inputButtons;
 		final boolean timerActive = this.timerRunning;
@@ -720,10 +717,14 @@ public class Connect64 extends Activity implements
 			final int value = NUM_INPUT_BUTTONS * range + i + 1;
 			final Button inputButton = inputs[i];
 			inputButton.setText(String.valueOf(value));
-			inputButton.setEnabled(timerActive && !this.onBoard(value));
+			inputButton.setEnabled(timerActive && !this.isOnBoard(value));
 		}
 	}
 
+	/**
+	 * Loads in the preferences and sets the grid background/foreground colors
+	 * as appropriate.
+	 */
 	private void setupPreferences() {
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		this.preferences.registerOnSharedPreferenceChangeListener(this);
@@ -739,6 +740,10 @@ public class Connect64 extends Activity implements
 				SettingsActivity.PREF_AUTO_FILLIN_DEFAULT);
 	}
 
+	/**
+	 * Gets references to all the important views, hooks up the conext
+	 * listeners.
+	 */
 	private void setupViews() {
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);

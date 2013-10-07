@@ -1,7 +1,7 @@
 Android Assignment 3: Connect64
 
 Checkstyle issues:
-* Something something array initialization and switch indents.
+* Something something array initialization indents.
 * this.localField is ok, but the Source Cleanup tool removes "this" on method
   calls defined elsewhere in the Class, including those calls as part of an
   assignment operation. Checkstyle doesn't seem to care about methods defined
@@ -12,24 +12,23 @@ Checkstyle issues:
   going on.
 * Interface-defined methods with >4 parameters aren't liked either, but there's
   nothing I can do about that.
+* There's still one nested if. I'm leaving it in for efficiency reasons.
 
 
 
-BIG BIG IMPLEMENTATION NOTE: (this is my wow factor)
+BIG BIG IMPLEMENTATION NOTE:
 
 
 * I am using a library for the color picker. If it's not in the zip, it can be
-  found at <http://code.google.com/p/android-color-picker/>. More info on at 
+  found at <http://code.google.com/p/android-color-picker/>. More info at 
   https://developer.android.com/tools/projects/projects-eclipse.html#ReferencingLibraryProject
-  
+
+
 Other implementation notes:
 * Serialization/Parcelization is painful. I'm really curious to see how the
-  rest of the class saves state in onPause().
+  rest of the class saves state in onPause(). Hopefully not in 64 prefs...
 * I've got a boatload of member fields this time around, most of which are
   static tags or references to Views. Only 7 actual state members...
-* I keep wanting to factor all of the game logic out into another class since
-  the game state's all localized into the seven fields (and leave the GUI
-  handling where it is...) but I'm worried about the performance hit of calling
-  across classes all the time.
 * Tablet-mode views are workable, but meh. Struggling to get the buttons to
   actually take up vertical space, not just increase the padding between them.
+* My wow factor is the auto-fill-in feature, can be turned off in settings.
