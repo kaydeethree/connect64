@@ -98,7 +98,6 @@ public class Connect64 extends Activity implements
 	 *            ignored
 	 */
 	public final void clearButtonClick(final View view) {
-		Log.d(LOG_TAG, "clearButtonClick()");
 		loadPuzzle(this.currentPuzzle, true);
 	}
 
@@ -133,8 +132,8 @@ public class Connect64 extends Activity implements
 	@Override
 	public final boolean onContextItemSelected(MenuItem item) {
 		if (this.autoFillIn) {
-			this.currentInput = Integer.valueOf(item.getTitle().toString());
-			Button button = getGameButton("" + item.getItemId());
+			this.currentInput = Integer.parseInt(item.getTitle().toString());
+			Button button = getGameButton(String.valueOf(item.getItemId()));
 			setGameButtonText(button);
 			return true;
 		}
@@ -146,21 +145,17 @@ public class Connect64 extends Activity implements
 			ContextMenuInfo menuInfo) {
 		super.onCreateContextMenu(menu, view, menuInfo);
 		if (this.autoFillIn) {
-			Log.d(LOG_TAG, "context click on " + view.getTag().toString());
-
-			int[] options = this.getValidOptions(Integer.valueOf(view.getTag()
-					.toString()));
+			final int position = Integer.parseInt(view.getTag().toString());
+			final int[] options = this.getValidOptions(position);
 			menu.clear();
-			for (int value : options) {
-				menu.add(0, Integer.valueOf(view.getTag().toString()), 0, ""
-						+ value);
+			for (final int value : options) {
+				menu.add(Menu.NONE, position, Menu.NONE, String.valueOf(value));
 			}
 		}
 	}
 
 	@Override
 	public final boolean onCreateOptionsMenu(final Menu menu) {
-		Log.d(LOG_TAG, "onCreateOptionsMenu()");
 		getMenuInflater().inflate(R.menu.connect64, menu);
 		return true;
 	}
@@ -232,7 +227,6 @@ public class Connect64 extends Activity implements
 					SettingsActivity.KEY_PREF_NUMBER_COLOR,
 					SettingsActivity.PREF_NUMBER_COLOR_DEFAULT);
 			changeButtonTextColor();
-			Log.d(LOG_TAG, "new number color: " + this.prefNumberColor);
 		} else if (key.equals(SettingsActivity.KEY_PREF_CELL_COLOR)) {
 			this.gameBoard.setBackgroundColor(sharedPreferences.getInt(
 					SettingsActivity.KEY_PREF_CELL_COLOR,
@@ -266,7 +260,6 @@ public class Connect64 extends Activity implements
 	 *            ignored
 	 */
 	public final void pauseResumeClick(final View view) {
-		Log.d(LOG_TAG, "pauseResumeClick()");
 		if (this.timerRunning) {
 			pauseTimer();
 		} else {
@@ -681,12 +674,12 @@ public class Connect64 extends Activity implements
 	 */
 	private void setGameButtonText(final Button button) {
 		Log.d(LOG_TAG, "setGameButtonText(): " + this.currentInput);
-		final int pos = Integer.parseInt(button.getTag().toString());
-		final int oldValue = this.getValue(pos);
+		final int position = Integer.parseInt(button.getTag().toString());
+		final int oldValue = this.getValue(position);
 
 		if (this.autoFillIn && this.currentInput == BAD_VALUE
 				&& oldValue == BAD_VALUE) {
-			int[] options = this.getValidOptions(pos);
+			int[] options = this.getValidOptions(position);
 			if (options.length == 1) {
 				this.currentInput = options[0];
 			}
@@ -694,14 +687,22 @@ public class Connect64 extends Activity implements
 
 		if (this.currentInput == BAD_VALUE) {
 			button.setText("");
-			this.boardState.delete(pos);
+			this.boardState.delete(position);
 		} else {
 			button.setText(String.valueOf(this.currentInput));
-			this.boardState.put(pos, this.currentInput);
+			this.boardState.put(position, this.currentInput);
 		}
 		this.currentInput = oldValue;
 		Log.d(LOG_TAG, "calling setupInputButtons() from setGameButtonText()");
 		setupInputButtons();
+	}
+
+	private void setupContextClicks() {
+		for (int i = 1; i <= COL_SIZE; i++) {
+			for (int j = 1; j <= ROW_SIZE; j++) {
+				registerForContextMenu(this.getGameButton("" + i + j));
+			}
+		}
 	}
 
 	/**
@@ -741,7 +742,7 @@ public class Connect64 extends Activity implements
 	private void setupViews() {
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
-		setupContextClicks();
+		this.setupContextClicks();
 		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
 		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
 		this.pauseResume = (ImageButton) findViewById(R.id.pauseResumeButton);
@@ -759,13 +760,5 @@ public class Connect64 extends Activity implements
 			buttons[i] = (Button) inputs.findViewWithTag("in" + (i + 1));
 		}
 		this.inputButtons = buttons;
-	}
-
-	private void setupContextClicks() {
-		for (int i = 1; i <= COL_SIZE; i++) {
-			for (int j = 1; j <= ROW_SIZE; j++) {
-				registerForContextMenu(this.getGameButton("" + i + j));
-			}
-		}
 	}
 }
