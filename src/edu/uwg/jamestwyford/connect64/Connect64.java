@@ -31,8 +31,9 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Spinner;
-import android.widget.TableLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import edu.uwg.jamestwyford.connect64.db.ScoresContentProviderDB;
@@ -69,7 +70,7 @@ public class Connect64 extends Activity implements
 	private static final String PLAYER_NAME = "Player";
 
 	// views
-	private TableLayout gameBoard;
+	private LinearLayout gameBoard;
 	private Button[] inputButtons;
 	private ImageButton pauseResume;
 	private TextView puzzleLabel;
@@ -576,7 +577,7 @@ public class Connect64 extends Activity implements
 			break;
 		case SettingsActivity.FEEDBACK_HAPTIC:
 			Log.d(LOG_TAG, "BZZZTT!!1!");
-			final int longLength = 2000;
+			final int longLength = 500;
 			final Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 			vibe.vibrate(longLength);
 			break;
@@ -598,7 +599,7 @@ public class Connect64 extends Activity implements
 			break;
 		case SettingsActivity.FEEDBACK_HAPTIC:
 			Log.d(LOG_TAG, "BZZZTT!!1!");
-			final int shortLength = 1000;
+			final int shortLength = 250;
 			final Vibrator vibe = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
 			vibe.vibrate(shortLength);
 			break;
@@ -721,10 +722,7 @@ public class Connect64 extends Activity implements
 		}
 	}
 
-	/**
-	 * Loads in the preferences and sets the grid background/foreground colors
-	 * as appropriate.
-	 */
+	/** Loads prefs and sets the grid bg/fg colors as appropriate. */
 	private void setupPreferences() {
 		this.preferences = PreferenceManager.getDefaultSharedPreferences(this);
 		this.preferences.registerOnSharedPreferenceChangeListener(this);
@@ -740,13 +738,10 @@ public class Connect64 extends Activity implements
 				SettingsActivity.PREF_AUTO_FILLIN_DEFAULT);
 	}
 
-	/**
-	 * Gets references to all the important views, hooks up the conext
-	 * listeners.
-	 */
+	/** Gets references to views, hooks up the conext listeners. */
 	private void setupViews() {
 		this.boardState = new SparseIntArray(BOARD_MAX);
-		this.gameBoard = (TableLayout) findViewById(R.id.connect64);
+		this.gameBoard = (LinearLayout) findViewById(R.id.connect64);
 		this.setupContextClicks();
 		this.puzzleLabel = (TextView) findViewById(R.id.puzzleLabel);
 		this.rangeSpinner = (Spinner) findViewById(R.id.rangeSpinner);
@@ -759,7 +754,7 @@ public class Connect64 extends Activity implements
 		this.rangeSpinner.setAdapter(adapter);
 		this.rangeSpinner.setOnItemSelectedListener(this);
 
-		final TableLayout inputs = (TableLayout) findViewById(R.id.inputButtons);
+		final RelativeLayout inputs = (RelativeLayout) findViewById(R.id.inputButtons);
 		final Button[] buttons = new Button[NUM_INPUT_BUTTONS];
 		for (int i = 0; i < NUM_INPUT_BUTTONS; i++) {
 			buttons[i] = (Button) inputs.findViewWithTag("in" + (i + 1));

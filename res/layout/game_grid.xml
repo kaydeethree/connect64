@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/connect64"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#FFFFFF" >
+    android:background="#FFFFFF"
+    android:orientation="vertical" >
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -41,9 +42,9 @@
         <Button
             style="@style/MarginlessButton"
             android:tag="18" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -79,9 +80,9 @@
         <Button
             style="@style/MarginlessButton"
             android:tag="28" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -117,9 +118,9 @@
         <Button
             style="@style/MarginlessButton"
             android:tag="38" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -155,9 +156,9 @@
         <Button
             style="@style/MarginlessButton"
             android:tag="48" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -193,9 +194,9 @@
         <Button
             style="@style/MarginlessButton"
             android:tag="58" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -231,9 +232,9 @@
         <Button
             style="@style/MarginlessButton"
             android:tag="68" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -269,9 +270,9 @@
         <Button
             style="@style/MarginlessButton"
             android:tag="78" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="0dp"
         android:layout_weight="1" >
@@ -307,6 +308,6 @@
         <Button
             style="@style/MarginlessButton"
             android:tag="88" />
-    </TableRow>
+    </LinearLayout>
 
-</TableLayout>
+</LinearLayout>

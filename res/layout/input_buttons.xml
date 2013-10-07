@@ -1,18 +1,21 @@
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/inputButtons"
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="fill_parent" >
 
-    <TableRow
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+    <LinearLayout
+        android:id="@+id/inputrow1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:gravity="fill_vertical" >
 
         <Spinner
             android:id="@+id/rangeSpinner"
-            android:layout_width="wrap_content"
+            android:layout_width="0dip"
             android:layout_height="wrap_content"
-            android:layout_span="2"
-            android:layout_weight="0.166" />
+            android:layout_weight="16" />
 
         <Button
             style="@style/InputButtonPort"
@@ -29,11 +32,15 @@
         <Button
             style="@style/InputButtonPort"
             android:tag="in4" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+    <LinearLayout
+        android:id="@+id/inputrow2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/inputrow1"
+        android:gravity="fill_vertical" >
 
         <Button
             style="@style/InputButtonPort"
@@ -58,11 +65,15 @@
         <Button
             style="@style/InputButtonPort"
             android:tag="in10" />
-    </TableRow>
+    </LinearLayout>
 
-    <TableRow
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent" >
+    <LinearLayout
+        android:id="@+id/inputrow3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/inputrow2"
+        android:gravity="fill_horizontal" >
 
         <Button
             style="@style/InputButtonPort"
@@ -87,6 +98,6 @@
         <Button
             style="@style/InputButtonPort"
             android:tag="in16" />
-    </TableRow>
+    </LinearLayout>
 
-</TableLayout>
+</RelativeLayout>

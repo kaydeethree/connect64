@@ -8,7 +8,7 @@
         android:id="@+id/pauseResumeButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:contentDescription="@string/pause"
         android:onClick="pauseResumeClick"
@@ -18,7 +18,7 @@
         android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
         android:layout_below="@+id/pauseResumeButton"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/clearButton"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
         android:text="@string/puzzle_s"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
@@ -37,7 +37,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentLeft="true"
         android:contentDescription="@string/clear"
         android:onClick="clearButtonClick"
         android:src="@android:drawable/ic_menu_revert" />

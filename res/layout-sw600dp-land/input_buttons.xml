@@ -1,17 +1,23 @@
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/inputButtons"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:orientation="vertical" >
 
-    <TableRow
+    <Spinner
+        android:id="@+id/rangeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true" />
+
+    <LinearLayout
+        android:id="@+id/ilayout1"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" >
-
-        <Spinner
-            android:id="@+id/rangeSpinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.25" />
+        android:layout_height="fill_parent"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/rangeSpinner"
+        android:orientation="vertical" >
 
         <Button
             style="@style/InputButtonLand"
@@ -19,15 +25,7 @@
 
         <Button
             style="@style/InputButtonLand"
-            android:tag="in2" />
-
-        <Button
-            style="@style/InputButtonLand"
             android:tag="in3" />
-
-        <Button
-            style="@style/InputButtonLand"
-            android:tag="in4" />
 
         <Button
             style="@style/InputButtonLand"
@@ -35,15 +33,7 @@
 
         <Button
             style="@style/InputButtonLand"
-            android:tag="in6" />
-
-        <Button
-            style="@style/InputButtonLand"
             android:tag="in7" />
-
-        <Button
-            style="@style/InputButtonLand"
-            android:tag="in8" />
 
         <Button
             style="@style/InputButtonLand"
@@ -51,15 +41,7 @@
 
         <Button
             style="@style/InputButtonLand"
-            android:tag="in10" />
-
-        <Button
-            style="@style/InputButtonLand"
             android:tag="in11" />
-
-        <Button
-            style="@style/InputButtonLand"
-            android:tag="in12" />
 
         <Button
             style="@style/InputButtonLand"
@@ -67,15 +49,48 @@
 
         <Button
             style="@style/InputButtonLand"
+            android:tag="in15" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/ilayout2"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_below="@+id/rangeSpinner"
+        android:layout_toRightOf="@+id/ilayout1"
+        android:orientation="vertical" >
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in2" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in4" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in6" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in8" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in10" />
+
+        <Button
+            style="@style/InputButtonLand"
+            android:tag="in12" />
+
+        <Button
+            style="@style/InputButtonLand"
             android:tag="in14" />
 
         <Button
             style="@style/InputButtonLand"
-            android:tag="in15" />
-
-        <Button
-            style="@style/InputButtonLand"
             android:tag="in16" />
-    </TableRow>
+    </LinearLayout>
 
-</TableLayout>
+</RelativeLayout>

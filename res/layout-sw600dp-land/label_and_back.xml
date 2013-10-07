@@ -18,17 +18,8 @@
         android:id="@+id/chronometer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toRightOf="@+id/pauseResumeButton"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
-
-    <TextView
-        android:id="@+id/puzzleLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerVertical="true"
-        android:layout_toLeftOf="@+id/clear"
-        android:text="@string/puzzle_s"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/pauseResumeButton"
         android:textAppearance="?android:attr/textAppearanceLarge" />
 
     <ImageButton
@@ -36,10 +27,19 @@
         style="?android:attr/buttonStyleSmall"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentTop="true"
-        android:onClick="clearButtonClick"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
         android:contentDescription="@string/clear"
+        android:onClick="clearButtonClick"
         android:src="@android:drawable/ic_menu_revert" />
+
+    <TextView
+        android:id="@+id/puzzleLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/clear"
+        android:layout_alignParentLeft="true"
+        android:text="@string/puzzle_s"
+        android:textAppearance="?android:attr/textAppearanceLarge" />
 
 </RelativeLayout>

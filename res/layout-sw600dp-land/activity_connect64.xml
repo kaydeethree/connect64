@@ -5,21 +5,25 @@
     android:layout_height="fill_parent"
     android:layout_alignParentLeft="true"
     android:layout_alignParentTop="true"
-    android:orientation="vertical" >
+    android:orientation="horizontal"
+    android:baselineAligned="false" >
 
     <include
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dip"
+        android:layout_height="fill_parent"
+        android:layout_weight="2"
         layout="@layout/label_and_back" />
 
     <include
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dip"
+        android:layout_height="match_parent"
+        android:layout_weight="13"
         layout="@layout/game_grid" />
 
     <include
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="0dip"
+        android:layout_weight="2"
+        android:layout_height="fill_parent"
         layout="@layout/input_buttons" />
 
 </LinearLayout>
