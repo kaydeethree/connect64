@@ -44,16 +44,18 @@ public class SettingsActivity extends PreferenceActivity {
 	public static final String KEY_PREF_NUMBER_COLOR = "pref_number_color";
 	/** default value for the "text color" preference. */
 	public static final int PREF_NUMBER_COLOR_DEFAULT = 0xFF000000;
+	/** key for the player name preference. */
+	public static final String KEY_PREF_PLAYER_NAME = "pref_player_name";
+	/** default value for the player name preference. */
+	public static final String PREF_PLAYER_NAME_DEFAULT = "Player";
 	/** key for the "feedback" (aural or haptic) preference. */
 	public static final String KEY_PREF_FEEDBACK = "pref_feedback";
-
 	/** default value for the "feedback" (aural or haptic) preference. */
 	public static final String PREF_FEEDBACK_DEFAULT = "0";
 	/** value for Feedback: "None". */
 	public static final int FEEDBACK_NONE = 0;
 	/** value for Feedback: "Aural". */
 	public static final int FEEDBACK_AURAL = 1;
-
 	/** value for Feedback: "Haptic". */
 	public static final int FEEDBACK_HAPTIC = 2;
 
@@ -187,6 +189,7 @@ public class SettingsActivity extends PreferenceActivity {
 		editor.putInt(KEY_PREF_NUMBER_COLOR, PREF_NUMBER_COLOR_DEFAULT);
 		editor.putString(KEY_PREF_FEEDBACK, PREF_FEEDBACK_DEFAULT);
 		editor.putBoolean(KEY_PREF_AUTO_FILLIN, PREF_AUTO_FILLIN_DEFAULT);
+		editor.putString(KEY_PREF_PLAYER_NAME, PREF_PLAYER_NAME_DEFAULT);
 		editor.apply();
 		Toast toast = Toast.makeText(this.getBaseContext(),
 				R.string.prefs_reset, Toast.LENGTH_SHORT);
@@ -232,6 +235,7 @@ public class SettingsActivity extends PreferenceActivity {
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_NUMBER_COLOR));
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_FEEDBACK));
 			bindPreferenceSummaryToValue(findPreference(KEY_PREF_AUTO_FILLIN));
+			bindPreferenceSummaryToValue(findPreference(KEY_PREF_PLAYER_NAME));
 		}
 	}
 }

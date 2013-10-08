@@ -5,6 +5,8 @@
     <string name="pref_auto_fillin">Automatic fill in</string>
     <string name="pref_auto_fillin_on">If only one option exists, automatically place it in the clicked game space.</string>
     <string name="pref_auto_fillin_off">Do not automatically fill in values on clicked game spaces. Only use values from clicked input buttons.</string>
+    <string name="pref_player_name">Player name</string>
+    <string name="pref_player_name_default">Player</string>
     <string name="pref_choose_feedback">Choose feedback</string>
 
     <string-array name="pref_feedback_list_titles">

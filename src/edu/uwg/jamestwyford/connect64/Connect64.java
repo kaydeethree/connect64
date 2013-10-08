@@ -67,7 +67,6 @@ public class Connect64 extends Activity implements
 	private static final String STATE_POSITIONS = "statePositions";
 	private static final String STATE_VALUES = "stateValues";
 	private static final String TIMER_RUNNING = "timerRunning";
-	private static final String PLAYER_NAME = "Player";
 
 	// views
 	private LinearLayout gameBoard;
@@ -90,6 +89,7 @@ public class Connect64 extends Activity implements
 	private SharedPreferences preferences;
 	private boolean autoFillIn;
 	private int prefNumberColor;
+	private String playerName;
 
 	/**
 	 * Input handler for the clear button. Reloads the current puzzle and resets
@@ -231,6 +231,10 @@ public class Connect64 extends Activity implements
 			this.autoFillIn = sharedPreferences.getBoolean(
 					SettingsActivity.KEY_PREF_AUTO_FILLIN,
 					SettingsActivity.PREF_AUTO_FILLIN_DEFAULT);
+		} else if (key.equals(SettingsActivity.KEY_PREF_PLAYER_NAME)) {
+			this.playerName = sharedPreferences.getString(
+					SettingsActivity.KEY_PREF_PLAYER_NAME,
+					SettingsActivity.PREF_PLAYER_NAME_DEFAULT);
 		}
 	}
 
@@ -334,7 +338,7 @@ public class Connect64 extends Activity implements
 
 	private void addScoretoDB() {
 		final ContentValues newScore = new ContentValues(3);
-		newScore.put(Scores.PLAYER, PLAYER_NAME);
+		newScore.put(Scores.PLAYER, this.playerName);
 		newScore.put(Scores.PUZZLE, this.currentPuzzle);
 		newScore.put(Scores.COMPLETION_TIME, formatTime(this.elapsedTime));
 		getContentResolver().insert(ScoresContentProviderDB.CONTENT_URI,
@@ -736,9 +740,12 @@ public class Connect64 extends Activity implements
 		this.autoFillIn = this.preferences.getBoolean(
 				SettingsActivity.KEY_PREF_AUTO_FILLIN,
 				SettingsActivity.PREF_AUTO_FILLIN_DEFAULT);
+		this.playerName = this.preferences.getString(
+				SettingsActivity.KEY_PREF_PLAYER_NAME,
+				SettingsActivity.PREF_PLAYER_NAME_DEFAULT);
 	}
 
-	/** Gets references to views, hooks up the conext listeners. */
+	/** Gets references to views, hooks up the context listeners. */
 	private void setupViews() {
 		this.boardState = new SparseIntArray(BOARD_MAX);
 		this.gameBoard = (LinearLayout) findViewById(R.id.connect64);

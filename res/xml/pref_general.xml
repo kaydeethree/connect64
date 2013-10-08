@@ -4,9 +4,14 @@
         <CheckBoxPreference
             android:defaultValue="true"
             android:key="pref_auto_fillin"
-            android:title="@string/pref_auto_fillin"
+            android:summaryOff="@string/pref_auto_fillin_off"
             android:summaryOn="@string/pref_auto_fillin_on"
-            android:summaryOff="@string/pref_auto_fillin_off" />
+            android:title="@string/pref_auto_fillin" />
+
+        <EditTextPreference
+            android:defaultValue="@string/pref_player_name_default"
+            android:key="pref_player_name"
+            android:title="@string/pref_player_name" />
 
         <ListPreference
             android:defaultValue="0"
