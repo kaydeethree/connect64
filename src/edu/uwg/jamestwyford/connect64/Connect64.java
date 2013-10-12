@@ -57,7 +57,7 @@ public class Connect64 extends Activity implements
 	private static final int MENU_PUZZLE_OFFSET = 100;
 	private static final int ROW_DELTA = 10;
 	private static final int ROW_SIZE = 8;
-	private static final int STARTING_PUZZLE = 0;
+	private static final int STARTING_PUZZLE = 1;
 	private static final String CURRENT_INPUT = "currentInput";
 	private static final String CURRENT_PUZZLE = "currentPuzzle";
 	private static final String CURRENT_RANGE = "currentRange";
