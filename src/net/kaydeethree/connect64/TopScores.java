@@ -1,5 +1,7 @@
-package edu.uwg.jamestwyford.connect64;
+package net.kaydeethree.connect64;
 
+import net.kaydeethree.connect64.db.ScoresContentProviderDB;
+import net.kaydeethree.connect64.db.ScoresContract.Scores;
 import android.app.ListActivity;
 import android.app.LoaderManager;
 import android.content.CursorLoader;
@@ -10,8 +12,6 @@ import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.SimpleCursorAdapter;
-import edu.uwg.jamestwyford.connect64.db.ScoresContentProviderDB;
-import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
 
 /**
  * Top scores activity.

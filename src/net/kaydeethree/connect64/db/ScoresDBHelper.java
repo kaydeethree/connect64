@@ -1,9 +1,9 @@
-package edu.uwg.jamestwyford.connect64.db;
+package net.kaydeethree.connect64.db;
 
+import net.kaydeethree.connect64.db.ScoresContract.Scores;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
 
 /**
  * Helper class to open/create the Scores database.

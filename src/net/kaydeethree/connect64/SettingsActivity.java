@@ -1,4 +1,4 @@
-package edu.uwg.jamestwyford.connect64;
+package net.kaydeethree.connect64;
 
 import android.annotation.TargetApi;
 import android.content.Context;

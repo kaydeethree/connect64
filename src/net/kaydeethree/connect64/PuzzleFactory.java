@@ -1,4 +1,4 @@
-package edu.uwg.jamestwyford.connect64;
+package net.kaydeethree.connect64;
 
 /**
  * Factory class for puzzles. Call {@link #getPuzzlePositions(int)} and

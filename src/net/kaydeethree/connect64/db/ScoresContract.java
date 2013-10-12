@@ -1,4 +1,4 @@
-package edu.uwg.jamestwyford.connect64.db;
+package net.kaydeethree.connect64.db;
 
 import android.provider.BaseColumns;
 

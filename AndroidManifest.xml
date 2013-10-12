@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="edu.uwg.jamestwyford.connect64"
+    package="net.kaydeethree.connect64"
     android:versionCode="1"
     android:versionName="1.0" >
 
@@ -15,7 +15,7 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
         <activity
-            android:name="edu.uwg.jamestwyford.connect64.Connect64"
+            android:name="net.kaydeethree.connect64.Connect64"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -24,25 +24,25 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="edu.uwg.jamestwyford.connect64.TopScores"
+            android:name="net.kaydeethree.connect64.TopScores"
             android:label="@string/title_activity_top_scores"
-            android:parentActivityName="edu.uwg.jamestwyford.connect64.Connect64" >
+            android:parentActivityName="net.kaydeethree.connect64.Connect64" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.uwg.jamestwyford.connect64.Connect64" />
         </activity>
         <activity
-            android:name="edu.uwg.jamestwyford.connect64.SettingsActivity"
+            android:name="net.kaydeethree.connect64.SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName="edu.uwg.jamestwyford.connect64.Connect64" >
+            android:parentActivityName="net.kaydeethree.connect64.Connect64" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="edu.uwg.jamestwyford.connect64.Connect64" />
         </activity>
 
         <provider
-            android:name="edu.uwg.jamestwyford.connect64.db.ScoresContentProviderDB"
-            android:authorities="edu.uwg.jamestwyford.connect64.scoresdbprovider" >
+            android:name="net.kaydeethree.connect64.db.ScoresContentProviderDB"
+            android:authorities="net.kaydeethree.connect64.scoresdbprovider" >
         </provider>
     </application>
 

@@ -1,4 +1,4 @@
-package edu.uwg.jamestwyford.connect64.db;
+package net.kaydeethree.connect64.db;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -21,7 +21,7 @@ import android.text.TextUtils;
 public class ScoresContentProviderDB extends ContentProvider {
 	private static final int ALL_SCORES = 1;
 	private static final int SCORE_ID = 2;
-	private static final String AUTHORITY = "edu.uwg.jamestwyford.connect64.scoresdbprovider";
+	private static final String AUTHORITY = "net.kaydeethree.connect64.scoresdbprovider";
 	private static final String BASE_PATH = "scores";
 	/** content URI used to access this provider. */
 	public static final Uri CONTENT_URI = Uri.parse("content://" + AUTHORITY

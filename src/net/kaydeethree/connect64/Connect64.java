@@ -1,4 +1,4 @@
-package edu.uwg.jamestwyford.connect64;
+package net.kaydeethree.connect64;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -7,6 +7,8 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Locale;
 
+import net.kaydeethree.connect64.db.ScoresContentProviderDB;
+import net.kaydeethree.connect64.db.ScoresContract.Scores;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
@@ -37,8 +39,6 @@ import android.widget.RelativeLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import edu.uwg.jamestwyford.connect64.db.ScoresContentProviderDB;
-import edu.uwg.jamestwyford.connect64.db.ScoresContract.Scores;
 
 /**
  * Game logic and GUI handling for the 8x8 board.
