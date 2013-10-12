@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.OnSharedPreferenceChangeListener;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.os.Vibrator;
@@ -56,7 +57,7 @@ public class Connect64 extends Activity implements
 	private static final int MENU_PUZZLE_OFFSET = 100;
 	private static final int ROW_DELTA = 10;
 	private static final int ROW_SIZE = 8;
-	private static final int STARTING_PUZZLE = 1;
+	private static final int STARTING_PUZZLE = 0;
 	private static final String CURRENT_INPUT = "currentInput";
 	private static final String CURRENT_PUZZLE = "currentPuzzle";
 	private static final String CURRENT_RANGE = "currentRange";
@@ -367,7 +368,7 @@ public class Connect64 extends Activity implements
 		if (boardCorrect) {
 			setElapsedTime(); // so checkstyle is ok with no "this." here...
 			this.addScoretoDB(); // but it wants one here?
-			performWinFeedback();
+			performWinFeedback(); // but not here?
 		}
 		if (boardCorrect && onLastPuzzle) {
 			toast = Toast.makeText(this, R.string.all_puzzles_complete,
@@ -574,10 +575,8 @@ public class Connect64 extends Activity implements
 		switch (prefFeedback) {
 		case SettingsActivity.FEEDBACK_AURAL:
 			Log.d(LOG_TAG, "music play goes here");
-			/*// @formatter:off
 			final MediaPlayer mp = MediaPlayer.create(this, R.raw.lose);
 			mp.start();
-			*/// @formatter:on
 			break;
 		case SettingsActivity.FEEDBACK_HAPTIC:
 			Log.d(LOG_TAG, "BZZZTT!!1!");
@@ -596,10 +595,8 @@ public class Connect64 extends Activity implements
 		switch (prefFeedback) {
 		case SettingsActivity.FEEDBACK_AURAL:
 			Log.d(LOG_TAG, "music play goes here");
-			/*// @formatter:off
 			final MediaPlayer mp = MediaPlayer.create(this, R.raw.win);
 			mp.start();
-			*/// @formatter:on
 			break;
 		case SettingsActivity.FEEDBACK_HAPTIC:
 			Log.d(LOG_TAG, "BZZZTT!!1!");
@@ -627,9 +624,8 @@ public class Connect64 extends Activity implements
 		this.rangeSpinner.setSelection(0);
 		this.currentInput = BAD_VALUE;
 
-		final Puzzle puzzle = PuzzleFactory.getPuzzle(this.currentPuzzle);
-		final int[] pos = puzzle.getPositions();
-		final int[] vals = puzzle.getValues();
+		final int[] pos = PuzzleFactory.getPuzzlePositions(this.currentPuzzle);
+		final int[] vals = PuzzleFactory.getPuzzleValues(this.currentPuzzle);
 
 		for (int i = 0; i < pos.length; i++) {
 			final Button button = this.getGameButton(String.valueOf(pos[i]));

@@ -12,7 +12,6 @@ Checkstyle issues:
   going on.
 * Interface-defined methods with >4 parameters aren't liked either, but there's
   nothing I can do about that.
-* There's still one nested if. I'm leaving it in for efficiency reasons.
 
 
 
@@ -29,6 +28,9 @@ Other implementation notes:
   rest of the class saves state in onPause(). Hopefully not in 64 prefs...
 * I've got a boatload of member fields this time around, most of which are
   static tags or references to Views. Only 7 actual state members...
-* Tablet-mode views are workable, but meh. Struggling to get the buttons to
-  actually take up vertical space, not just increase the padding between them.
-* My wow factor is the auto-fill-in feature, can be turned off in settings.
+* My wow factor is the auto-fill-in feature, can be turned off in settings,
+  which is also my wow factor ("a proper PreferencesActivity").
+* Win sound sourced from CC-0 resource:
+  <http://www.freesound.org/people/Kastenfrosch/sounds/162467/>
+* Loss sound sorced from CC-0 resource: 
+  <http://www.freesound.org/people/Kastenfrosch/sounds/162465/>

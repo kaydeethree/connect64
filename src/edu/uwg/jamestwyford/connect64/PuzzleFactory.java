@@ -1,8 +1,8 @@
 package edu.uwg.jamestwyford.connect64;
 
 /**
- * Factory class for puzzles. Call {@link #getPuzzle(int)} to construct the
- * specified Puzzle.
+ * Factory class for puzzles. Call {@link #getPuzzlePositions(int)} and
+ * {@link #getPuzzleValues(int)} to retrieve the specified data for the puzzle.
  * 
  * @author jtwyford
  * @version assignment3
@@ -107,14 +107,25 @@ public final class PuzzleFactory {
 	}
 
 	/**
-	 * Returns a new Puzzle.
+	 * Returns the initial positions of the specified puzzle.
 	 * 
 	 * @param puzzle
-	 *            the Puzzle to create
-	 * @return the newly-constructed specified Puzzle
+	 *            the puzzle to get the initial positions of
+	 * @return the positions of the specified puzzle
 	 */
-	public static Puzzle getPuzzle(final int puzzle) {
-		return new Puzzle(PUZZLE_POSITIONS[puzzle], PUZZLE_VALUES[puzzle]);
+	public static int[] getPuzzlePositions(final int puzzle) {
+		return PUZZLE_POSITIONS[puzzle];
+	}
+
+	/**
+	 * Returns the initial values of the specified puzzle.
+	 * 
+	 * @param puzzle
+	 *            the puzzle to get the values of
+	 * @return the positions of the specified puzzle
+	 */
+	public static int[] getPuzzleValues(final int puzzle) {
+		return PUZZLE_VALUES[puzzle];
 	}
 
 	/**
