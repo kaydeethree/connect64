@@ -5,7 +5,7 @@ package net.kaydeethree.connect64;
  * {@link #getPuzzleValues(int)} to retrieve the specified data for the puzzle.
  * 
  * @author jtwyford
- * @version assignment3
+ * @version 1.0
  * 
  */
 public final class PuzzleFactory {

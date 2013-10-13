@@ -9,7 +9,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  * Helper class to open/create the Scores database.
  * 
  * @author jtwyford
- * @version assignment 3
+ * @version 1.0
  */
 public class ScoresDBHelper extends SQLiteOpenHelper {
 	private static final String DATABASE_NAME = "scores.db";

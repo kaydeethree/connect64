@@ -28,7 +28,7 @@ import android.widget.Toast;
  * API Guide</a> for more information on developing a Settings UI.
  * 
  * @author jtwyford
- * @version assignment3
+ * @version 1.0
  */
 public class SettingsActivity extends PreferenceActivity {
 

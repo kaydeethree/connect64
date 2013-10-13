@@ -44,7 +44,7 @@ import android.widget.Toast;
  * Game logic and GUI handling for the 8x8 board.
  * 
  * @author jtwyford
- * @version assignment3
+ * @version 1.0
  */
 public class Connect64 extends Activity implements
 		AdapterView.OnItemSelectedListener, OnSharedPreferenceChangeListener {

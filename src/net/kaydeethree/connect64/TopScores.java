@@ -17,7 +17,7 @@ import android.widget.SimpleCursorAdapter;
  * Top scores activity.
  * 
  * @author jtwyford
- * @version assignment3
+ * @version 1.0
  */
 public class TopScores extends ListActivity implements
 		LoaderManager.LoaderCallbacks<Cursor> {

@@ -15,8 +15,8 @@ import android.text.TextUtils;
 /**
  * Content provider for the Scores DB.
  * 
- * @author jtwyfor1
- * @version assignment3
+ * @author jtwyford
+ * @version 1.0
  */
 public class ScoresContentProviderDB extends ContentProvider {
 	private static final int ALL_SCORES = 1;

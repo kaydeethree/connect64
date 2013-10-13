@@ -6,7 +6,7 @@ import android.provider.BaseColumns;
  * Contract of the database.
  * 
  * @author jtwyford
- * @version assignment 3
+ * @version 1.0
  * 
  */
 public final class ScoresContract {
@@ -17,7 +17,7 @@ public final class ScoresContract {
 	 * Contract of the Scores table.
 	 * 
 	 * @author jtwyford
-	 * @version assignment3
+	 * @version 1.0
 	 */
 	public static class Scores implements BaseColumns {
 		/** Scores table name. */
